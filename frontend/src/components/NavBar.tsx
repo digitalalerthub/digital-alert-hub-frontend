@@ -1,17 +1,21 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth"; // Hook del contexto global
+// Detecta isLoggedIn y actualiza el menú dinámicamente
+
+import { Link, useNavigate } from "react-router-dom"; // Uso de navegación interna
+import { useAuth } from "../context/useAuth"; // Hook del contexto global de autenticación
 
 const NavBar: React.FC = () => {
   // Obtenemos el estado global de autenticación
+  // Extraemos del contexto si el usuario está logueado y la función para cerrar sesión
   const { isLoggedIn, logout } = useAuth();
   const navigate = useNavigate();
 
-  // 🔹 Cuando el usuario cierra sesión
+  // Función para cuando el usuario cierra sesión
   const handleLogout = () => {
-    logout(); // borra token y cambia el estado global
+    logout(); // Borra token y cambia el estado global
     navigate("/"); // redirige al login
   };
 
+  // Estructura Visual
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3">
       <div className="container-fluid">
@@ -21,7 +25,7 @@ const NavBar: React.FC = () => {
           to={isLoggedIn ? "/dashboard" : "/"}
         >
           <img
-            src="/Logo_Blanco.png" // 👈 Cambia por el nombre real de tu archivo (por ej. /Texto_Slogan_Transparente.png)
+            src="/Logo_Blanco.png" // Cambia por el nombre real de tu archivo (por ej. /Texto_Slogan_Transparente.png)
             alt="Digital Alert Hub Logo"
             width="150"
             height="auto"

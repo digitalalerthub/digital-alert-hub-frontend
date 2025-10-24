@@ -1,3 +1,5 @@
+// Este componente: Envía credenciales, obtiene token, ejecuta login()
+
 import { useState } from "react";
 import type { FormEvent } from "react";
 import api from "../services/api";
