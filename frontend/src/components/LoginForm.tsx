@@ -32,7 +32,7 @@ const LoginForm = () => {
       toast.success("Inicio de sesión exitoso");
 
       // Redirigimos al dashboard sin refrescar la página
-      setTimeout(() => navigate("/dashboard"), 1000);
+      setTimeout(() => navigate("/dashboard"), 800);
     } catch (error: unknown) {
       // Manejo de errores del servidor
       if (axios.isAxiosError(error)) {
@@ -45,7 +45,10 @@ const LoginForm = () => {
 
   return (
     <div className="login-background d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow p-4" style={{ width: "360px", borderRadius: "15px" }}>
+      <div
+        className="card shadow p-4"
+        style={{ width: "360px", borderRadius: "15px" }}
+      >
         <div className="text-center mb-3">
           <i className="bi bi-box-arrow-in-right fs-1 text-primary"></i>
         </div>
@@ -91,7 +94,11 @@ const LoginForm = () => {
             <a href="#" className="d-block text-secondary mb-1 small">
               ¿Olvidaste la contraseña?
             </a>
-            <a href="/register" className="d-block fw-semibold text-primary small">
+
+            <a
+              href="/register"
+              className="d-block fw-semibold text-primary small"
+            >
               ¿Eres un usuario nuevo? Crear cuenta
             </a>
           </div>

@@ -1,21 +1,19 @@
-// Detecta isLoggedIn y actualiza el menú dinámicamente
+// ✅ NavBar dinámico — ahora el menú público SIEMPRE muestra ambos botones (login y registro)
 
-import { Link, useNavigate } from "react-router-dom"; // Uso de navegación interna
-import { useAuth } from "../context/useAuth"; // Hook del contexto global de autenticación
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth";
 
 const NavBar: React.FC = () => {
-  // Obtenemos el estado global de autenticación
-  // Extraemos del contexto si el usuario está logueado y la función para cerrar sesión
-  const { isLoggedIn, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth(); // Estado global: true si hay sesión
+  const navigate = useNavigate(); // Permite navegación programática
+  const location = useLocation(); // saber la ubicación de la ruta
 
-  // Función para cuando el usuario cierra sesión
+  // 🔹 Función para cerrar sesión
   const handleLogout = () => {
-    logout(); // Borra token y cambia el estado global
+    logout(); // limpia el token
     navigate("/"); // redirige al login
   };
 
-  // Estructura Visual
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3">
       <div className="container-fluid">
@@ -25,7 +23,7 @@ const NavBar: React.FC = () => {
           to={isLoggedIn ? "/dashboard" : "/"}
         >
           <img
-            src="/Logo_Blanco.png" // Cambia por el nombre real de tu archivo (por ej. /Texto_Slogan_Transparente.png)
+            src="/Logo_Blanco.png"
             alt="Digital Alert Hub Logo"
             width="150"
             height="auto"
@@ -33,7 +31,7 @@ const NavBar: React.FC = () => {
           />
         </Link>
 
-        {/* Botón hamburguesa para móviles */}
+        {/* Botón hamburguesa (para móviles) */}
         <button
           className="navbar-toggler"
           type="button"
@@ -43,41 +41,45 @@ const NavBar: React.FC = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menú de navegación */}
+        {/* Contenedor del menú */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto">
-            {/* 🔹 Si el usuario está logueado */}
+          <ul className="navbar-nav ms-auto align-items-center">
+            {/* MENÚ PRIVADO: visible solo cuando hay sesión */}
+
             {isLoggedIn ? (
               <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/crear-alertas">
+                    Crear alerta
+                  </Link>
+                </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/dashboard">
                     Dashboard
                   </Link>
                 </li>
-                <li className="nav-item">
-                  <Link className="nav-link" to="/alertas">
-                    Alertas
-                  </Link>
-                </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/perfil">
                     Perfil
                   </Link>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item btn-primary fw-semibold mx-1">
                   <button
                     onClick={handleLogout}
-                    className="btn nav-link text-danger fw-semibold border-0 bg-transparent"
+                    className="btn btn-danger fw-semibold text-white border-0"
                   >
                     Cerrar sesión
                   </button>
                 </li>
               </>
             ) : (
-              /* 🔹 Si NO está logueado */
+              /* MENÚ PÚBLICO: siempre visible cuando no hay sesión */
+
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/inicio">
+                  <Link className="nav-link" to="/">
                     Inicio
                   </Link>
                 </li>
@@ -91,22 +93,24 @@ const NavBar: React.FC = () => {
                     Contacto
                   </Link>
                 </li>
-                <li className="nav-item">
+
+                {/* Botones de acción (siempre visibles en menú público) */}
+                {location.pathname !== "/login" && (
                   <button
                     className="btn btn-outline-light fw-semibold mx-1"
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate("/login")}
                   >
                     Iniciar sesión
                   </button>
-                </li>
-                <li className="nav-item">
+                )}
+                {location.pathname !== "/register" && (
                   <button
                     className="btn btn-primary fw-semibold mx-1"
                     onClick={() => navigate("/register")}
                   >
                     Crear cuenta
                   </button>
-                </li>
+                )}
               </>
             )}
           </ul>

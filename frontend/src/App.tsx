@@ -6,9 +6,13 @@ import "react-toastify/dist/ReactToastify.css"; // Importante para estilos del t
 import "./App.css";
 
 // Importación de las páginas que se van a renderizar
+import HomePage from "./pages/HomePage";
+import QuienesSomosPage from "./pages/QuienesSomosPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ContactoPage from "./pages/ContactoPage";
 import DashboardPage from "./pages/DashboardPage";
+import ProfilePage from "./pages/ProfilePage";
 
 // Importación componentes
 import NavBar from "./components/NavBar";
@@ -16,6 +20,7 @@ import PrivateRoute from "./components/PrivateRoute";
 
 // Contexto global de autenticación, cualquier componente dentro de la app pueda usar useAuth()
 import { AuthProvider } from "./context/AuthProvider";
+import CreateAlertPage from "./pages/CreateAlertPage";
 
 // Componente principal de la aplicación
 function App() {
@@ -26,15 +31,33 @@ function App() {
         <NavBar />
         <Routes>
           {/* Públicas */}
-          <Route path="/" element={<LoginPage />} />
+          <Route path="/" element={<HomePage />} />
+          <Route path="/quienes-somos" element={<QuienesSomosPage />} />
+          <Route path="contacto" element={<ContactoPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-
           {/* Protegidas  El componente PrivateRoute verifica si hay sesión activa, Si sí: renderiza DashboardPage. si no renderiza al login */}
           <Route
             path="/dashboard"
             element={
               <PrivateRoute>
                 <DashboardPage />
+              </PrivateRoute>
+            }
+          />{" "}
+          <Route
+            path="/crear-alertas"
+            element={
+              <PrivateRoute>
+                <CreateAlertPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
               </PrivateRoute>
             }
           />
