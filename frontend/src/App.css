@@ -1,12 +1,18 @@
-body, html, #root {
+body,
+html,
+#root {
   margin: 0;
   height: 100%;
 }
 
+/* Navbar.css o App.css */
+.navbar {
+  background-color: #12182a00 !important; /* El !important es para asegurar que sobrescribe estilos previos, pero intenta evitarlo si puedes */
+}
 
 .register-background,
 .login-background {
-  background-image: url("/Fondo_Inicial.jpg");
+  background-image: url("/Fondo_Formularios.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -19,7 +25,7 @@ body, html, #root {
 }
 
 .navbar-top {
-    z-index: 10; /* Un valor alto para asegurar que esté encima de todo */
+  z-index: 10; /* Un valor alto para asegurar que esté encima de todo */
 }
 
 input.form-control:focus {

@@ -1,69 +1,115 @@
-import { Link } from "react-router-dom";
-import { useState, useEffect } from "react";
-import NavLoggedOut from "./NavLoggedOut";
-import NavLoggedIn from "./NavLoggedIn";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/useAuth"; // Hook del contexto global
 
-// Componente principal de la barra de navegación
-const Navbar: React.FC = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false); // Estado para saber si el usuario está logueado o no
+const NavBar: React.FC = () => {
+  // Obtenemos el estado global de autenticación
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
 
-  // useEffect se ejecuta una vez al montar el componente
-  // Aquí verificamos si existe un token guardado en el localStorage
-  // Si existe, asumimos que el usuario está logueado
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Puedes adaptar según tu lógica de auth
-    if (token) setIsLoggedIn(true);
-  }, []);
-
-  // Función para cerrar sesión
-  // Elimina el token del localStorage y actualiza el estado
-  const handleLogout = (): void => {
-    localStorage.removeItem("token");
-    setIsLoggedIn(false);
+  // 🔹 Cuando el usuario cierra sesión
+  const handleLogout = () => {
+    logout(); // borra token y cambia el estado global
+    navigate("/"); // redirige al login
   };
 
   return (
-    // Navbar con clases de Bootstrap para color, posición y espaciado
-    <nav className="navbar navbar-expand-lg navbar-dark position-absolute w-100 p-3 navbar-top">
-      <div className="container">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3">
+      <div className="container-fluid">
         {/* Logo */}
-        <Link className="navbar-brand" to="/">
+        <Link
+          className="navbar-brand fw-bold"
+          to={isLoggedIn ? "/dashboard" : "/"}
+        >
           <img
-            src="/Texto_Slogan_Transparente.png"
-            alt="Logo"
-            width="280"
-            height="80"
+            src="/Logo_Blanco.png" // 👈 Cambia por el nombre real de tu archivo (por ej. /Texto_Slogan_Transparente.png)
+            alt="Digital Alert Hub Logo"
+            width="150"
+            height="auto"
+            className="me-2"
           />
         </Link>
 
-        {/* Botón tipo "hamburguesa" para el menú en dispositivos móviles */}
+        {/* Botón hamburguesa para móviles */}
         <button
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Contenedor colapsable del menú */}
-        {/* Si el usuario está logueado, mostramos NavLoggedIn */}
-        {/* Si no lo está, mostramos NavLoggedOut */}
-
-        {/* Menú según autenticación */}
+        {/* Menú de navegación */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          {isLoggedIn ? (
-            <NavLoggedIn handleLogout={handleLogout} />
-          ) : (
-            <NavLoggedOut />
-          )}
+          <ul className="navbar-nav ms-auto">
+            {/* 🔹 Si el usuario está logueado */}
+            {isLoggedIn ? (
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/dashboard">
+                    Dashboard
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/alertas">
+                    Alertas
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/perfil">
+                    Perfil
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    onClick={handleLogout}
+                    className="btn nav-link text-danger fw-semibold border-0 bg-transparent"
+                  >
+                    Cerrar sesión
+                  </button>
+                </li>
+              </>
+            ) : (
+              /* 🔹 Si NO está logueado */
+              <>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/inicio">
+                    Inicio
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/quienes-somos">
+                    Quiénes somos
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link" to="/contacto">
+                    Contacto
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-outline-light fw-semibold mx-1"
+                    onClick={() => navigate("/")}
+                  >
+                    Iniciar sesión
+                  </button>
+                </li>
+                <li className="nav-item">
+                  <button
+                    className="btn btn-primary fw-semibold mx-1"
+                    onClick={() => navigate("/register")}
+                  >
+                    Crear cuenta
+                  </button>
+                </li>
+              </>
+            )}
+          </ul>
         </div>
       </div>
     </nav>
   );
 };
 
-export default Navbar;
+export default NavBar;
