@@ -1,4 +1,5 @@
-// Define la estructura del contexto global, es decir, qué datos y funciones estarán disponibles (por ejemplo: isLoggedIn, login, logout).
+/* Define la estructura del contexto global, es decir, qué datos y funciones estarán disponibles 
+(por ejemplo: isLoggedIn, login, logout).*/
 
 import { createContext } from "react";
 
@@ -8,7 +9,7 @@ interface AuthContextType {
   logout: () => void;
 }
 
-// 👇 Solo exportamos el contexto, sin lógica
+// Solo exportamos el contexto, sin lógica
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
 );

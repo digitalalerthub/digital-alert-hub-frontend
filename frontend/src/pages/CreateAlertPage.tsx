@@ -13,5 +13,5 @@ const CreateAlertPage: React.FC = () => {
 
 export default CreateAlertPage;
 
-// Esta será la página protegida que se ve solo si el usuario está logueado
+
 

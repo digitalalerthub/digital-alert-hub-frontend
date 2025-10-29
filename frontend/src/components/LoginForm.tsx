@@ -6,7 +6,7 @@ import api from "../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth"; // 🔹 Importamos el contexto
+import { useAuth } from "../context/useAuth"; // Importamos el contexto
 import "../App.css";
 
 const LoginForm = () => {
@@ -18,7 +18,7 @@ const LoginForm = () => {
   // Obtenemos la función login del contexto
   const { login } = useAuth();
 
-  // 🔹 Función para enviar el formulario
+  // Función para enviar el formulario
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -37,6 +37,7 @@ const LoginForm = () => {
       // Manejo de errores del servidor
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "Error en el login");
+        setPassword("");
       } else {
         toast.error("Error desconocido");
       }
@@ -91,7 +92,10 @@ const LoginForm = () => {
 
           {/* Enlaces secundarios */}
           <div className="text-center">
-            <a href="#" className="d-block text-secondary mb-1 small">
+            <a
+              href="/forgot-password"
+              className="d-block text-secondary mb-1 small"
+            >
               ¿Olvidaste la contraseña?
             </a>
 

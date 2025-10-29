@@ -1,5 +1,5 @@
-/* Es el cerebro del sistema de autenticación. Guarda si el usuario está logueado, permite iniciar o cerrar sesión, y comparte esa información con toda la app.
-Guarda token, cambia isLoggedIn = true */
+/* Es el cerebro del sistema de autenticación. Guarda si el usuario está logueado, permite iniciar o cerrar sesión, 
+y comparte esa información con toda la app. Guarda token, cambia isLoggedIn = true */
 
 import { useState, useEffect, type ReactNode } from "react"; // Manejar estados y ejecución de la logica del componente
 import { AuthContext } from "./AuthContext"; // Contexto estado de autenticación

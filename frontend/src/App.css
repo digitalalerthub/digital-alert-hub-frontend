@@ -5,6 +5,11 @@ html,
   height: 100%;
 }
 
+h2{
+  font-size: 25px;
+  text-align: center;
+}
+
 /* Navbar.css o App.css */
 .navbar {
   background-color: #12182a00 !important; /* El !important es para asegurar que sobrescribe estilos previos, pero intenta evitarlo si puedes */
