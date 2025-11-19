@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css"; // Importante para estilos del t
 import "./App.css";
 
 // Importación de las páginas que se van a renderizar
-import HomePage from "./pages/HomePage";
+import HomePage from "./pages/Home/HomePage";
 import QuienesSomosPage from "./pages/QuienesSomosPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -35,7 +35,7 @@ function App() {
         <NavBar />
         <Routes>
           {/* Públicas */}
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage/>} />
           <Route path="/quienes-somos" element={<QuienesSomosPage />} />
           <Route path="contacto" element={<ContactoPage />} />
           <Route path="/login" element={<LoginPage />} />

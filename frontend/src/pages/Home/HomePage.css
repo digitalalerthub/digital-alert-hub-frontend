@@ -1,0 +1,26 @@
+.home-container {
+  background-image: url("/Fondo_Formularios.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Opcional: para que el contenido no pegue al borde */
+.home-container section {
+  padding-top: 40px;
+}
+
+@media (max-width: 768px) {
+  .hero-section img {
+    width: 300px !important;
+  }
+}
+
+.hero-section {
+  padding-top: 120px;
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+}
