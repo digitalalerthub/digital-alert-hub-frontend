@@ -1,46 +1,37 @@
-// ✅ NavBar dinámico — ahora el menú público SIEMPRE muestra ambos botones (login y registro)
+// NavBar dinámico — ahora el menú público SIEMPRE muestra ambos botones (login y registro)
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
-import { useHideOnScroll } from "../hooks/useHideOnScroll";
 
 const NavBar: React.FC = () => {
-  const { isLoggedIn, logout } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  // 👇 AQUÍ es donde DEBE ir el hook (dentro del componente)
-  const hidden = useHideOnScroll();
+  const { isLoggedIn, logout } = useAuth(); // Estado global: true si hay sesión
+  const navigate = useNavigate(); // Permite navegación programática
+  const location = useLocation(); // saber la ubicación de la ruta
 
   // 🔹 Función para cerrar sesión
   const handleLogout = () => {
-    logout();
-    navigate("/");
+    logout(); // limpia el token
+    navigate("/"); // redirige al login
   };
 
   return (
-    <nav
-      className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3 ${
-        hidden ? "navbar-hidden" : ""
-      }`}
-    >
+    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3">
       <div className="container-fluid">
-
         {/* Logo */}
         <Link
           className="navbar-brand fw-bold"
           to={isLoggedIn ? "/dashboard" : "/"}
         >
           <img
-            src="/logoSinFondo.png"
+            src="/Logo_transparente.png"
             alt="Digital Alert Hub Logo"
-            width="90"
+            width="150"
             height="auto"
             className="me-2"
           />
         </Link>
 
-        {/* Botón hamburguesa */}
+        {/* Botón hamburguesa (para móviles) */}
         <button
           className="navbar-toggler"
           type="button"
@@ -53,6 +44,7 @@ const NavBar: React.FC = () => {
         {/* Contenedor del menú */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">
+            {/* MENÚ PRIVADO: visible solo cuando hay sesión */}
 
             {isLoggedIn ? (
               <>
@@ -68,12 +60,6 @@ const NavBar: React.FC = () => {
                   </Link>
                 </li>
 
-                <li className="nav-item">
-                  <Link className="nav-link" to="/perfil">
-                    Perfil
-                  </Link>
-                </li>
-
                 <li className="nav-item btn-primary fw-semibold mx-1">
                   <button
                     onClick={handleLogout}
@@ -84,27 +70,31 @@ const NavBar: React.FC = () => {
                 </li>
               </>
             ) : (
+              /* MENÚ PÚBLICO: siempre visible cuando no hay sesión */
+
               <>
-                {/* MENÚ PÚBLICO */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/">
                     Inicio
                   </Link>
                 </li>
-
+                <li className="nav-item">
+                  <Link className="nav-link" to="/perfil">
+                    Perfil
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <Link className="nav-link" to="/quienes-somos">
                     Quiénes somos
                   </Link>
                 </li>
-
                 <li className="nav-item">
                   <Link className="nav-link" to="/contacto">
                     Contacto
                   </Link>
                 </li>
 
-                {/* Botones de acción */}
+                {/* Botones de acción (siempre visibles en menú público) */}
                 {location.pathname !== "/login" && (
                   <button
                     className="btn btn-outline-light fw-semibold mx-1"
@@ -113,7 +103,6 @@ const NavBar: React.FC = () => {
                     Iniciar sesión
                   </button>
                 )}
-
                 {location.pathname !== "/register" && (
                   <button
                     className="btn btn-primary fw-semibold mx-1"

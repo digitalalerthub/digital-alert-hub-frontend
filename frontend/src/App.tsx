@@ -37,6 +37,7 @@ function App() {
           {/* Públicas */}
           <Route path="/" element={<HomePage/>} />
           <Route path="/quienes-somos" element={<QuienesSomosPage />} />
+          <Route path="/perfil" element={< ProfilePage />} />
           <Route path="contacto" element={<ContactoPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -62,6 +63,7 @@ function App() {
               </PrivateRoute>
             }
           />
+           {/*
           <Route
             path="/perfil"
             element={
@@ -70,6 +72,7 @@ function App() {
               </PrivateRoute>
             }
           />
+           */}
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
       </Router>
