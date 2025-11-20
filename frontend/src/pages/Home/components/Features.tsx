@@ -1,48 +1,60 @@
-import React from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Card } from "react-bootstrap";
+import "./Features.css";
 
-const Features: React.FC = () => {
+const items = [
+  {
+    img: "/img01.jpg",
+    title: "Reportar alertas",
+    text: "Envía incidentes como deslizamientos, daños viales y más."
+  },
+  {
+    img: "/img02.jpeg",
+    title: "Ver alertas cercanas",
+    text: "Explora problemas de tu barrio en tiempo real."
+  },
+  {
+    img: "/img03.jpg",
+    title: "Conectar con autoridades",
+    text: "Tu reporte llega a quienes pueden resolverlo."
+  },
+  {
+    img: "/img04.jpg",
+    title: "Noticias en tiempo real",
+    text: "Mantente informado de alertas importantes."
+  },
+  {
+    img: "/img05.jpg",
+    title: "Comunidad conectada",
+    text: "Comparte info y apoya a tus vecinos."
+  },
+];
+
+const Features = () => {
+  const navigate = useNavigate();
+
   return (
-    <section id="features" className="py-5">
-      <Container>
-        <h2 className="text-center fw-bold mb-4">¿Qué puedes hacer aquí?</h2>
+    <div className="carousel-infinite">
 
-        <Row className="g-4">
-          <Col md={4}>
-            <Card className="h-100 shadow-sm">
+      <div className="carousel-track">
+        {[...items, ...items].map((item, index) => (
+          <div
+            key={index}
+            className="carousel-card"
+            onClick={() => navigate("/login")}
+            style={{ cursor: "pointer" }}
+          >
+            <Card className="shadow-sm h-100">
+              <Card.Img src={item.img} />
               <Card.Body>
-                <Card.Title>Reportar alertas</Card.Title>
-                <Card.Text>
-                  Envía incidentes como daños viales, deslizamientos, fallas eléctricas y más.
-                </Card.Text>
+                <Card.Title>{item.title}</Card.Title>
+                <Card.Text>{item.text}</Card.Text>
               </Card.Body>
             </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="h-100 shadow-sm">
-              <Card.Body>
-                <Card.Title>Ver alertas cercanas</Card.Title>
-                <Card.Text>
-                  Explora en el mapa los problemas de tu barrio en tiempo real.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={4}>
-            <Card className="h-100 shadow-sm">
-              <Card.Body>
-                <Card.Title>Conectar con autoridades</Card.Title>
-                <Card.Text>
-                  Tu reporte llega a quienes realmente pueden solucionarlo.
-                </Card.Text>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </section>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 

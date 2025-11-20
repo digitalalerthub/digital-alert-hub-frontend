@@ -1,0 +1,71 @@
+/* Fondo igual al hero */
+.stats-strip {
+  width: 100%;
+  background-image: url("/Fondo_Formularios.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  padding: 40px 0;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Franja oscura semitransparente opcional (queda brutal) */
+.stats-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(2px);
+}
+
+/* Track que se mueve */
+.stats-track {
+  display: flex;
+  gap: 80px;
+  width: max-content;
+  animation: slideStats 25s linear infinite;
+  position: relative;
+  z-index: 2; /* Para quedar encima del overlay */
+}
+
+.stats-item {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  color: white;
+  min-width: 300px;
+}
+
+.stats-label {
+  font-size: 18px;
+  opacity: 0.9;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.stats-value {
+  font-size: 42px;
+  font-weight: 800;
+}
+
+/* Animación continua sin saltos */
+@keyframes slideStats {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-380px * 4));
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-item {
+    min-width: 240px;
+  }
+
+  .stats-value {
+    font-size: 32px;
+  }
+}

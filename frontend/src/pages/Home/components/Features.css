@@ -1,0 +1,42 @@
+.carousel-infinite {
+  width: 100%;
+  overflow: hidden;
+  padding: 40px 0;
+}
+
+.carousel-track {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 20px;
+  width: max-content;
+  animation: scroll 30s linear infinite;
+}
+
+.carousel-card {
+  flex: 0 0 300px;
+}
+
+.carousel-card img {
+  height: 220px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+/* ✨ Loop perfecto sin salto */
+@keyframes scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-300px * 5 - 20px * 5));
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-card {
+    flex: 0 0 240px;
+  }
+  .carousel-card img {
+    height: 180px;
+  }
+}

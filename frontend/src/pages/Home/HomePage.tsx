@@ -1,22 +1,16 @@
-import React from "react";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
+import CarouselInfo from "./components/CarouselInfo";
 import Footer from "./components/Footer";
-import NavBar from "../../components/NavBar";
 
-import "./HomePage.css"; // CSS propio del Home
-
-const Home: React.FC = () => {
+const Home = () => {
   return (
-    <div className="home-container">
-      <NavBar />
-
+    <>
       <Hero />
-
       <Features />
-
-      <Footer />
-    </div>
+      <CarouselInfo />
+      <Footer/>
+    </>
   );
 };
 
