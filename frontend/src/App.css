@@ -31,6 +31,12 @@ h2{
   left: 0;
 }
 
+.navbar {
+  font-weight: 700;
+  font-size: 18px;
+  background-color: #12182a00 !important; /* El !important es para asegurar que sobrescribe estilos previos, pero intenta evitarlo si puedes */
+}
+
 .navbar-top {
   z-index: 10; /* Un valor alto para asegurar que esté encima de todo */
 }

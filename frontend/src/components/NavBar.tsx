@@ -12,23 +12,44 @@ const NavBar: React.FC = () => {
   const navigate = useNavigate(); // Permite navegación programática
   const location = useLocation(); // saber la ubicación de la ruta
 
-  // 🔹 Función para cerrar sesión
+  // Función para cerrar sesión
   const handleLogout = () => {
     logout(); // limpia el token
     navigate("/"); // redirige al login
   };
 
+    // Función para definir el color del navbar según la ruta
+  const NavBarTextColor = () => {
+    switch (location.pathname) {
+      case "/":
+        return "#ffffff";
+      case "/quienes-somos":
+        return "#ffffff";
+      case "/contacto":
+        return "#ffffff"; // azul
+      case "/dashboard":
+        return "#ffc107"; // amarillo
+      case "/perfil":
+        return "#ffc107"; // amarillo
+      default:
+        return "#ffffff";
+    }
+  };
+
+  
+  const textColor = NavBarTextColor(); // llama la funcion de definir colores menu segun la ruta
+
   return (
     <nav
       className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${hidden ? "navbar-hidden" : ""
-        }`}
+        }`}      style={{ color: textColor }}
     >
 
       <div className="container-fluid">
         {/* Logo */}
         <Link
           className="navbar-brand fw-bold"
-          to={isLoggedIn ? "/dashboard" : "/"}
+          to={isLoggedIn ? "/dashboard" : "/"} style={{ color: textColor }}
         >
           <img
             src="/Logo_transparente.png"
@@ -57,13 +78,13 @@ const NavBar: React.FC = () => {
             {isLoggedIn ? (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/crear-alertas">
+                  <Link className="nav-link" to="/crear-alertas" style={{ color: textColor }}> 
                     Crear alerta
                   </Link>
                 </li>
 
                 <li className="nav-item">
-                  <Link className="nav-link" to="/dashboard">
+                  <Link className="nav-link" to="/dashboard" style={{ color: textColor }}>
                     Dashboard
                   </Link>
                 </li>
@@ -82,22 +103,22 @@ const NavBar: React.FC = () => {
 
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/">
+                  <Link className="nav-link" to="/" style={{ color: textColor }}>
                     Inicio
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/perfil">
+                  <Link className="nav-link" to="/perfil" style={{ color: textColor }}>
                     Perfil
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/quienes-somos">
+                  <Link className="nav-link" to="/quienes-somos" style={{ color: textColor }}>
                     Quiénes somos
                   </Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/contacto">
+                  <Link className="nav-link" to="/contacto" style={{ color: textColor }}>
                     Contacto
                   </Link>
                 </li>
