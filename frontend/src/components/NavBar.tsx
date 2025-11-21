@@ -2,8 +2,12 @@
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
+import { useHideOnScroll } from "../hooks/useHideOnScroll";
+
 
 const NavBar: React.FC = () => {
+  const hidden = useHideOnScroll();
+
   const { isLoggedIn, logout } = useAuth(); // Estado global: true si hay sesión
   const navigate = useNavigate(); // Permite navegación programática
   const location = useLocation(); // saber la ubicación de la ruta
@@ -15,7 +19,11 @@ const NavBar: React.FC = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-3">
+    <nav
+      className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${hidden ? "navbar-hidden" : ""
+        }`}
+    >
+
       <div className="container-fluid">
         {/* Logo */}
         <Link
@@ -25,7 +33,7 @@ const NavBar: React.FC = () => {
           <img
             src="/Logo_transparente.png"
             alt="Digital Alert Hub Logo"
-            width="150"
+            width="110"
             height="auto"
             className="me-2"
           />

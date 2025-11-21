@@ -42,10 +42,9 @@ input.form-control:focus {
 
 .navbar-hidden {
   transform: translateY(-100%);
-  transition: transform 0.3s ease;
+  transition: transform 0.45s ease-in-out;
 }
 
 nav.navbar {
-  transition: transform 0.3s ease;
+  transition: transform 0.45s ease-in-out;
 }
-
