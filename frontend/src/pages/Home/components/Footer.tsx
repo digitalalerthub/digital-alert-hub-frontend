@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
             </Link>
 
             <p className="mt-3 small">
-              Construyendo comunidades más seguras con tecnología.
+              La red inteligente de alertas ciudadanas.
             </p>
           </Col>
 

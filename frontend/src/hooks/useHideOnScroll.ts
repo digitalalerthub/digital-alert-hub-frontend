@@ -6,12 +6,23 @@ export function useHideOnScroll() {
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > lastScrollY && window.scrollY > 80) {
-        setHidden(true);  // ocultar navbar al bajar
+      const current = window.scrollY;
+
+      // ↓↓↓ LÓGICA EXACTA QUE TÚ PEDISTE ↓↓↓
+
+      if (current < 80) {
+        // 👉 Estás arriba → siempre mostrar navbar
+        setHidden(false);
       } else {
-        setHidden(false); // mostrar navbar al subir
+        if (current > lastScrollY) {
+          // 👉 Bajando → ocultar
+          setHidden(true);
+        } else {
+          // 👉 Subiendo → NO mostrar hasta llegar arriba
+          setHidden(true);
+        }
       }
-      setLastScrollY(window.scrollY);
+      setLastScrollY(current);
     };
 
     window.addEventListener("scroll", handleScroll);

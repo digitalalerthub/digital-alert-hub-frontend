@@ -1,7 +1,10 @@
+
+
 .carousel-infinite {
   width: 100%;
   overflow: hidden;
   padding: 40px 0;
+  background: whitesmoke
 }
 
 .carousel-track {
@@ -9,7 +12,7 @@
   flex-wrap: nowrap;
   gap: 20px;
   width: max-content;
-  animation: scroll 30s linear infinite;
+  animation: scroll 50s linear infinite;
 }
 
 .carousel-card {

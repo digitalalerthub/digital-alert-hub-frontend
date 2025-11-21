@@ -6,30 +6,35 @@ const Hero = () => {
     <section className="hero-section text-white d-flex align-items-center">
 
       <div className="w-100 d-flex justify-content-center">
-        <div 
+        <div
           className="d-flex align-items-center flex-wrap justify-content-center"
           style={{ maxWidth: "1200px", gap: "40px", minHeight: "70vh" }}
         >
 
           {/* COLUMNA IZQUIERDA */}
-          <div 
+          <div
             className="d-flex flex-column text-start"
-            style={{ maxWidth: "480px" }}
+            style={{ maxWidth: "580px" }}
           >
             <h1 className="fw-bold display-5">
               ¡TU <span className="text-danger">ALERTA</span>, <br />
-              NUESTRA <span className="text-info">ACCIÓN</span>! 🚨
+              NUESTRA <span className="text-info">ACCIÓN</span>!
+              <span className="alert-icon">
+                <img src="/alertaIcono.png" alt="alert icon" />
+              </span>
             </h1>
 
+
             <p className="mt-3 mb-4 lead">
-              La forma más rápida de informar riesgos en tu comunidad.  
-              Envía evidencias y ubicación para que las JAC actúen.
+              La forma más rápida de informar riesgos <br />  
+              en tu comunidad. Envía evidencias y <br />
+              ubicación para que las JAC actúen.
             </p>
 
             <div className="text-center">
-              <Button 
-                variant="danger" 
-                size="lg" 
+              <Button
+                variant="danger"
+                size="lg"
                 href="/login"
                 className="rounded-pill px-5"
               >

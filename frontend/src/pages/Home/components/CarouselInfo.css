@@ -11,7 +11,7 @@
   position: relative;
 }
 
-/* Franja oscura semitransparente opcional (queda brutal) */
+/* Franja oscura semitransparente opcional */
 .stats-strip::before {
   content: "";
   position: absolute;
@@ -25,7 +25,7 @@
   display: flex;
   gap: 80px;
   width: max-content;
-  animation: slideStats 25s linear infinite;
+  animation: slideStats 15s linear infinite;
   position: relative;
   z-index: 2; /* Para quedar encima del overlay */
 }

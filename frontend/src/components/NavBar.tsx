@@ -116,7 +116,7 @@ const NavBar: React.FC = () => {
 
                 {location.pathname !== "/register" && (
                   <button
-                    className="btn btn-primary fw-semibold mx-1"
+                    className="btn btn-danger fw-semibold mx-1"
                     onClick={() => navigate("/register")}
                   >
                     Crear cuenta
