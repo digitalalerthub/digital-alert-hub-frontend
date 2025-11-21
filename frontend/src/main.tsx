@@ -5,6 +5,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js"; // Esto activa el colapso de
 import "react-toastify/dist/ReactToastify.css"; // Notificaciones
 import "bootstrap-icons/font/bootstrap-icons.css"; // Iconos de Bootstrap
 
+
 import "./App.css";
 
 import App from "./App.tsx";

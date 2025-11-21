@@ -33,7 +33,7 @@ const ForgotPasswordPage = () => {
       <div className="login-background d-flex justify-content-center align-items-center vh-100 bg-light">
         <div
           className="card shadow p-4"
-          style={{ width: "360px", borderRadius: "15px" }}
+          style={{ width: "340px", borderRadius: "15px" }}
         >
           <div className="text-center mb-3">
             <i className="bi bi-check-circle fs-1 text-success"></i>
