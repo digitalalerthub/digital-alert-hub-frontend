@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "./ImpactSection.css";
 
 export default function ImpactSection() {
@@ -41,10 +42,12 @@ export default function ImpactSection() {
 
       {/* CTA */}
       <div className="text-center mt-5">
+        <Link to="/login">
         <button className="btninfe btn-lg rounded-3 fw-bold px-5 py-2 shadow-sm">
           <i className="bi bi-shield-lock me-2"></i>
           Activar Mis Alertas Ahora
         </button>
+        </Link>
       </div>
     </div>
   );

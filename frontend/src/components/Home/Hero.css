@@ -1,17 +1,3 @@
-.home-container {
-  background-image: url("/Fondo_Formularios.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  min-height: 100vh;
-  width: 100%;
-}
-
-/* Opcional: para que el contenido no pegue al borde */
-.home-container section {
-  padding-top: 40px;
-}
-
 .hero-section {
   min-height: 100vh;
   padding-top: 120px;
@@ -20,19 +6,7 @@
       rgba(0, 0, 0, 0.55),
       rgba(0, 0, 0, 0.55)
     ),
-    url("/Fondo_Formularios.png") center/cover no-repeat;
-}
-
-@media (max-width: 768px) {
-  .hero-section img {
-    width: 280px !important;
-  }
-}
-
-
-.carousel .card img {
-  height: 300px;
-  object-fit: cover;
+    url("/Banner_Home.jpg") center/cover no-repeat;
 }
 
 .alert-icon {
@@ -54,4 +28,3 @@
   height: 100%;
   object-fit: contain;
 }
-

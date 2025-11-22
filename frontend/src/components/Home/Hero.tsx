@@ -1,5 +1,5 @@
-import { Container, Button } from "react-bootstrap";
-import "../HomePage.css";
+import {Button} from "react-bootstrap";
+import "./Hero.css";
 
 const Hero = () => {
   return (

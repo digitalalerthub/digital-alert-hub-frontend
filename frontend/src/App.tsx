@@ -6,7 +6,7 @@ import "react-toastify/dist/ReactToastify.css"; // Importante para estilos del t
 import "./App.css";
 
 // Importación de las páginas que se van a renderizar
-import HomePage from "./pages/Home/HomePage";
+import HomePage from "./pages/HomePage";
 import QuienesSomosPage from "./pages/QuienesSomosPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
