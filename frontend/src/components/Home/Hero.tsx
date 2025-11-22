@@ -1,5 +1,10 @@
+<<<<<<< HEAD:frontend/src/components/Home/Hero.tsx
 import { Button } from "react-bootstrap"; // Importa el componente Button de React Bootstrap para usar botones ya estilizados.
 import "./Hero.css";
+=======
+import { Button } from "react-bootstrap";
+import "../HomePage.css";
+>>>>>>> 085e1ef (Cambios antes de traer los nuevos cambios de Andres):frontend/src/pages/Home/components/Hero.tsx
 
 const Hero = () => {
   return (
