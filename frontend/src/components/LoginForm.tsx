@@ -6,35 +6,26 @@ import api from "../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth"; // Importamos el contexto
+import { useAuth } from "../context/useAuth"; 
 import "../App.css";
+import GoogleButton from "./Auth/GoogleButton";
 
 const LoginForm = () => {
-  // Estados locales del formulario
   const [email, setEmail] = useState("");
   const [contrasena, setPassword] = useState("");
   const navigate = useNavigate();
-
-  // Obtenemos la función login del contexto
   const { login } = useAuth();
 
-  // Función para enviar el formulario
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
-      // Petición al backend
       const res = await api.post("/auth/login", { email, contrasena });
-
-      // Guardamos el token y actualizamos el contexto global
       login(res.data.token);
 
       toast.success("Inicio de sesión exitoso");
-
-      // Redirigimos al dashboard sin refrescar la página
       setTimeout(() => navigate("/dashboard"), 800);
     } catch (error: unknown) {
-      // Manejo de errores del servidor
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "Error en el login");
         setPassword("");
@@ -46,10 +37,8 @@ const LoginForm = () => {
 
   return (
     <div className="login-background d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div
-        className="card shadow p-4"
-        style={{ width: "360px", borderRadius: "15px" }}
-      >
+      <div className="card shadow p-4" style={{ width: "360px", borderRadius: "15px" }}>
+        
         <div className="text-center mb-3">
           <i className="bi bi-box-arrow-in-right fs-1 text-primary"></i>
         </div>
@@ -57,6 +46,7 @@ const LoginForm = () => {
         <h3 className="text-center mb-4 fw-bold">Iniciar Sesión</h3>
 
         <form onSubmit={handleSubmit}>
+          
           {/* Campo Email */}
           <div className="position-relative mb-3">
             <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
@@ -90,6 +80,11 @@ const LoginForm = () => {
             </button>
           </div>
 
+          {/* BOTÓN DE GOOGLE */}
+          <div className="d-flex justify-content-center mb-3">
+            <GoogleButton />
+          </div>
+
           {/* Enlaces secundarios */}
           <div className="text-center">
             <a
@@ -111,5 +106,6 @@ const LoginForm = () => {
     </div>
   );
 };
+
 
 export default LoginForm;

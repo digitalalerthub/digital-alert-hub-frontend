@@ -1,32 +1,35 @@
-// NavBar dinámico — ahora el menú público SIEMPRE muestra ambos botones (login y registro)
-
+// Hook para navegar entre páginas sin recargar
 import { Link, useLocation, useNavigate } from "react-router-dom";
+
+// Hook de autenticación global (estado de sesión)
 import { useAuth } from "../context/useAuth";
+
+// Hook personalizado: oculta el navbar cuando el usuario hace scroll hacia abajo
 import { useHideOnScroll } from "../hooks/useHideOnScroll";
 
 
 const NavBar: React.FC = () => {
-  const hidden = useHideOnScroll();
+  const hidden = useHideOnScroll(); // true si debe esconderse el navbar
 
-  const { isLoggedIn, logout } = useAuth(); // Estado global: true si hay sesión
-  const navigate = useNavigate(); // Permite navegación programática
-  const location = useLocation(); // saber la ubicación de la ruta
+  const { isLoggedIn, logout } = useAuth(); // Estado actual de login y función para cerrar sesión
+  const navigate = useNavigate(); // Permite redirigir desde código
+  const location = useLocation(); // Saber en qué ruta estamos
 
-  // Función para cerrar sesión
+  // Cierra sesión y manda al usuario al home
   const handleLogout = () => {
-    logout(); // limpia el token
-    navigate("/"); // redirige al login
+    logout();     // Limpia token o sesión
+    navigate("/"); // Redirige al inicio
   };
 
-    // Función para definir el color del navbar según la ruta
+  // Cambia el color del texto del navbar dependiendo de la ruta
   const NavBarTextColor = () => {
     switch (location.pathname) {
       case "/":
-        return "#ffffff";
+        return "#ffffff"; // blanco
       case "/quienes-somos":
         return "#ffffff";
       case "/contacto":
-        return "#ffffff"; // azul
+        return "#ffffff";
       case "/dashboard":
         return "#ffc107"; // amarillo
       case "/perfil":
@@ -36,20 +39,25 @@ const NavBar: React.FC = () => {
     }
   };
 
-  
-  const textColor = NavBarTextColor(); // llama la funcion de definir colores menu segun la ruta
+  // Color ya calculado para usarlo en varios elementos
+  const textColor = NavBarTextColor();
+
 
   return (
     <nav
-      className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${hidden ? "navbar-hidden" : ""
-        }`}      style={{ color: textColor }}
+      className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${
+        hidden ? "navbar-hidden" : "" // Agrega clase si el navbar debe ocultarse
+      }`}
+      style={{ color: textColor }} // Cambia color del texto según ruta
     >
 
       <div className="container-fluid">
-        {/* Logo */}
+
+        {/* LOGO — clicable, lleva al dashboard si hay sesión; si no, al home */}
         <Link
           className="navbar-brand fw-bold"
-          to={isLoggedIn ? "/dashboard" : "/"} style={{ color: textColor }}
+          to={isLoggedIn ? "/dashboard" : "/"}
+          style={{ color: textColor }}
         >
           <img
             src="/Logo_transparente.png"
@@ -60,7 +68,7 @@ const NavBar: React.FC = () => {
           />
         </Link>
 
-        {/* Botón hamburguesa (para móviles) */}
+        {/* Botón hamburguesa para móviles */}
         <button
           className="navbar-toggler"
           type="button"
@@ -73,22 +81,35 @@ const NavBar: React.FC = () => {
         {/* Contenedor del menú */}
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">
-            {/* MENÚ PRIVADO: visible solo cuando hay sesión */}
 
+            {/* ===========================
+                MENÚ PRIVADO (usuario logueado)
+               ============================ */}
             {isLoggedIn ? (
               <>
+                {/* Crear alerta */}
                 <li className="nav-item">
-                  <Link className="nav-link" to="/crear-alertas" style={{ color: textColor }}> 
+                  <Link
+                    className="nav-link"
+                    to="/crear-alertas"
+                    style={{ color: textColor }}
+                  >
                     Crear alerta
                   </Link>
                 </li>
 
+                {/* Dashboard */}
                 <li className="nav-item">
-                  <Link className="nav-link" to="/dashboard" style={{ color: textColor }}>
+                  <Link
+                    className="nav-link"
+                    to="/dashboard"
+                    style={{ color: textColor }}
+                  >
                     Dashboard
                   </Link>
                 </li>
 
+                {/* Botón cerrar sesión */}
                 <li className="nav-item btn-primary fw-semibold mx-1">
                   <button
                     onClick={handleLogout}
@@ -98,32 +119,38 @@ const NavBar: React.FC = () => {
                   </button>
                 </li>
               </>
-            ) : (
-              /* MENÚ PÚBLICO: siempre visible cuando no hay sesión */
 
+            ) : (
+              /* ===========================
+                 MENÚ PÚBLICO (no logueado)
+                 ============================ */
               <>
+                {/* Links del menú público */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/" style={{ color: textColor }}>
                     Inicio
                   </Link>
                 </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/perfil" style={{ color: textColor }}>
                     Perfil
                   </Link>
                 </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/quienes-somos" style={{ color: textColor }}>
                     Quiénes somos
                   </Link>
                 </li>
+
                 <li className="nav-item">
                   <Link className="nav-link" to="/contacto" style={{ color: textColor }}>
                     Contacto
                   </Link>
                 </li>
 
-                {/* Botones de acción (siempre visibles en menú público) */}
+                {/* Botón iniciar sesión (solo si no está ya en /login) */}
                 {location.pathname !== "/login" && (
                   <button
                     className="btn btn-outline-light fw-semibold mx-1"
@@ -132,6 +159,8 @@ const NavBar: React.FC = () => {
                     Iniciar sesión
                   </button>
                 )}
+
+                {/* Botón registro (solo si no está en /register) */}
                 {location.pathname !== "/register" && (
                   <button
                     className="btn btn-danger fw-semibold mx-1"
@@ -144,6 +173,7 @@ const NavBar: React.FC = () => {
             )}
           </ul>
         </div>
+
       </div>
     </nav>
   );

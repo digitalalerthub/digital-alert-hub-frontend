@@ -1,7 +1,12 @@
+// Importa los componentes de layout de React Bootstrap (grid responsiva)
 import { Container, Row, Col } from "react-bootstrap";
+
+// Link de React Router para navegación sin recargar la página
 import { Link } from "react-router-dom";
+
 import "../App.css";
 
+// Lista de redes sociales con su ícono y URL
 const socialIcons = [
   { icon: "bi-facebook", url: "#" },
   { icon: "bi-instagram", url: "#" },
@@ -11,12 +16,16 @@ const socialIcons = [
 
 const Footer: React.FC = () => {
   return (
+    // Sección completa del footer con estilo oscuro
     <footer className="footer-section text-light">
       <Container>
         <Row className="gy-4">
 
-          {/* Logo → Registro */}
+          {/* =====================
+              Columna 1: Logo + Texto
+             ===================== */}
           <Col md={4} className="text-center text-md-start">
+            {/* Logo que al hacer clic te envía al registro */}
             <Link to="/register">
               <img
                 src="/logoSinFondo.png"
@@ -30,7 +39,9 @@ const Footer: React.FC = () => {
             </p>
           </Col>
 
-          {/* Contacto */}
+          {/* =====================
+              Columna 2: Datos de contacto
+             ===================== */}
           <Col md={4} className="text-center">
             <h5 className="fw-bold mb-3">Contacto</h5>
             <p className="m-0">📍 Medellín, Colombia</p>
@@ -38,10 +49,13 @@ const Footer: React.FC = () => {
             <p className="m-0">📞 +57 300 000 0000</p>
           </Col>
 
-          {/* Redes con íconos */}
+          {/* =====================
+              Columna 3: Redes sociales
+             ===================== */}
           <Col md={4} className="text-center text-md-end">
             <h5 className="fw-bold mb-3">Síguenos</h5>
 
+            {/* Lista de íconos con enlaces */}
             <div className="social-icons d-flex justify-content-md-end justify-content-center gap-3">
               {socialIcons.map((item, i) => (
                 <a
@@ -51,6 +65,7 @@ const Footer: React.FC = () => {
                   rel="noopener noreferrer"
                   className="social-icon"
                 >
+                  {/* Clase de Bootstrap Icons dinámica */}
                   <i className={`bi ${item.icon}`}></i>
                 </a>
               ))}
@@ -59,6 +74,9 @@ const Footer: React.FC = () => {
 
         </Row>
 
+        {/* =====================
+            Línea inferior del footer
+           ===================== */}
         <div className="text-center mt-4 pt-3 border-top small footer-separator">
           © {new Date().getFullYear()} Digital Alert Hub — Todos los derechos reservados.
         </div>

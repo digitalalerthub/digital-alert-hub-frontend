@@ -1,8 +1,7 @@
-// Esta será la página protegida que se ve solo si el usuario está logueado
-
-import React from "react";
+import React from 'react';
 
 const DashboardPage: React.FC = () => {
+  
   return (
     <div className="login-background d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="text-center text-white">
@@ -14,6 +13,3 @@ const DashboardPage: React.FC = () => {
 };
 
 export default DashboardPage;
-
-
-

@@ -5,6 +5,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import "../App.css";
+import GoogleButton from "./Auth/GoogleButton";
 
 const RegisterForm = () => {
   const [nombre, setNombre] = useState("");
@@ -39,7 +40,7 @@ const RegisterForm = () => {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "Error en el registro", {
           position: "top-right",
-          autoClose: 3000, // Tiempo en milisegundos para mostrar la notificación 3 seg
+          autoClose: 3000,
         });
       } else {
         toast.error("Error desconocido", {
@@ -56,16 +57,14 @@ const RegisterForm = () => {
         className="card shadow p-4"
         style={{ width: "380px", borderRadius: "15px" }}
       >
-        {/* Icono superior */}
         <div className="text-center mb-3">
           <i className="bi bi-person-circle fs-1 text-success"></i>
         </div>
 
-        {/* Título */}
         <h3 className="text-center mb-4 fw-bold">Crear una Cuenta</h3>
 
-        {/* Formulario */}
         <form onSubmit={handleSubmit}>
+          {/* Inputs */}
           <div className="mb-3 position-relative">
             <i className="bi bi-person position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
             <input
@@ -126,14 +125,18 @@ const RegisterForm = () => {
             />
           </div>
 
-          {/* Botón */}
-          <div className="d-flex justify-content-center mb-4">
+          {/* Botón principal */}
+          <div className="d-flex justify-content-center mb-3">
             <button type="submit" className="btn btn-success w-50">
               Registrarse
             </button>
           </div>
 
-          {/* Enlace inferior */}
+          {/* Google Login */}
+          <div className="d-flex justify-content-center mb-3">
+            <GoogleButton />
+          </div>
+
           <p className="text-center">
             ¿Ya tienes una cuenta?{" "}
             <a

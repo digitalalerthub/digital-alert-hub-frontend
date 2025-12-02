@@ -1,47 +1,52 @@
-
-
-
-
+/* Contenedor general del carrusel infinito */
 .carousel-infinite {
-  width: 100%;
-  overflow: hidden;
-  padding: 40px 0;
-  background: whitesmoke
+  width: 100%;           /* Ocupa todo el ancho disponible */
+  overflow: hidden;      /* Oculta las tarjetas que salen del borde */
+  padding: 40px 0;       /* Espacio arriba y abajo */
+  background: whitesmoke;/* Fondo claro para separar esta sección */
 }
 
+/* Track donde van TODAS las tarjetas alineadas horizontalmente */
 .carousel-track {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 20px;
-  width: max-content;
-  animation: scroll 50s linear infinite;
+  display: flex;              /* Pone las tarjetas en fila */
+  flex-wrap: nowrap;          /* Evita que bajen de línea */
+  gap: 20px;                  /* Espacio entre tarjetas */
+  width: max-content;         /* El ancho se adapta al contenido total */
+  animation: scroll 50s linear infinite; /* Animación que mueve todo hacia la izquierda sin parar */
 }
 
+/* Cada tarjeta del carrusel */
 .carousel-card {
-  flex: 0 0 300px;
+  flex: 0 0 300px;     /* Cada tarjeta mide exactamente 300px de ancho */
 }
 
+/* Imagen dentro de la tarjeta */
 .carousel-card img {
-  height: 220px;
-  object-fit: cover;
-  border-radius: 6px;
+  height: 220px;        /* Alto estándar para todas las imágenes */
+  object-fit: cover;    /* Recorta la imagen para que siempre se vea bien */
+  border-radius: 6px;   /* Bordes redondeados */
 }
 
-/* ✨ Loop perfecto sin salto */
+/* Animación para hacer el loop infinito sin saltos */
 @keyframes scroll {
   from {
-    transform: translateX(0);
+    transform: translateX(0); /* Comienza desde el inicio */
   }
   to {
+    /* Se mueve hacia la izquierda exactamente la suma de: 
+       - 5 tarjetas * 300px cada una 
+       - 5 espacios de 20px entre tarjetas
+       Esto hace que no haya “brinco” al reiniciar la animación. */
     transform: translateX(calc(-300px * 5 - 20px * 5));
   }
 }
 
+/* Adaptación para pantallas pequeñas */
 @media (max-width: 768px) {
   .carousel-card {
-    flex: 0 0 240px;
+    flex: 0 0 240px;    /* Tarjetas un poco más pequeñas */
   }
   .carousel-card img {
-    height: 180px;
+    height: 180px;      /* Imagen más proporcional al ancho */
   }
 }
