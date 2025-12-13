@@ -54,7 +54,7 @@ const RegisterForm = () => {
   return (
     <div className="register-background d-flex justify-content-center align-items-center vh-100 bg-light">
       <div
-        className="card shadow p-4"
+        className="card shadow p-4 bg-white bg-opacity-75 border border-white"
         style={{ width: "380px", borderRadius: "15px" }}
       >
         <div className="text-center mb-3">

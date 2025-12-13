@@ -7,5 +7,6 @@ export interface User {
   email: string;
   telefono?: string;
   rol?: string; // ? significa campo opcional
+  estado: boolean;
   // agrega opcionales que realmente necesites (avatarUrl?, telefono?, ...)
 }

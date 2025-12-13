@@ -1,11 +1,9 @@
-// Envuelve toda la aplicación dentro de AuthProvider lo que permite que cualquier componente acceda al estado global de autenticación.
-
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Manejo de rutas
-import { ToastContainer } from "react-toastify"; // Notificaciones
-import "react-toastify/dist/ReactToastify.css"; // Importante para estilos del toast
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
-// Importación de las páginas que se van a renderizar
+// Páginas
 import HomePage from "./pages/HomePage";
 import QuienesSomosPage from "./pages/QuienesSomosPage";
 import LoginPage from "./pages/LoginPage";
@@ -15,15 +13,15 @@ import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Callback from "./pages/Callback"; // ⚠️ AGREGAR ESTA IMPORTACIÓN
+import Callback from "./pages/Callback";
+import CreateAlertPage from "./pages/CreateAlertPage";
 
-// Importación componentes
+// Componentes
 import NavBar from "./components/NavBar";
 import PrivateRoute from "./components/PrivateRoute";
 
-// Contexto global de autenticación
+// Contexto
 import { AuthProvider } from "./context/AuthProvider";
-import CreateAlertPage from "./pages/CreateAlertPage";
 
 function App() {
   return (
@@ -31,20 +29,17 @@ function App() {
       <Router>
         <NavBar />
         <Routes>
-          {/* Públicas */}
+          {/* Rutas Públicas */}
           <Route path="/" element={<HomePage />} />
           <Route path="/quienes-somos" element={<QuienesSomosPage />} />
-          <Route path="/perfil" element={<ProfilePage />} />
-          <Route path="contacto" element={<ContactoPage />} />
+          <Route path="/contacto" element={<ContactoPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-          
-          {/* ⚠️ AGREGAR ESTA RUTA PARA GOOGLE OAuth */}
           <Route path="/auth/callback" element={<Callback />} />
 
-          {/* Protegidas */}
+          {/* Rutas Protegidas */}
           <Route
             path="/dashboard"
             element={
@@ -58,6 +53,14 @@ function App() {
             element={
               <PrivateRoute>
                 <CreateAlertPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/perfil"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
               </PrivateRoute>
             }
           />

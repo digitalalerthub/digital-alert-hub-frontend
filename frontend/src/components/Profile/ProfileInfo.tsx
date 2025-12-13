@@ -1,87 +1,91 @@
-// 2. mostrar información del usuario y botón para editar perfil.
-// Importamos el tipo User para tipar correctamente las props
-
 import type { User } from "../../types/User";
+import type { ReactNode } from "react";
 
 interface Props {
   user: User;
   onEdit: () => void;
   onChangePassword: () => void;
+  children?: ReactNode;
 }
 
-export default function ProfileInfo({ user, onEdit, onChangePassword }: Props) {
+export default function ProfileInfo({
+  user,
+  onEdit,
+  onChangePassword,
+  children,
+}: Props) {
   return (
-    <div>
-      {/* Icono superior */}
-      <div className="text-center mb-2">
-        <i className="bi bi-person-circle fs-1 text-success"></i>
-      </div>
+    <div className="edit-background d-flex justify-content-center align-items-center">
+      <div
+        className="card shadow-sm p-4 w-100 bg-light"
+        style={{ maxWidth: "400px", borderRadius: "16px" }}
+      >
+        {/* Avatar */}
+        <div className="text-center mb-4">
+          <div
+            className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+            style={{
+              width: "72px",
+              height: "72px",
+              background: "linear-gradient(135deg, #e6f4ff, #f3f8ff)",
+            }}
+          >
+            <i className="bi bi-person-circle text-primary fs-1"></i>
+          </div>
+          <h5 className="fw-bold mb-0">Mi Perfil</h5>
+          <small className="text-muted">Información de la cuenta</small>
+        </div>
 
-      {/* Título más pequeño */}
-      <h4 className="text-center mb-3 fw-semibold text-secondary">
-        Información del Perfil
-      </h4>
+        {/* Datos */}
+        <div className="input-group mb-3">
+          <span className="input-group-text">
+            <i className="bi bi-person"></i>
+          </span>
+          <input
+            className="form-control"
+            disabled
+            value={`${user.nombre} ${user.apellido}`}
+          />
+        </div>
 
-      {/* Campos de solo lectura */}
-      <div className="mb-2 position-relative">
-        <i className="bi bi-person position-absolute top-50 translate-middle-y ms-3 text-secondary small"></i>
-        <input
-          type="text"
-          className="form-control ps-5 py-2 small"
-          value={user.nombre || ""}
-          disabled
-        />
-      </div>
+        <div className="input-group mb-3">
+          <span className="input-group-text">
+            <i className="bi bi-envelope"></i>
+          </span>
+          <input className="form-control" disabled value={user.email} />
+        </div>
 
-      <div className="mb-2 position-relative">
-        <i className="bi bi-person-lines-fill position-absolute top-50 translate-middle-y ms-3 text-secondary small"></i>
-        <input
-          type="text"
-          className="form-control ps-5 py-2 small"
-          value={user.apellido || ""}
-          disabled
-        />
-      </div>
+        <div className="input-group mb-4">
+          <span className="input-group-text">
+            <i className="bi bi-telephone"></i>
+          </span>
+          <input
+            className="form-control"
+            disabled
+            value={user.telefono || "No registrado"}
+          />
+        </div>
 
-      <div className="mb-2 position-relative">
-        <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary small"></i>
-        <input
-          type="email"
-          className="form-control ps-5 py-2 small"
-          value={user.email || ""}
-          disabled
-        />
-      </div>
+        {/* Acciones */}
+        <div className="d-flex justify-content-center gap-2 mb-3">
+          <button onClick={onEdit} className="btn btn-primary btn-sm">
+            <i className="bi bi-pencil me-1" />
+            Editar perfil
+          </button>
 
-      <div className="mb-3 position-relative">
-        <i className="bi bi-telephone position-absolute top-50 translate-middle-y ms-3 text-secondary small"></i>
-        <input
-          type="text"
-          className="form-control ps-5 py-2 small"
-          value={user.telefono || ""}
-          disabled
-        />
-      </div>
+          <button
+            onClick={onChangePassword}
+            className="btn btn-outline-primary btn-sm"
+          >
+            <i className="bi bi-shield-lock me-1" />
+            Cambiar contraseña
+          </button>
+        </div>
 
-      {/* Botones más pequeños y centrados */}
-      <div className="d-flex justify-content-center gap-2 mb-2">
-        <button
-          onClick={onEdit}
-          type="button"
-          className="btn btn-primary btn-sm fw-semibold"
-          style={{ width: "135px", fontSize: "0.80rem" }}
-        >
-          Editar perfil
-        </button>
-
-        <button
-          onClick={onChangePassword}
-          type="button"
-          className="btn btn-secondary btn-sm fw-semibold"
-          style={{ width: "141px", fontSize: "0.80rem" }}
-        >
-          Cambiar contraseña
-        </button>
+        {/* ⚠️ Zona peligrosa */}
+        {children && (
+          <div className="border-top pt-3 mt-3 text-center">{children}</div>
+        )}
       </div>
     </div>
   );

@@ -16,28 +16,43 @@ h2 {
   text-align: center;
 }
 
-
-/* ================================
-   NAVBAR — estilos generales
-   ================================ */
-
 /* Navbar transparente por defecto */
 .navbar {
-  background-color: #12182a00 !important; 
+  background-color: #12182a00 !important;
   /* El !important obliga a pisar estilos previos (útil, pero mejor evitarlo si puedes) */
 }
 
 /* Fondo de páginas Login y Registro */
 .register-background,
 .login-background {
-  background-image: url("/Fondo_Formularios.png");
-  background-size: cover;            /* Ocupa toda el área sin deformarse */
+  background-image: url("/FondoForm.jpg");
+}
+
+.edit-background {
+  background-image: url("/FondoDash.jpg");
+}
+
+.dashboard-background,
+.alert-background {
+  background-image: url("/Fondo.jpg");
+
+}
+
+.change-background.change-background {
+  background-image: url("/FondoPassword.jpg");
+}
+
+.register-background,
+.login-background,
+.edit-background,
+.dashboard-background,
+.alert-background,
+.change-background {
+    background-size: cover; /* Ocupa toda el área sin deformarse */
   background-position: center;
   background-repeat: no-repeat;
-
-  height: 100vh;                     /* Pantalla completa */
+  height: 100vh; /* Pantalla completa */
   width: 100%;
-
   position: absolute;
   top: 0;
   left: 0;
@@ -57,7 +72,7 @@ h2 {
 
 /* Estilo al enfocar inputs */
 input.form-control:focus {
-  border-color: #0d6efd;                     /* Azul Bootstrap */
+  border-color: #0d6efd; /* Azul Bootstrap */
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
@@ -72,17 +87,13 @@ nav.navbar {
   transition: transform 0.45s ease-in-out;
 }
 
-
 /* ================================
    FOOTER
    ================================ */
 
 .footer-section {
   /* Fondo oscuro con overlay + imagen */
-  background: linear-gradient(
-      rgba(0, 0, 0, 0.70),
-      rgba(0, 0, 0, 0.70)
-    ),
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
     url("/Fondo_Formularios.png") center/cover no-repeat;
   padding: 50px 0;
 }
@@ -102,8 +113,8 @@ nav.navbar {
 
 /* Animación al pasar el mouse */
 .social-icons .social-icon:hover {
-  color: #0dcaf0;             /* Azul clarito */
-  transform: scale(1.15);     /* Efecto de zoom */
+  color: #0dcaf0; /* Azul clarito */
+  transform: scale(1.15); /* Efecto de zoom */
 }
 
 /* Línea separadora final del footer */

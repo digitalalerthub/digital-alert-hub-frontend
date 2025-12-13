@@ -1,90 +1,69 @@
-// Hook para navegar entre páginas sin recargar
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-// Hook de autenticación global (estado de sesión)
 import { useAuth } from "../context/useAuth";
-
-// Hook personalizado: oculta el navbar cuando el usuario hace scroll hacia abajo
 import { useHideOnScroll } from "../hooks/useHideOnScroll";
 
-
 const NavBar: React.FC = () => {
-  const hidden = useHideOnScroll(); // true si debe esconderse el navbar
+  const hidden = useHideOnScroll();
 
-  const { isLoggedIn, logout } = useAuth(); // Estado actual de login y función para cerrar sesión
-  const navigate = useNavigate(); // Permite redirigir desde código
-  const location = useLocation(); // Saber en qué ruta estamos
+  const { isLoggedIn, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Cierra sesión y manda al usuario al home
   const handleLogout = () => {
-    logout();     // Limpia token o sesión
-    navigate("/"); // Redirige al inicio
+    logout();
+    navigate("/");
   };
 
-  // Cambia el color del texto del navbar dependiendo de la ruta
   const NavBarTextColor = () => {
     switch (location.pathname) {
       case "/":
-        return "#ffffff"; // blanco
       case "/quienes-somos":
-        return "#ffffff";
       case "/contacto":
         return "#ffffff";
       case "/dashboard":
-        return "#ffc107"; // amarillo
+      case "/crear-alertas":
       case "/perfil":
-        return "#ffc107"; // amarillo
+        return "#ffffffff";
       default:
-        return "#ffffff";
+        return "#000000ff";
     }
   };
 
-  // Color ya calculado para usarlo en varios elementos
   const textColor = NavBarTextColor();
-
 
   return (
     <nav
       className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${
-        hidden ? "navbar-hidden" : "" // Agrega clase si el navbar debe ocultarse
+        hidden ? "navbar-hidden" : ""
       }`}
-      style={{ color: textColor }} // Cambia color del texto según ruta
     >
-
       <div className="container-fluid">
-
-        {/* LOGO — clicable, lleva al dashboard si hay sesión; si no, al home */}
+        {/* LOGO */}
         <Link
           className="navbar-brand fw-bold"
           to={isLoggedIn ? "/dashboard" : "/"}
-          style={{ color: textColor }}
         >
           <img
             src="/Logo_transparente.png"
             alt="Digital Alert Hub Logo"
             width="110"
-            height="auto"
             className="me-2"
           />
         </Link>
 
-        {/* Botón hamburguesa para móviles */}
+        {/* TOGGLER */}
         <button
           className="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggler-icon" />
         </button>
 
-        {/* Contenedor del menú */}
         <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center">
+          <ul className="navbar-nav ms-auto align-items-center gap-2">
 
-            {/* ===========================
-                MENÚ PRIVADO (usuario logueado)
-               ============================ */}
             {isLoggedIn ? (
               <>
                 {/* Crear alerta */}
@@ -109,23 +88,70 @@ const NavBar: React.FC = () => {
                   </Link>
                 </li>
 
-                {/* Botón cerrar sesión */}
-                <li className="nav-item btn-primary fw-semibold mx-1">
+                {/* 👤 AVATAR + DROPDOWN */}
+                <li className="nav-item dropdown">
                   <button
-                    onClick={handleLogout}
-                    className="btn btn-danger fw-semibold text-white border-0"
+                    className="btn border-0 bg-transparent p-0"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
                   >
-                    Cerrar sesión
+                    <div
+                      className="rounded-circle d-flex align-items-center justify-content-center"
+                      style={{
+                        width: "38px",
+                        height: "38px",
+                        background: "rgba(255,255,255,0.15)",
+                      }}
+                    >
+                      <i
+                        className="bi bi-person-fill fs-5"
+                        style={{ color: textColor }}
+                      />
+                    </div>
                   </button>
+
+                  <ul className="dropdown-menu dropdown-menu-end shadow mt-2">
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => navigate("/perfil")}
+                      >
+                        <i className="bi bi-person me-2" />
+                        Mi perfil
+                      </button>
+                    </li>
+
+                    <li>
+                      <button
+                        className="dropdown-item"
+                        onClick={() =>
+                          navigate("/perfil?tab=password")
+                        }
+                      >
+                        <i className="bi bi-shield-lock me-2" />
+                        Cambiar contraseña
+                      </button>
+                    </li>
+
+                    <li>
+                      <hr className="dropdown-divider" />
+                    </li>
+
+                    <li>
+                      <button
+                        className="dropdown-item text-danger"
+                        onClick={handleLogout}
+                      >
+                        <i className="bi bi-box-arrow-right me-2" />
+                        Cerrar sesión
+                      </button>
+                    </li>
+                  </ul>
                 </li>
               </>
-
             ) : (
-              /* ===========================
-                 MENÚ PÚBLICO (no logueado)
-                 ============================ */
               <>
-                {/* Links del menú público */}
+                {/* MENÚ PÚBLICO */}
                 <li className="nav-item">
                   <Link className="nav-link" to="/" style={{ color: textColor }}>
                     Inicio
@@ -133,37 +159,37 @@ const NavBar: React.FC = () => {
                 </li>
 
                 <li className="nav-item">
-                  <Link className="nav-link" to="/perfil" style={{ color: textColor }}>
-                    Perfil
-                  </Link>
-                </li>
-
-                <li className="nav-item">
-                  <Link className="nav-link" to="/quienes-somos" style={{ color: textColor }}>
+                  <Link
+                    className="nav-link"
+                    to="/quienes-somos"
+                    style={{ color: textColor }}
+                  >
                     Quiénes somos
                   </Link>
                 </li>
 
                 <li className="nav-item">
-                  <Link className="nav-link" to="/contacto" style={{ color: textColor }}>
+                  <Link
+                    className="nav-link"
+                    to="/contacto"
+                    style={{ color: textColor }}
+                  >
                     Contacto
                   </Link>
                 </li>
 
-                {/* Botón iniciar sesión (solo si no está ya en /login) */}
                 {location.pathname !== "/login" && (
                   <button
-                    className="btn btn-outline-light fw-semibold mx-1"
+                    className="btn btn-outline-light fw-semibold"
                     onClick={() => navigate("/login")}
                   >
                     Iniciar sesión
                   </button>
                 )}
 
-                {/* Botón registro (solo si no está en /register) */}
                 {location.pathname !== "/register" && (
                   <button
-                    className="btn btn-danger fw-semibold mx-1"
+                    className="btn btn-danger fw-semibold"
                     onClick={() => navigate("/register")}
                   >
                     Crear cuenta
@@ -173,7 +199,6 @@ const NavBar: React.FC = () => {
             )}
           </ul>
         </div>
-
       </div>
     </nav>
   );

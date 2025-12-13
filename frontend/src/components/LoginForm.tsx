@@ -6,7 +6,7 @@ import api from "../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth"; 
+import { useAuth } from "../context/useAuth";
 import "../App.css";
 import GoogleButton from "./Auth/GoogleButton";
 
@@ -37,8 +37,10 @@ const LoginForm = () => {
 
   return (
     <div className="login-background d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div className="card shadow p-4" style={{ width: "360px", borderRadius: "15px" }}>
-        
+      <div
+        className="card shadow p-4 bg-white bg-opacity-75 border border-white"
+        style={{ width: "360px", borderRadius: "15px" }}
+      >
         <div className="text-center mb-3">
           <i className="bi bi-box-arrow-in-right fs-1 text-primary"></i>
         </div>
@@ -46,7 +48,6 @@ const LoginForm = () => {
         <h3 className="text-center mb-4 fw-bold">Iniciar Sesión</h3>
 
         <form onSubmit={handleSubmit}>
-          
           {/* Campo Email */}
           <div className="position-relative mb-3">
             <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
@@ -106,6 +107,5 @@ const LoginForm = () => {
     </div>
   );
 };
-
 
 export default LoginForm;
