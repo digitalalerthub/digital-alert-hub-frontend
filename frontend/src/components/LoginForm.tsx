@@ -24,7 +24,7 @@ const LoginForm = () => {
       login(res.data.token);
 
       toast.success("Inicio de sesión exitoso");
-      setTimeout(() => navigate("/dashboard"), 800);
+      setTimeout(() => navigate("/admin"), 800);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "Error en el login");

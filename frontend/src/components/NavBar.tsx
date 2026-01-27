@@ -23,26 +23,46 @@ const NavBar: React.FC = () => {
       case "/dashboard":
       case "/crear-alertas":
       case "/perfil":
-        return "#ffffffff";
+      case "/admin":
+      case "/admin/users":
+        return "#000000";
       default:
         return "#000000ff";
     }
   };
 
+  const NavBarBackground = () => {
+    switch (location.pathname) {
+      case "/":
+      case "/quienes-somos":
+      case "/contacto":
+        return "transparent";
+
+      case "/admin":
+      case "/admin/users":
+        return "#ffffff";
+
+      default:
+        return "#ffffffff";
+    }
+  };
+
   const textColor = NavBarTextColor();
+  const backColor = NavBarBackground();
 
   return (
     <nav
-      className={`navbar navbar-expand-lg navbar-dark bg-dark fixed-top px-4 py-2 ${
+      className={`navbar navbar-expand-lg bg-dark fixed-top px-4 py-2 ${
         hidden ? "navbar-hidden" : ""
       }`}
+      style={{
+        backgroundColor: backColor,
+        transition: "background-color 0.3s ease",
+      }}
     >
       <div className="container-fluid">
         {/* LOGO */}
-        <Link
-          className="navbar-brand fw-bold"
-          to={isLoggedIn ? "/dashboard" : "/"}
-        >
+        <Link className="navbar-brand fw-bold" to={isLoggedIn ? "/admin" : "/"}>
           <img
             src="/Logo_transparente.png"
             alt="Digital Alert Hub Logo"
@@ -63,31 +83,8 @@ const NavBar: React.FC = () => {
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center gap-2">
-
             {isLoggedIn ? (
               <>
-                {/* Crear alerta */}
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="/crear-alertas"
-                    style={{ color: textColor }}
-                  >
-                    Crear alerta
-                  </Link>
-                </li>
-
-                {/* Dashboard */}
-                <li className="nav-item">
-                  <Link
-                    className="nav-link"
-                    to="/dashboard"
-                    style={{ color: textColor }}
-                  >
-                    Dashboard
-                  </Link>
-                </li>
-
                 {/* 👤 AVATAR + DROPDOWN */}
                 <li className="nav-item dropdown">
                   <button
@@ -124,9 +121,7 @@ const NavBar: React.FC = () => {
                     <li>
                       <button
                         className="dropdown-item"
-                        onClick={() =>
-                          navigate("/perfil?tab=password")
-                        }
+                        onClick={() => navigate("/perfil?tab=password")}
                       >
                         <i className="bi bi-shield-lock me-2" />
                         Cambiar contraseña
@@ -153,7 +148,11 @@ const NavBar: React.FC = () => {
               <>
                 {/* MENÚ PÚBLICO */}
                 <li className="nav-item">
-                  <Link className="nav-link" to="/" style={{ color: textColor }}>
+                  <Link
+                    className="nav-link"
+                    to="/"
+                    style={{ color: textColor }}
+                  >
                     Inicio
                   </Link>
                 </li>

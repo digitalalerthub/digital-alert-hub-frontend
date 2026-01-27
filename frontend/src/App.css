@@ -35,7 +35,6 @@ h2 {
 .dashboard-background,
 .alert-background {
   background-image: url("/Fondo.jpg");
-
 }
 
 .change-background.change-background {
@@ -48,7 +47,7 @@ h2 {
 .dashboard-background,
 .alert-background,
 .change-background {
-    background-size: cover; /* Ocupa toda el área sin deformarse */
+  background-size: cover; /* Ocupa toda el área sin deformarse */
   background-position: center;
   background-repeat: no-repeat;
   height: 100vh; /* Pantalla completa */
@@ -85,6 +84,19 @@ input.form-control:focus {
 /* Transición suave para ocultar/mostrar el navbar */
 nav.navbar {
   transition: transform 0.45s ease-in-out;
+}
+
+/* ================================
+   ADMIN
+   ================================ */
+
+.container {
+  padding-top: 9rem !important;
+}
+
+.display-4 {
+  padding-bottom: 20px;
+  font-size: 2.5rem;
 }
 
 /* ================================

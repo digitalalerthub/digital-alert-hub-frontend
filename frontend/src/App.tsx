@@ -15,6 +15,9 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import Callback from "./pages/Callback";
 import CreateAlertPage from "./pages/CreateAlertPage";
+import AdminDashboard from "./components/Admin/AdminDashboard";
+import UserTable from "./components/Admin/UserTable";
+import RoleTable from "./components/Admin/RoleTable";
 
 // Componentes
 import NavBar from "./components/NavBar";
@@ -36,7 +39,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPasswordPage />}
+          />
           <Route path="/auth/callback" element={<Callback />} />
 
           {/* Rutas Protegidas */}
@@ -45,6 +51,30 @@ function App() {
             element={
               <PrivateRoute>
                 <DashboardPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <PrivateRoute>
+                <AdminDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <PrivateRoute>
+                <UserTable />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/roles"
+            element={
+              <PrivateRoute>
+                <RoleTable />
               </PrivateRoute>
             }
           />
