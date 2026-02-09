@@ -2,14 +2,14 @@
 
 Frontend de aplicación web Digital Alert Hub
 
-Creación del proyecto con: npx create-vite frontend
+Creación del proyecto con: **npx create-vite frontend**
 
 - Select a Framework: React
 - Select a variant: TypeScript
 - Experimental: No
 - Install with npm and start: Yes
 
-Instalación Dependencias:
+**Instalación Dependencias:**
 
 - Axios: npm i axios (Comunica el frontend con el backend)
 - Bootstrap: npm i Bootstrap (Framework CSS para estilos y componentes responsivos)
