@@ -11,10 +11,10 @@ Creación del proyecto con: **npx create-vite frontend**
 
 **Instalación Dependencias:**
 
-- **Axios:** npm i axios _(Comunica el frontend con el backend)_
-- **Bootstrap:** npm i Bootstrap _(Framework CSS para estilos y componentes responsivos)_
-- **React:** npm install react _(Libreria Principal de React)_
-- **React-dom:** _(Permite renderizar react con el DOM del navegador)_
-- **React-router-dom:** _(Libreria para manejar rutas, permite navegar entre páginas sin recargar la web.)_
+- Axios: npm i axios (Comunica el frontend con el backend)
+- Bootstrap: npm i Bootstrap (Framework CSS para estilos y componentes responsivos)
+- React: npm install react (Libreria Principal de React)
+- React-dom: (Permite renderizar react con el DOM del navegador)
+- React-router-dom: (Libreria para manejar rutas, permite navegar entre páginas sin recargar la web.)
 
 Ejecución del proyecto con: **npm run dev**

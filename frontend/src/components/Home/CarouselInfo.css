@@ -1,0 +1,87 @@
+/* ================================
+   Fondo general del carrusel
+   ================================ */
+.stats-strip {
+  width: 100%;                                      /* Ocupa todo el ancho */
+  background-image: url("/Fondo_Formularios.png");  /* Imagen de fondo */
+  background-size: cover;                           /* Cubre sin deformar */
+  background-position: center;                      /* Centrada */
+  background-repeat: no-repeat;                     /* No se repite */
+
+  padding: 40px 0;                                  /* Espacio vertical */
+  overflow: hidden;                                 /* Oculta lo que se sale */
+  position: relative;                               /* Necesario para el overlay */
+}
+
+/* ================================
+   Overlay oscuro encima del fondo
+   ================================ */
+.stats-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0;                       /* Ocupa toda la sección */
+  background: rgba(0,0,0,0.55);   /* Capa oscura semitransparente */
+  backdrop-filter: blur(2px);     /* Difumina un poquito el fondo */
+}
+
+/* ================================
+   Track que se mueve horizontalmente
+   ================================ */
+.stats-track {
+  display: flex;                  /* Elementos en fila */
+  gap: 80px;                      /* Separación entre estadísticas */
+  width: max-content;             /* Se ajusta al contenido real */
+  animation: slideStats 15s linear infinite; /* Carrusel infinito */
+  position: relative;
+  z-index: 2;                     /* Sobre el overlay */
+}
+
+/* Cada ítem de estadística */
+.stats-item {
+  display: flex;
+  flex-direction: column;         /* Texto arriba, número abajo */
+  text-align: center;
+  color: white;
+  min-width: 300px;               /* Garantiza tamaño uniforme */
+}
+
+/* Etiqueta del dato (nombre) */
+.stats-label {
+  font-size: 18px;
+  opacity: 0.9;
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+/* Valor grande de la estadística */
+.stats-value {
+  font-size: 42px;
+  font-weight: 800;
+}
+
+/* ================================
+   Animación del carrusel infinito
+   ================================ */
+@keyframes slideStats {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    /* Se mueve el total equivalente a 4 ítems 
+       ~ 380px cada uno (300px + aprox padding/margin/espacio) */
+    transform: translateX(calc(-380px * 4));
+  }
+}
+
+/* ================================
+   Ajustes para pantallas pequeñas
+   ================================ */
+@media (max-width: 768px) {
+  .stats-item {
+    min-width: 240px;     /* Ítems más compactos */
+  }
+
+  .stats-value {
+    font-size: 32px;      /* Texto más pequeño */
+  }
+}

@@ -1,0 +1,160 @@
+/* Reutiliza los estilos del UserModal */
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Backdrop */
+.modal-backdrop-custom {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* Contenedor del modal */
+.modal-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1051;
+  padding: 1rem;
+  animation: slideIn 0.3s ease-out;
+  overflow-y: auto;
+}
+
+/* Contenido del modal */
+.modal-content-custom {
+  max-width: 500px;
+  width: 100%;
+  border-radius: 16px;
+  border: none;
+  overflow: hidden;
+  max-height: 90vh;
+  margin: auto;
+}
+
+/* Header */
+.modal-header-custom {
+  background: linear-gradient(135deg, #3352dc 0%, #d2d6e3 100%);
+  color: white;
+  padding: 1.25rem 1.5rem;
+  border: none;
+}
+
+.modal-title-custom {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.modal-subtitle {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin-bottom: 0;
+}
+
+.modal-close-btn {
+  font-size: 1.1rem;
+}
+
+/* Body */
+.modal-body-custom {
+  padding: 1.5rem;
+  overflow-y: auto;
+  max-height: calc(90vh - 180px);
+}
+
+/* Labels */
+.form-label-custom {
+  color: #1f2937;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 0.4rem;
+}
+
+.required-asterisk {
+  color: #ef4444;
+}
+
+/* Inputs */
+.form-input-custom {
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.form-input-custom.is-invalid {
+  border: 2px solid #ef4444;
+}
+
+.form-input-custom:focus {
+  border-color: #002fff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 47, 255, 0.25) !important;
+}
+
+/* Footer */
+.modal-footer-custom {
+  padding: 1.25rem 1.5rem;
+  background-color: #f9fafb;
+  border: none;
+  gap: 10px;
+}
+
+/* Botones */
+.btn-custom {
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-primary-custom {
+  border-radius: 8px;
+  padding: 0.6rem 1.25rem;
+  font-weight: 500;
+  background: linear-gradient(135deg, #052fed 0%, #25a5eb 100%);
+  border: none;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+}
+
+.btn-custom:hover,
+.btn-primary-custom:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-custom:active,
+.btn-primary-custom:active {
+  transform: translateY(0);
+}

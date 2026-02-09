@@ -1,0 +1,59 @@
+.banner-container {
+  width: 100%;
+  height: 700px;
+  overflow: hidden;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;    /* Muy importante: recorta la imagen sin deformarla */
+}
+
+
+/* -------------------------------------------
+   Contenedor Principal y la Línea Central
+   ------------------------------------------- */
+.simple-timeline {
+  position: relative;
+  /* El padding-left da espacio para la línea y los puntos */
+  padding-left: 30px; 
+}
+
+/* La Línea Central Vertical Azul */
+.simple-timeline::before {
+  content: '';
+  position: absolute;
+  width: 2px; /* Ancho de la línea */
+  background-color: #007bff; /* Color azul de Bootstrap Primary */
+  top: 0;
+  bottom: 0;
+  left: -4px; /* Posiciona la línea a 15px del borde */
+}
+
+/* -------------------------------------------
+   Estilos de los Items de Evento
+   ------------------------------------------- */
+.timeline-item {
+  position: relative;
+  margin-bottom: 20px; /* Espacio entre los eventos */
+}
+
+.timeline-content {
+  /* El contenido se alinea justo después del padding del contenedor */
+  padding-bottom: 15px; 
+}
+
+/* -------------------------------------------
+   El Círculo / Punto de Enlace
+   ------------------------------------------- */
+.timeline-point {
+  position: absolute;
+  width: 15px; /* Tamaño del círculo */
+  height: 15px;
+  border-radius: 50%;
+  background-color: #007bff; /* Relleno azul */
+  left: -40px; /* Posiciona el centro del círculo sobre la línea */
+  top: 10px; /* Ajusta la posición vertical */
+  z-index: 1; /* Asegura que esté por encima de la línea */
+}

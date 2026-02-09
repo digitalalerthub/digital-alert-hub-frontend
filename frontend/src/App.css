@@ -1,1 +1,135 @@
+/* ================================
+   ESTILOS GLOBALES
+   ================================ */
 
+/* Eliminan márgenes por defecto y aseguran que toda la app ocupe el alto completo */
+body,
+html,
+#root {
+  margin: 0;
+  height: 100%;
+}
+
+/* Títulos H2 más grandes y centrados */
+h2 {
+  font-size: 25px;
+  text-align: center;
+}
+
+/* Navbar transparente por defecto */
+.navbar {
+  background-color: #12182a00 !important;
+  /* El !important obliga a pisar estilos previos (útil, pero mejor evitarlo si puedes) */
+}
+
+/* Fondo de páginas Login y Registro */
+.register-background,
+.login-background {
+  background-image: url("/FondoForm.jpg");
+}
+
+.edit-background {
+  background-image: url("/FondoDash.jpg");
+}
+
+.dashboard-background,
+.alert-background {
+  background-image: url("/Fondo.jpg");
+}
+
+.change-background.change-background {
+  background-image: url("/FondoPassword.jpg");
+}
+
+.register-background,
+.login-background,
+.edit-background,
+.dashboard-background,
+.alert-background,
+.change-background {
+  background-size: cover; /* Ocupa toda el área sin deformarse */
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh; /* Pantalla completa */
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Tipografía general del navbar */
+.navbar {
+  font-weight: 700;
+  font-size: 18px;
+  background-color: #12182a00 !important;
+}
+
+/* Garantiza que el navbar quede por encima del contenido */
+.navbar-top {
+  z-index: 10;
+}
+
+/* Estilo al enfocar inputs */
+input.form-control:focus {
+  border-color: #0d6efd; /* Azul Bootstrap */
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Oculta el navbar moviéndolo hacia arriba (hook useHideOnScroll) */
+.navbar-hidden {
+  transform: translateY(-100%);
+  transition: transform 0.45s ease-in-out;
+}
+
+/* Transición suave para ocultar/mostrar el navbar */
+nav.navbar {
+  transition: transform 0.45s ease-in-out;
+}
+
+/* ================================
+   ADMIN
+   ================================ */
+
+.container {
+  padding-top: 9rem !important;
+}
+
+.display-4 {
+  padding-bottom: 20px;
+  font-size: 2.5rem;
+}
+
+/* ================================
+   FOOTER
+   ================================ */
+
+.footer-section {
+  /* Fondo oscuro con overlay + imagen */
+  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+    url("/Fondo_Formularios.png") center/cover no-repeat;
+  padding: 50px 0;
+}
+
+/* Tamaño del logo en el footer */
+.footer-logo {
+  width: 160px;
+}
+
+/* Estilos de los íconos de redes */
+.social-icons .social-icon {
+  font-size: 1.8rem;
+  color: #ffffff;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+/* Animación al pasar el mouse */
+.social-icons .social-icon:hover {
+  color: #0dcaf0; /* Azul clarito */
+  transform: scale(1.15); /* Efecto de zoom */
+}
+
+/* Línea separadora final del footer */
+.footer-separator {
+  border-color: rgba(255, 0, 0, 1) !important;
+}

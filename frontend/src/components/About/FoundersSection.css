@@ -1,0 +1,64 @@
+/* Fondo de la sección */
+.founders-section {
+  background-color: #f5f7fa;
+}
+
+
+/* Tarjeta individual */
+.founder-card {
+  background-color: white;
+  border-radius: 16px;
+  padding: 60px 30px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.founder-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Contenedor de imagen */
+.founder-image-wrapper {
+  width: 180px;
+  height: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.founder-image {
+  width: 90%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Nombre */
+.founder-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  margin-top: 0;
+}
+
+/* Rol */
+.founder-role {
+  font-size: 14px;
+  color: #336B87;
+  font-weight: 600;
+  margin: 0 0 15px 0;
+  letter-spacing: 0.3px;
+}
+
+/* Descripción */
+.founder-description {
+  font-size: 14px;
+  padding: 0 14px;
+  color: #6c757d;
+  line-height: 1.6;
+  margin: 0;
+}

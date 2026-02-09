@@ -1,13 +1,21 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "react-toastify/dist/ReactToastify.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { GOOGLE_CLIENT_ID } from "./config/google";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import App from "./App.tsx";
+import "./App.css";
 
-// Crea el punto de entrada de la aplicación React en el elemento con id="root"
-createRoot(document.getElementById("root")!).render(
-  // StrictMode: herramienta de desarrollo de React para detectar problemas potenciales
+  createRoot(document.getElementById("root")!).render(
   <StrictMode>
-     {/* Se renderiza el componente principal de la aplicación */}
-    <App />
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <App />
+    </GoogleOAuthProvider>
   </StrictMode>
 );
+  
+
+
