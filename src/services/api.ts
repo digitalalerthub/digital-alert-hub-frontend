@@ -1,8 +1,11 @@
 import axios from "axios";
 
+// URL del backend desde variables de entorno
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
+
 // Se crea una instancia de Axios con una configuración base
 const api = axios.create({
-  baseURL: "http://localhost:4000/api", // URL del backend para todas las peticiones
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },
