@@ -16,8 +16,9 @@ const CarouselInfo = () => {
 
   // Función para traer estadísticas desde el backend
   const fetchStats = async () => {
+    const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001/api";
     try {
-      const res = await fetch("http://localhost:4000/api/stats"); // 🟩 Llama a tu API
+      const res = await fetch(`${API_URL}/stats`); // 🟩 Llama a tu API
       const data = await res.json();                              // 🟩 Convierte a JSON
       setStats(data);                                             // 🟩 Guarda datos en el estado
     } catch (error) {
