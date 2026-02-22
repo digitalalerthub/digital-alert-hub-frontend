@@ -1,11 +1,11 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import "../App.css";
-import GoogleButton from "./Auth/GoogleButton";
+import "../../App.css";
+import GoogleButton from "./GoogleButton";
 
 const RegisterForm = () => {
   const [nombre, setNombre] = useState("");

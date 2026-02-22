@@ -20,8 +20,8 @@ import UserTable from "./components/Admin/UserTable";
 import RoleTable from "./components/Admin/RoleTable";
 
 // Componentes
-import NavBar from "./components/NavBar";
-import PrivateRoute from "./components/PrivateRoute";
+import NavBar from "./components/Layout/NavBar";
+import PrivateRoute from "./components/Route/PrivateRoute";
 
 // Contexto
 import { AuthProvider } from "./context/AuthProvider";
