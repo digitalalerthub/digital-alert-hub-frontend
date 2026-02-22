@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
-import api from "../services/api";
+import api from "../../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
-import "../App.css";
-import GoogleButton from "./Auth/GoogleButton";
+import { useAuth } from "../../context/useAuth";
+import "../../App.css";
+import GoogleButton from "./GoogleButton";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");

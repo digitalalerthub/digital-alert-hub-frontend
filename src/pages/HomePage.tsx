@@ -1,7 +1,7 @@
 import Hero from "../components/Home/Hero";
 import Features from "../components/Home/Features";
 import CarouselInfo from "../components/Home/CarouselInfo";
-import Footer from "../components/Footer";
+import Footer from "../components/Layout/Footer";
 
 const Home = () => {
   return (

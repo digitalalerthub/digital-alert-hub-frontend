@@ -1,4 +1,4 @@
-import RegisterForm from "../components/RegisterForm";
+import RegisterForm from "../components/Auth/RegisterForm";
 
 // Página de Registro (vista completa)
 const RegisterPage = () => {

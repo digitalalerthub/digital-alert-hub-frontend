@@ -1,7 +1,7 @@
 // Componente de control de acceso es decir las paginas protegidas que solo se ven cuando estan logueados, es decir isLoggedIn es true
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "../../context/useAuth";
 
 interface PrivateRouteProps {
   children: React.ReactElement;

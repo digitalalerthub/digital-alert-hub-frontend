@@ -4,7 +4,7 @@ import { Container, Row, Col } from "react-bootstrap";
 // Link de React Router para navegación sin recargar la página
 import { Link } from "react-router-dom";
 
-import "../App.css";
+import "../../App.css";
 
 // Lista de redes sociales con su ícono y URL
 const socialIcons = [

@@ -3,7 +3,7 @@ import FirstSection from "../components/About/FirstSection";
 import HistorySection from "../components/About/HistorySection";
 import FoundersSection from "../components/About/FoundersSection";
 import ImpactSection from "../components/About/ImpactSection";
-import Footer from "../components/Footer";
+import Footer from "../components/Layout/Footer";
 
 export default function QuienesSomosPage() {
   return (

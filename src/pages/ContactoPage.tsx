@@ -1,7 +1,7 @@
 import React from "react";
 import BannerContact from "../components/Contact/BannerContact";
 import ContactInfo from "../components/Contact/ContactInfo";
-import Footer from "../components/Footer";
+import Footer from "../components/Layout/Footer";
 
 const ContactoPage: React.FC = () => {
   return (

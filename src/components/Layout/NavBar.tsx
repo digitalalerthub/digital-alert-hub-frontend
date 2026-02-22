@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/useAuth";
-import { useHideOnScroll } from "../hooks/useHideOnScroll";
+import { useAuth } from "../../context/useAuth";
+import { useHideOnScroll } from "../../hooks/useHideOnScroll";
 
 const NavBar: React.FC = () => {
   const hidden = useHideOnScroll();
