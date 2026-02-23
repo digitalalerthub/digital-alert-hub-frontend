@@ -4,17 +4,17 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 // Páginas
-import HomePage from "./pages/HomePage";
-import QuienesSomosPage from "./pages/QuienesSomosPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ContactoPage from "./pages/ContactoPage";
-import DashboardPage from "./pages/DashboardPage";
-import ProfilePage from "./pages/ProfilePage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import Callback from "./pages/Callback";
-import CreateAlertPage from "./pages/CreateAlertPage";
+import HomePage from "./pages/Home/HomePage";
+import QuienesSomosPage from "./pages/Home/QuienesSomosPage";
+import LoginPage from "./pages/Auth/LoginPage";
+import RegisterPage from "./pages/Auth/RegisterPage";
+import ContactoPage from "./pages/Contact/ContactPage";
+import DashboardPage from "./pages/Dashboard/DashboardPage";
+import ProfilePage from "./pages/Profile/ProfilePage";
+import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/Auth/ResetPasswordPage";
+import Callback from "./pages/Auth/Callback";
+import CreateAlertPage from "./pages/Alert/CreateAlertPage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import UserTable from "./components/Admin/UserTable";
 import RoleTable from "./components/Admin/RoleTable";

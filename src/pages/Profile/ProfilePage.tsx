@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { getProfile } from "../services/profileService";
-import ProfileInfo from "../components/Profile/ProfileInfo";
-import EditProfileForm from "../components/Profile/EditProfileForm";
-import ChangePasswordForm from "../components/Profile/ChangePasswordForm";
-import DeleteAccount from "../components/Profile/DeleteAccount";
+import { getProfile } from "../../services/profileService";
+import ProfileInfo from "../../components/Profile/ProfileInfo"
+import EditProfileForm from "../../components/Profile/EditProfileForm";
+import ChangePasswordForm from "../../components/Profile/ChangePasswordForm";
+import DeleteAccount from "../../components/Profile/DeleteAccount";
 import { toast } from "react-toastify";
-import type { User } from "../types/User";
+import type { User } from "../../types/User";
 
 export default function Profile() {
   const [user, setUser] = useState<User | null>(null);

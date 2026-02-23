@@ -1,4 +1,4 @@
-import LoginForm from "../components/Auth/LoginForm";
+import LoginForm from "../../components/Auth/LoginForm";
 
 // Página de Login (vista completa)
 const LoginPage = () => {
