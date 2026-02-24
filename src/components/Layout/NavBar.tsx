@@ -15,36 +15,45 @@ const NavBar: React.FC = () => {
   };
 
   const NavBarTextColor = () => {
-    switch (location.pathname) {
-      case "/":
-      case "/quienes-somos":
-      case "/contacto":
-        return "#ffffff";
-      case "/dashboard":
-      case "/crear-alertas":
-      case "/perfil":
-      case "/admin":
-      case "/admin/users":
-        return "#000000";
-      default:
-        return "#000000ff";
+    if (
+      location.pathname === "/" ||
+      location.pathname === "/quienes-somos" ||
+      location.pathname === "/contacto"
+    ) {
+      return "#ffffff";
     }
+
+    if (location.pathname.startsWith("/crear-alertas")) {
+      return "#000000";
+    }
+
+    if (
+      location.pathname === "/dashboard" ||
+      location.pathname === "/perfil" ||
+      location.pathname === "/admin" ||
+      location.pathname.startsWith("/admin/")
+    ) {
+      return "#000000";
+    }
+
+    return "#000000ff";
   };
 
   const NavBarBackground = () => {
-    switch (location.pathname) {
-      case "/":
-      case "/quienes-somos":
-      case "/contacto":
-        return "transparent";
-
-      case "/admin":
-      case "/admin/users":
-        return "#ffffff";
-
-      default:
-        return "#ffffffff";
+    if (
+      location.pathname === "/" ||
+      location.pathname === "/quienes-somos" ||
+      location.pathname === "/contacto" ||
+      location.pathname.startsWith("/crear-alertas")
+    ) {
+      return "transparent";
     }
+
+    if (location.pathname === "/admin" || location.pathname.startsWith("/admin/")) {
+      return "#ffffff";
+    }
+
+    return "#ffffffff";
   };
 
   const textColor = NavBarTextColor();
@@ -52,7 +61,7 @@ const NavBar: React.FC = () => {
 
   return (
     <nav
-      className={`navbar navbar-expand-lg bg-dark fixed-top px-4 py-2 ${
+      className={`navbar navbar-expand-lg fixed-top px-4 py-2 ${
         hidden ? "navbar-hidden" : ""
       }`}
       style={{
