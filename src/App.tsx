@@ -10,6 +10,7 @@ import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
 import ContactoPage from './pages/Contact/ContactPage';
 import ProfilePage from './pages/Profile/ProfilePage';
+import ChangePasswordPage from './pages/Profile/ChangePasswordPage';
 import ForgotPasswordPage from './pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/Auth/ResetPasswordPage';
 import Callback from './pages/Auth/Callback';
@@ -88,6 +89,14 @@ function App() {
                         element={
                             <PrivateRoute>
                                 <ProfilePage />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route
+                        path='/perfil/cambiar-contrasena'
+                        element={
+                            <PrivateRoute>
+                                <ChangePasswordPage />
                             </PrivateRoute>
                         }
                     />

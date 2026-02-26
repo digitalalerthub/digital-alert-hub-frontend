@@ -128,7 +128,7 @@ const NavBar: React.FC = () => {
                                                 className='dropdown-item'
                                                 onClick={() =>
                                                     navigate(
-                                                        '/perfil?tab=password',
+                                                        '/perfil/cambiar-contrasena',
                                                     )
                                                 }
                                             >
