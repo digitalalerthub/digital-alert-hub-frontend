@@ -1,4 +1,4 @@
-import CreateAlertWorkspace from "../components/Alert/CreateAlertWorkspace";
+import CreateAlertWorkspace from "../../components/Alert/CreateAlertWorkspace";
 
 const CreateAlertPage = () => <CreateAlertWorkspace />;
 
