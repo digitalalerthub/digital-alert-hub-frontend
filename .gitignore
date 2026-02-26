@@ -25,3 +25,6 @@ dist-ssr
 .env
 .env.production
 .env.local
+
+# Node Version Manager
+.nvmrc
