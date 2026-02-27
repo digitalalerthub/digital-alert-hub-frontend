@@ -18,6 +18,7 @@ import CreateAlertPage from './pages/Alert/CreateAlertPage';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserTable from './components/Admin/UserTable';
 import RoleTable from './components/Admin/RoleTable';
+import RoleRoute from './components/Route/RoleRoute';
 
 // Componentes
 import NavBar from './components/Layout/NavBar';
@@ -51,55 +52,25 @@ function App() {
                     />
                     <Route path='/auth/callback' element={<Callback />} />
 
-                    {/* Rutas Protegidas */}
-                    <Route
-                        path='/admin'
-                        element={
-                            <PrivateRoute>
-                                <AdminDashboard />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path='/admin/users'
-                        element={
-                            <PrivateRoute>
-                                <UserTable />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path='/admin/roles'
-                        element={
-                            <PrivateRoute>
-                                <RoleTable />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path='/crear-alertas'
-                        element={
-                            <PrivateRoute>
-                                <CreateAlertPage />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path='/perfil'
-                        element={
-                            <PrivateRoute>
-                                <ProfilePage />
-                            </PrivateRoute>
-                        }
-                    />
-                    <Route
-                        path='/perfil/cambiar-contrasena'
-                        element={
-                            <PrivateRoute>
-                                <ChangePasswordPage />
-                            </PrivateRoute>
-                        }
-                    />
+                    {/* RUTAS PROTEGIDAS GENERALES */}
+                    <Route element={<PrivateRoute />}>
+                        <Route path='/admin' element={<AdminDashboard />} />
+                        <Route
+                            path='/crear-alertas'
+                            element={<CreateAlertPage />}
+                        />
+                        <Route path='/perfil' element={<ProfilePage />} />
+                        <Route
+                            path='/perfil/cambiar-contrasena'
+                            element={<ChangePasswordPage />}
+                        />
+                    </Route>
+
+                    {/*RUTAS DE ADMIN*/}
+                    <Route element={<RoleRoute allowedRoles={[1]} />}>
+                        <Route path='/admin/users' element={<UserTable />} />
+                        <Route path='/admin/roles' element={<RoleTable />} />
+                    </Route>
                 </Routes>
                 <ToastContainer position='top-right' autoClose={3000} />
             </Router>

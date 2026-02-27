@@ -3,7 +3,6 @@
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
-// Definimos un hook personalizado: useAuth
 // Su propósito es facilitar el uso del AuthContext en otros componentes
 export const useAuth = () => {
   const context = useContext(AuthContext);  // Esto nos da acceso a las variables y funciones compartidas (isLoggedIn, login, logout)

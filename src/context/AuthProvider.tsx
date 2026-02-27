@@ -1,56 +1,69 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { jwtDecode } from "jwt-decode";
-import { AuthContext } from "./AuthContext";
-import type { JWTPayload } from "./AuthContext";
+// Controla el manejo global de autenticación
+
+import { useState, useEffect, type ReactNode } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import { AuthContext } from './AuthContext';
+import type { JWTPayload } from './AuthContext';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<JWTPayload | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+    const [user, setUser] = useState<JWTPayload | null>(null);
+    const [token, setToken] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const savedToken = localStorage.getItem("token");
+    const isTokenExpired = (token: string): boolean => {
+        try {
+            const decoded = jwtDecode<JWTPayload>(token);
+            const now = Math.floor(Date.now() / 1000);
+            return decoded.exp < now;
+        } catch {
+            return true;
+        }
+    };
 
-    if (savedToken) {
-      try {
-        const decoded = jwtDecode<JWTPayload>(savedToken);
+    useEffect(() => {
+        const savedToken = localStorage.getItem('token');
+
+        if (savedToken && !isTokenExpired(savedToken)) {
+            try {
+                const decoded = jwtDecode<JWTPayload>(savedToken);
+                setUser(decoded);
+                setToken(savedToken);
+            } catch {
+                localStorage.removeItem('token');
+            }
+        } else {
+            localStorage.removeItem('token');
+        }
+
+        setIsLoading(false);
+    }, []);
+
+    const login = (newToken: string) => {
+        localStorage.setItem('token', newToken);
+        const decoded = jwtDecode<JWTPayload>(newToken);
         setUser(decoded);
-        setToken(savedToken);
-        setIsLoggedIn(true);
-      } catch {
-        localStorage.removeItem("token");
-      }
-    }
-  }, []);
+        setToken(newToken);
+    };
 
-  const login = (newToken: string) => {
-    localStorage.setItem("token", newToken);
-    const decoded = jwtDecode<JWTPayload>(newToken);
+    const logout = () => {
+        localStorage.removeItem('token');
+        setUser(null);
+        setToken(null);
+    };
 
-    setUser(decoded);
-    setToken(newToken);
-    setIsLoggedIn(true);
-  };
-
-  const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
-    setToken(null);
-    setIsLoggedIn(false);
-  };
-
-  return (
-    <AuthContext.Provider
-      value={{
-        isLoggedIn,
-        user,
-        isAdmin: user?.rol === 1,
-        token,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider
+            value={{
+                isLoggedIn: !!user,
+                user,
+                isAdmin: user?.rol === 1,
+                token,
+                isLoading,
+                login,
+                logout,
+            }}
+        >
+            {children}
+        </AuthContext.Provider>
+    );
 };

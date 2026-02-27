@@ -1,45 +1,30 @@
-import { useEffect, useState } from "react";
+// Controla el navegador para que oculte cuando hay un inicio de sesión
+
+import { useEffect, useState, useRef } from 'react';
 
 export function useHideOnScroll() {
-  // Estado que indica si el navbar debe ocultarse o no
-  const [hidden, setHidden] = useState(false);
+    const [hidden, setHidden] = useState(false);
+    const lastScrollY = useRef(0);
 
-  // Guarda la última posición del scroll para detectar si sube o baja
-  const [lastScrollY, setLastScrollY] = useState(0);
+    useEffect(() => {
+        const handleScroll = () => {
+            const current = window.scrollY;
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const current = window.scrollY; // scroll actual
+            if (current < 80) {
+                setHidden(false); // Siempre visible en la parte superior el nav
+            } else if (current > lastScrollY.current) {
+                setHidden(true); // Scroll hacia abajo ocultarse
+            }
 
-      /* ================================
-         LÓGICA EXACTA QUE USAS PARA OCULTAR EL NAVBAR
-         ================================ */
+            lastScrollY.current = current;
+        };
 
-      if (current < 80) {
-        // 👉 Si estás en la parte superior de la página → mostrar navbar siempre
-        setHidden(false);
-      } else {
-        if (current > lastScrollY) {
-          // 👉 Si el scroll va hacia abajo → ocultar navbar
-          setHidden(true);
-        } else {
-          // 👉 Si el scroll va hacia arriba → NO mostrar todavía
-          //     (solo se mostrará cuando vuelva a la zona superior)
-          setHidden(true);
-        }
-      }
+        window.addEventListener('scroll', handleScroll);
 
-      // Actualizar la última posición del scroll
-      setLastScrollY(current);
-    };
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []); // solo una vez
 
-    // Escuchar el scroll del usuario
-    window.addEventListener("scroll", handleScroll);
-
-    // Limpiar el evento cuando el componente se desmonta
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]); // Re-evaluar cuando cambie la posición previa del scroll
-
-  // El componente que use este hook sabrá si debe ocultarse o mostrarse
-  return hidden;
+    return hidden;
 }
