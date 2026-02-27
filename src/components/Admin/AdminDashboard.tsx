@@ -73,6 +73,20 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
+                {/* Tarjeta Report JAC */}
+                <div className='col-lg-4'>
+                    <div
+                        className='card shadow h-100'
+                        onClick={() => navigate('/reportes')}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <div className='card-body text-center p-5'>
+                            <i className='bi bi-people-fill fs-1 text-danger'></i>
+                            <h3 className='fw-bold text-danger'>Panel JAC</h3>
+                            <p className='text-muted'>Gestión Comunitaria</p>
+                        </div>
+                    </div>
+                </div>
                 {/* Admin, Ciudadano y JAC */}
                 <div className='col-lg-4'>
                     <div
