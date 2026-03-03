@@ -110,14 +110,14 @@ export const formatAlertDate = (value?: string): string => {
 export const getStatusMeta = (idEstado: number) => {
   switch (idEstado) {
     case 1:
-      return { label: "Activa", className: "text-bg-success" };
+      return { label: "Pendiente", className: "is-pending" };
     case 2:
-      return { label: "En proceso", className: "text-bg-warning text-dark" };
+      return { label: "En Progreso", className: "is-progress" };
     case 3:
-      return { label: "Atendida", className: "text-bg-primary" };
+      return { label: "Resuelta", className: "is-resolved" };
     case 4:
-      return { label: "Cerrada", className: "text-bg-secondary" };
+      return { label: "Falsa Alerta", className: "is-false-alert" };
     default:
-      return { label: "Sin estado", className: "text-bg-dark" };
+      return { label: "Sin Estado", className: "is-unknown" };
   }
 };
