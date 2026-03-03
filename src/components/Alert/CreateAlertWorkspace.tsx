@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import L from "leaflet";
+import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import type { Alert } from "../../types/Alert";
 import AlertDetailModal from "./AlertDetailModal";
 import AlertEditModal from "./AlertEditModal";
@@ -17,19 +13,8 @@ import { useAlertsManager } from "./hooks/useAlertsManager";
 import { useAuth } from "../../context/useAuth";
 import "./CreateAlertWorkspace.css";
 
-const iconDefaultProto = L.Icon.Default.prototype as unknown as {
-  _getIconUrl?: () => string;
-};
-delete iconDefaultProto._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 const CreateAlertWorkspace = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [editingAlert, setEditingAlert] = useState<Alert | null>(null);
 
@@ -44,9 +29,17 @@ const CreateAlertWorkspace = () => {
     setPrioridad,
     ubicacion,
     setUbicacion,
-    evidencia,
+    comunas,
+    barrios,
+    comunaId,
+    barrioId,
+    onComunaChange,
+    setBarrioId,
+    loadingLocations,
+    evidencias,
     submitting,
     handleEvidenceChange,
+    handleEvidenceDrop,
     submitAlert,
   } = useAlertCreationForm();
 
@@ -58,7 +51,6 @@ const CreateAlertWorkspace = () => {
     forceCoordsOnSubmit,
     suggestions,
     suggestionsLoading,
-    isMapReady,
     renderActiveAlertsOnMap,
     handleManualUbicacionChange,
     handleSelectSuggestion,
@@ -81,10 +73,8 @@ const CreateAlertWorkspace = () => {
   } = useAlertsManager({ renderActiveAlertsOnMap });
 
   useEffect(() => {
-    if (isMapReady) {
-      void loadAlerts();
-    }
-  }, [isMapReady, loadAlerts]);
+    void loadAlerts();
+  }, [loadAlerts]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -105,7 +95,7 @@ const CreateAlertWorkspace = () => {
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
               <Link to="/admin" className="breadcrumb-link">
-                <i className="bi bi-house-door-fill me-2" />
+                <i className="bi bi-house-door me-2" />
                 Panel Principal
               </Link>
             </li>
@@ -117,9 +107,6 @@ const CreateAlertWorkspace = () => {
 
         <div className="create-alert-header-section">
           <h1 className="create-alert-page-title">Gestion de Alertas</h1>
-          <p className="create-alert-page-subtitle">
-            Administra y controla los reportes de alertas del sistema
-          </p>
         </div>
 
         <div className="create-alert-shell">
@@ -136,18 +123,26 @@ const CreateAlertWorkspace = () => {
             ubicacion={ubicacion}
             onUbicacionChange={handleManualUbicacionChange}
             onAddressBlur={handleAddressBlur}
-            reverseLoading={reverseLoading}
             suggestionsLoading={suggestionsLoading}
             suggestions={suggestions}
             onSelectSuggestion={handleSelectSuggestion}
             onVerifyAddress={verifyAddress}
             onUseMyLocation={useMyLocation}
+            reverseLoading={reverseLoading}
             locatingUser={locatingUser}
-            submitting={submitting}
-            evidencia={evidencia}
-            onEvidenceChange={handleEvidenceChange}
+            comunas={comunas}
+            comunaId={comunaId}
+            onComunaChange={onComunaChange}
+            barrioId={barrioId}
+            barrios={barrios}
+            onBarrioChange={setBarrioId}
+            loadingLocations={loadingLocations}
             mapContainerRef={mapContainerRef}
             selectedCoords={selectedCoords}
+            submitting={submitting}
+            evidencias={evidencias}
+            onEvidenceChange={handleEvidenceChange}
+            onEvidenceDrop={handleEvidenceDrop}
           />
 
           <AlertListSection
@@ -159,7 +154,7 @@ const CreateAlertWorkspace = () => {
             currentPage={currentPage}
             onPageChange={onPageChange}
             onSelectAlert={setSelectedAlert}
-            onBackToAdmin={() => navigate("/admin")}
+            currentUserId={user?.id ?? null}
           />
         </div>
       </div>

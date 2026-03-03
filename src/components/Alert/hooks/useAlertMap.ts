@@ -334,6 +334,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
     verifyAddress,
     useMyLocation,
     handleAddressBlur,
+    setLocationFromCoords,
     clearLocationSelection,
   };
 };
