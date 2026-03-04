@@ -19,6 +19,7 @@ import AdminDashboard from './components/Admin/AdminDashboard';
 import UserTable from './components/Admin/UserTable';
 import RoleTable from './components/Admin/RoleTable';
 import RoleRoute from './components/Route/RoleRoute';
+import JACAlertPanel from './pages/Jac/JACAlertPanel';
 
 // Componentes
 import NavBar from './components/Layout/NavBar';
@@ -70,6 +71,14 @@ function App() {
                     <Route element={<RoleRoute allowedRoles={[1]} />}>
                         <Route path='/admin/users' element={<UserTable />} />
                         <Route path='/admin/roles' element={<RoleTable />} />
+                    </Route>
+
+                    {/* RUTAS JAC + ADMIN */}
+                    <Route element={<RoleRoute allowedRoles={[1, 3]} />}>
+                        <Route
+                            path='/jac/alertas'
+                            element={<JACAlertPanel />}
+                        />
                     </Route>
                 </Routes>
                 <ToastContainer position='top-right' autoClose={3000} />

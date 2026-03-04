@@ -72,22 +72,27 @@ const AdminDashboard = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Tarjeta Report JAC */}
-                <div className='col-lg-4'>
-                    <div
-                        className='card shadow h-100'
-                        onClick={() => navigate('/reportes')}
-                        style={{ cursor: 'pointer' }}
-                    >
-                        <div className='card-body text-center p-5'>
-                            <i className='bi bi-people-fill fs-1 text-danger'></i>
-                            <h3 className='fw-bold text-danger'>Panel JAC</h3>
-                            <p className='text-muted'>Gestión Comunitaria</p>
+                {/* Tarjeta Panel JAC — solo Admin (1) y JAC (3) */}
+                {(rol === 1 || rol === 3) && (
+                    <div className='col-lg-4'>
+                        <div
+                            className='card shadow h-100'
+                            onClick={() => navigate('/jac/alertas')}
+                            style={{ cursor: 'pointer' }}
+                        >
+                            <div className='card-body text-center p-5'>
+                                <i className='bi bi-people-fill fs-1 text-danger'></i>
+                                <h3 className='fw-bold text-danger'>
+                                    Panel JAC
+                                </h3>
+                                <p className='text-muted'>
+                                    Gestión Comunitaria
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                {/* Admin, Ciudadano y JAC */}
+                )}
+                {/* Tarjeta Power BI */}
                 <div className='col-lg-4'>
                     <div
                         className='card shadow h-100'
