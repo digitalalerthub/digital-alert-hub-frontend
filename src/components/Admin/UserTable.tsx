@@ -10,6 +10,7 @@ const UserTable = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<Rol[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -22,20 +23,33 @@ const UserTable = () => {
   }, []);
 
   const loadData = async () => {
-    try {
-      const [usersList, rolesList] = await Promise.all([
+    setLoading(true);
+    setErrorMessage(null);
+
+    const [usersResult, rolesResult] = await Promise.allSettled([
         usersService.getAll(),
         rolesService.getAll(),
       ]);
 
-      setUsers(usersList);
-      setRoles(rolesList);
+      if (usersResult.status === "fulfilled") {
+        setUsers(usersResult.value);
+      } else {
+        console.error("Error cargando usuarios", usersResult.reason);
+        setUsers([]);
+        setErrorMessage(
+          "No fue posible consultar la API de usuarios. Verifica que el backend esté activo y que tu sesión tenga permisos de administrador."
+        );
+      }
+
+      if (rolesResult.status === "fulfilled") {
+        setRoles(rolesResult.value);
+      } else {
+        console.warn("Error cargando roles", rolesResult.reason);
+        setRoles([]);
+      }
+
       setCurrentPage(1);
-    } catch (err) {
-      console.error("Error cargando usuarios o roles", err);
-    } finally {
       setLoading(false);
-    }
   };
 
   // Filtrado de usuarios
@@ -196,7 +210,7 @@ const UserTable = () => {
           </button>
         </div>
 
-        {searchTerm && (
+        {searchTerm && !errorMessage && (
           <div className="search-results-info">
             {filteredUsers.length === 0 ? (
               <span className="no-results-text">
@@ -230,12 +244,16 @@ const UserTable = () => {
                 </svg>
               </div>
               <h3 className="empty-title">
-                {searchTerm
+                {errorMessage
+                  ? "No se pudieron cargar los usuarios"
+                  : searchTerm
                   ? "No se encontraron resultados"
                   : "No hay usuarios"}
               </h3>
               <p className="empty-description">
-                {searchTerm
+                {errorMessage
+                  ? errorMessage
+                  : searchTerm
                   ? "Intenta con otros términos de búsqueda"
                   : "Comienza creando tu primer usuario"}
               </p>
