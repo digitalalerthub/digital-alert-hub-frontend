@@ -1,20 +1,20 @@
-// Este componente: Envía credenciales, obtiene token, ejecuta login()
-
 import { useState } from "react";
 import type { FormEvent } from "react";
-import api from "../../services/api";
 import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import api from "../../services/api";
 import { useAuth } from "../../context/useAuth";
-import "../../App.css";
 import GoogleButton from "./GoogleButton";
+import "../../App.css";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [contrasena, setPassword] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+  const redirectTo = new URLSearchParams(location.search).get("redirect") || "/admin";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,8 +23,8 @@ const LoginForm = () => {
       const res = await api.post("/auth/login", { email, contrasena });
       login(res.data.token);
 
-      toast.success("Inicio de sesión exitoso");
-      setTimeout(() => navigate("/admin"), 800);
+      toast.success("Inicio de sesion exitoso");
+      setTimeout(() => navigate(redirectTo, { replace: true }), 800);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "Error en el login");
@@ -42,65 +42,54 @@ const LoginForm = () => {
         style={{ width: "360px", borderRadius: "15px" }}
       >
         <div className="text-center mb-3">
-          <i className="bi bi-box-arrow-in-right fs-1 text-primary"></i>
+          <i className="bi bi-box-arrow-in-right fs-1 text-primary" />
         </div>
 
-        <h3 className="text-center mb-4 fw-bold">Iniciar Sesión</h3>
+        <h3 className="text-center mb-4 fw-bold">Iniciar Sesion</h3>
 
         <form onSubmit={handleSubmit}>
-          {/* Campo Email */}
           <div className="position-relative mb-3">
-            <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="email"
               className="form-control ps-5"
-              placeholder="Correo electrónico"
+              placeholder="Correo electronico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          {/* Campo Contraseña */}
           <div className="position-relative mb-4">
-            <i className="bi bi-lock position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-lock position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="password"
               className="form-control ps-5"
-              placeholder="Contraseña"
+              placeholder="Contrasena"
               value={contrasena}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
           </div>
 
-          {/* Botón enviar */}
           <div className="d-flex justify-content-center mb-3">
             <button type="submit" className="btn btn-primary w-50">
               Ingresar
             </button>
           </div>
 
-          {/* BOTÓN DE GOOGLE */}
           <div className="d-flex justify-content-center mb-3">
             <GoogleButton />
           </div>
 
-          {/* Enlaces secundarios */}
           <div className="text-center">
-            <a
-              href="/forgot-password"
-              className="d-block text-secondary mb-1 small"
-            >
-              ¿Olvidaste la contraseña?
-            </a>
+            <Link to="/forgot-password" className="d-block text-secondary mb-1 small">
+              Olvidaste la contrasena?
+            </Link>
 
-            <a
-              href="/register"
-              className="d-block fw-semibold text-primary small"
-            >
-              ¿Eres un usuario nuevo? Crear cuenta
-            </a>
+            <Link to={`/register${location.search}`} className="d-block fw-semibold text-primary small">
+              Eres un usuario nuevo? Crear cuenta
+            </Link>
           </div>
         </form>
       </div>

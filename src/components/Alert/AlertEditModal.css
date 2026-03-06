@@ -219,6 +219,54 @@
   font-size: 0.68rem;
 }
 
+.alert-edit-existing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.55rem;
+}
+
+.alert-edit-existing-item {
+  position: relative;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e2e8f0;
+  aspect-ratio: 1 / 1;
+}
+
+.alert-edit-existing-media {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.alert-edit-existing-remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  border: 1px solid #fecaca;
+  background: rgba(254, 242, 242, 0.96);
+  color: #b91c1c;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  line-height: 1;
+}
+
+.alert-edit-existing-remove:hover:not(:disabled) {
+  background: #fee2e2;
+}
+
+.alert-edit-existing-remove:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
 .alert-edit-dropzone-wrap {
   position: relative;
 }
