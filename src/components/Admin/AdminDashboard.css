@@ -1,0 +1,48 @@
+/* FONDO: overlay oscuro semitransparente sobre la imagen */
+.panel-admin {
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.55); /* overlay oscuro */
+    background-blend-mode: darken;
+    background-image: url('/public/crearAlerta.avif');
+    background-size: cover;
+    background-position: center;
+}
+
+/* TÍTULO más legible */
+.panel-admin h1 {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+/* CARDS: glassmorphism (vidrio esmerilado) */
+.panel-admin .card {
+    background: rgba(255, 255, 255, 0.92) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 0, 0, 0.7) !important;
+    border-radius: 20px !important;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Hover en cards */
+.panel-admin .card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Iconos más grandes */
+.panel-admin .card-body i {
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* Subtítulos de cards */
+.panel-admin .card-body .text-muted {
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
