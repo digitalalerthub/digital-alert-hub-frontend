@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, MouseEvent } from "react";
+import axios from "axios";
 import L from "leaflet";
+import { useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import type { Alert, AlertEvidence } from "../../types/Alert";
 import reactionsService from "../../services/reactionsService";
 import type { AlertReactionSummary } from "../../types/Reaction";
@@ -81,7 +84,9 @@ const AlertDetailModal = ({
   onEdit,
   onDeleteRequest,
 }: Props) => {
-  const { user, isAdmin } = useAuth();
+  const { user, isAdmin, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [reactions, setReactions] = useState<AlertReactionSummary[]>([]);
@@ -104,6 +109,10 @@ const AlertDetailModal = ({
   );
   const status = getStatusMeta(alert.id_estado);
   const priorityText = (alert.prioridad || "Sin prioridad").toUpperCase();
+  const shareUrl = useMemo(
+    () => `${window.location.origin}/alertas/${alert.id_alerta}`,
+    [alert.id_alerta]
+  );
   const evidenceItems = useMemo(() => {
     const listFromArray = (alert.evidencias || [])
       .filter((item): item is AlertEvidence => Boolean(item?.url_evidencia))
@@ -223,13 +232,27 @@ const AlertDetailModal = ({
     };
   }, [alert.id_alerta]);
 
+  const redirectToLogin = (reason: "reaction" | "comment") => {
+    const actionLabel = reason === "reaction" ? "reaccionar" : "comentar";
+    const redirectPath = `${location.pathname}${location.search}${location.hash}`;
+    toast.info(`Debes iniciar sesion o crear una cuenta para ${actionLabel} esta alerta`);
+    navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`);
+  };
+
   const handleReactionToggle = async (idReaccion: number) => {
+    if (!isLoggedIn) {
+      redirectToLogin("reaction");
+      return;
+    }
+
     setPendingReactionId(idReaccion);
     try {
       const data = await reactionsService.toggleAlertReaction(alert.id_alerta, idReaccion);
       setReactions(data);
-    } catch {
-      // Sin bloquear el modal por errores de red.
+    } catch (error) {
+      if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+        redirectToLogin("reaction");
+      }
     } finally {
       setPendingReactionId((current) => (current === idReaccion ? null : current));
     }
@@ -239,7 +262,7 @@ const AlertDetailModal = ({
     const shareData = {
       title: alert.titulo,
       text: `Alerta: ${alert.titulo} - ${readableLocation}`,
-      url: window.location.href,
+      url: shareUrl,
     };
 
     try {
@@ -261,6 +284,10 @@ const AlertDetailModal = ({
 
     const cleanText = commentText.trim();
     if (!cleanText || submittingComment) return;
+    if (!isLoggedIn) {
+      redirectToLogin("comment");
+      return;
+    }
 
     try {
       setSubmittingComment(true);
@@ -269,8 +296,10 @@ const AlertDetailModal = ({
       });
       setComments((prev) => [...prev, createdComment]);
       setCommentText("");
-    } catch {
-      // No bloqueamos el modal por errores de red.
+    } catch (error) {
+      if (axios.isAxiosError(error) && [401, 403].includes(error.response?.status ?? 0)) {
+        redirectToLogin("comment");
+      }
     } finally {
       setSubmittingComment(false);
     }
@@ -516,6 +545,11 @@ const AlertDetailModal = ({
                 {submittingComment ? "..." : "Enviar"}
               </button>
             </form>
+            {!isLoggedIn && (
+              <p className="alert-detail-reactions-empty">
+                Inicia sesion o crea una cuenta para comentar o reaccionar.
+              </p>
+            )}
 
             {loadingComments && <span className="alert-detail-reactions-empty">Cargando comentarios...</span>}
 

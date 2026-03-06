@@ -124,7 +124,7 @@ const AlertListSection = ({
 
     const readableLocation = (alert.ubicacion || "").split(" | Punto en mapa:")[0].trim();
     const shareText = `Alerta: ${alert.titulo}${readableLocation ? ` - ${readableLocation}` : ""}`;
-    const shareUrl = window.location.href;
+    const shareUrl = `${window.location.origin}/alertas/${alert.id_alerta}`;
 
     try {
       if (navigator.share) {
@@ -201,24 +201,7 @@ const AlertListSection = ({
                 }
               }}
             >
-              <div className="create-alert-item-top">
-                <div className="create-alert-item-user">
-                  <i className="bi bi-person-circle create-alert-item-user-icon" />
-                  <div>
-                    <p className="create-alert-item-user-name">{creatorName}</p>
-                    <span className="create-alert-item-date">{formatAlertDate(alert.created_at)}</span>
-                  </div>
-                </div>
-
-                <div className="create-alert-item-state">
-                  <span className={`create-alert-item-status ${status.className}`}>{status.label}</span>
-                  <span className="create-alert-item-priority-note">
-                    Prioridad {alert.prioridad || "Sin prioridad"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="create-alert-item-body">
+              <div className="create-alert-item-layout">
                 <div className="create-alert-item-media">
                   {hasImageEvidence ? (
                     <img
@@ -233,70 +216,93 @@ const AlertListSection = ({
                   )}
                 </div>
 
-                <div className="create-alert-item-content">
-                  <h4 className="create-alert-item-title">{alert.titulo}</h4>
-                  <p className="create-alert-item-desc">{alert.descripcion}</p>
+                <div className="create-alert-item-side">
+                  <div className="create-alert-item-content">
+                    <div className="create-alert-item-content-top">
+                      <div className="create-alert-item-user">
+                        <i className="bi bi-person-circle create-alert-item-user-icon" />
+                        <div>
+                          <p className="create-alert-item-user-name">{creatorName}</p>
+                          <span className="create-alert-item-date">{formatAlertDate(alert.created_at)}</span>
+                        </div>
+                      </div>
 
-                  <div className="create-alert-item-meta">
-                    <span className="badge rounded-pill text-bg-light">{alert.categoria}</span>
-                    {alert.ubicacion && <span className="create-alert-item-location">{alert.ubicacion}</span>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="create-alert-item-footer">
-                <div className="create-alert-item-share">
-                  <button
-                    type="button"
-                    className="create-alert-icon-btn"
-                    title="Compartir alerta"
-                    onClick={(event) => void handleShareClick(event, alert)}
-                    onKeyDown={(event) => event.stopPropagation()}
-                  >
-                    <i className="bi bi-share create-alert-footer-icon" />
-                  </button>
-                </div>
-                <div className="create-alert-item-actions">
-                  <i className="bi bi-chat-left-text create-alert-footer-icon" />
-                  {alertReactions.length > 0 && (
-                    <div className="create-alert-item-reactions">
-                      {alertReactions.map((reaction) => {
-                        const reactionKey = `${alert.id_alerta}-${reaction.id_reaccion}`;
-                        return (
-                          <button
-                            key={reaction.id_reaccion}
-                            type="button"
-                            className={`create-alert-reaction-chip ${reaction.user_reacted ? "is-active" : ""}`}
-                            title={reaction.descrip_tipo_reaccion || "Reaccion"}
-                            onClick={(event) =>
-                              void handleReactionClick(event, alert.id_alerta, reaction.id_reaccion)
-                            }
-                            onKeyDown={(event) => event.stopPropagation()}
-                            disabled={pendingReaction === reactionKey}
-                          >
-                            <span>{reaction.tipo}</span>
-                            {reaction.count > 0 && (
-                              <span className="create-alert-reaction-count">{reaction.count}</span>
-                            )}
-                          </button>
-                        );
-                      })}
+                      <div className="create-alert-item-state">
+                        <span className={`create-alert-item-status ${status.className}`}>{status.label}</span>
+                        <span className="create-alert-item-priority-note">
+                          Prioridad {alert.prioridad || "Sin prioridad"}
+                        </span>
+                      </div>
                     </div>
-                  )}
-                </div>
-                {canDeleteAlert && (
-                  <div className="create-alert-item-tools">
-                    <button
-                      type="button"
-                      className="create-alert-icon-btn"
-                      title="Eliminar alerta"
-                      onClick={(event) => void handleDeleteClick(event, alert)}
-                      onKeyDown={(event) => event.stopPropagation()}
-                    >
-                      <i className="bi bi-trash3 create-alert-footer-icon" />
-                    </button>
+
+                    <div className="create-alert-item-main">
+                      <h4 className="create-alert-item-title">{alert.titulo}</h4>
+                      <p className="create-alert-item-desc">{alert.descripcion}</p>
+                    </div>
+
+                    <div className="create-alert-item-meta">
+                      <span className="badge rounded-pill text-bg-light">{alert.categoria}</span>
+                      {alert.ubicacion && <span className="create-alert-item-location">{alert.ubicacion}</span>}
+                    </div>
                   </div>
-                )}
+
+                  <div className="create-alert-item-footer">
+                    <div className="create-alert-item-share">
+                      <button
+                        type="button"
+                        className="create-alert-icon-btn"
+                        title="Compartir alerta"
+                        onClick={(event) => void handleShareClick(event, alert)}
+                        onKeyDown={(event) => event.stopPropagation()}
+                      >
+                        <i className="bi bi-share create-alert-footer-icon" />
+                      </button>
+                    </div>
+
+                    <div className="create-alert-item-actions">
+                      <i className="bi bi-chat-left-text create-alert-footer-icon" />
+                      {alertReactions.length > 0 && (
+                        <div className="create-alert-item-reactions">
+                          {alertReactions.map((reaction) => {
+                            const reactionKey = `${alert.id_alerta}-${reaction.id_reaccion}`;
+                            return (
+                              <button
+                                key={reaction.id_reaccion}
+                                type="button"
+                                className={`create-alert-reaction-chip ${reaction.user_reacted ? "is-active" : ""}`}
+                                title={reaction.descrip_tipo_reaccion || "Reaccion"}
+                                onClick={(event) =>
+                                  void handleReactionClick(event, alert.id_alerta, reaction.id_reaccion)
+                                }
+                                onKeyDown={(event) => event.stopPropagation()}
+                                disabled={pendingReaction === reactionKey}
+                              >
+                                <span>{reaction.tipo}</span>
+                                {reaction.count > 0 && (
+                                  <span className="create-alert-reaction-count">{reaction.count}</span>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {canDeleteAlert && (
+                      <div className="create-alert-item-tools">
+                        <button
+                          type="button"
+                          className="create-alert-icon-btn"
+                          title="Eliminar alerta"
+                          onClick={(event) => void handleDeleteClick(event, alert)}
+                          onKeyDown={(event) => event.stopPropagation()}
+                        >
+                          <i className="bi bi-trash3 create-alert-footer-icon" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </article>
           );

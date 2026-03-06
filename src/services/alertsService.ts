@@ -39,6 +39,11 @@ const alertsService = {
         return data;
     },
 
+    getById: async (id: number): Promise<Alert> => {
+        const { data } = await api.get<Alert>(`/alerts/${id}`);
+        return data;
+    },
+
     update: async (id: number, payload: UpdateAlertPayload): Promise<Alert> => {
         const formData = new FormData();
 

@@ -19,6 +19,8 @@ export interface Alert {
   id_alerta: number;
   id_usuario: number;
   nombre_usuario?: string;
+  nombre_comuna?: string;
+  nombre_barrio?: string;
   id_estado: number;
   id_comuna?: number;
   id_barrio?: number;

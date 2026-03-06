@@ -15,6 +15,7 @@ import ForgotPasswordPage from './pages/Auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/Auth/ResetPasswordPage';
 import Callback from './pages/Auth/Callback';
 import CreateAlertPage from './pages/Alert/CreateAlertPage';
+import AlertDetailPage from './pages/Alert/AlertDetailPage';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import UserTable from './components/Admin/UserTable';
 import RoleTable from './components/Admin/RoleTable';
@@ -43,6 +44,7 @@ function App() {
                     <Route path='/contacto' element={<ContactoPage />} />
                     <Route path='/login' element={<LoginPage />} />
                     <Route path='/register' element={<RegisterPage />} />
+                    <Route path='/alertas/:id' element={<AlertDetailPage />} />
                     <Route
                         path='/forgot-password'
                         element={<ForgotPasswordPage />}
