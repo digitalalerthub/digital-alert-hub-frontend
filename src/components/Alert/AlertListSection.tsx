@@ -16,6 +16,8 @@ type Props = {
   onPageChange: (page: number) => void;
   onSelectAlert: (alert: Alert) => void;
   currentUserId: number | null;
+  isAdmin: boolean;
+  onDeleteAlertRequest: (alert: Alert) => void;
 };
 
 const buildDefaultReactionSummary = (catalog: Reaction[]): AlertReactionSummary[] =>
@@ -35,6 +37,8 @@ const AlertListSection = ({
   onPageChange,
   onSelectAlert,
   currentUserId,
+  isAdmin,
+  onDeleteAlertRequest,
 }: Props) => {
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [reactionSummaryByAlert, setReactionSummaryByAlert] = useState<
@@ -146,6 +150,12 @@ const AlertListSection = ({
     }
   };
 
+  const handleDeleteClick = async (event: MouseEvent<HTMLButtonElement>, alert: Alert) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onDeleteAlertRequest(alert);
+  };
+
   return (
     <section className="create-alert-right">
       <div className="create-alert-search-wrap">
@@ -175,6 +185,7 @@ const AlertListSection = ({
           const creatorName = alert.nombre_usuario?.trim() || `Usuario #${alert.id_usuario}`;
           const isOwnAlert =
             currentUserId !== null && Number(currentUserId) === Number(alert.id_usuario);
+          const canDeleteAlert = isAdmin || (isOwnAlert && alert.id_estado === 1);
 
           return (
             <article
@@ -273,9 +284,17 @@ const AlertListSection = ({
                     </div>
                   )}
                 </div>
-                {isOwnAlert && (
+                {canDeleteAlert && (
                   <div className="create-alert-item-tools">
-                    <i className="bi bi-trash3 create-alert-footer-icon" />
+                    <button
+                      type="button"
+                      className="create-alert-icon-btn"
+                      title="Eliminar alerta"
+                      onClick={(event) => void handleDeleteClick(event, alert)}
+                      onKeyDown={(event) => event.stopPropagation()}
+                    >
+                      <i className="bi bi-trash3 create-alert-footer-icon" />
+                    </button>
                   </div>
                 )}
               </div>

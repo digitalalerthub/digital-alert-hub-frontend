@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import "leaflet/dist/leaflet.css";
 import type { Alert } from "../../types/Alert";
+import AlertDeleteConfirmModal from "./AlertDeleteConfirmModal";
 import AlertDetailModal from "./AlertDetailModal";
 import AlertEditModal from "./AlertEditModal";
 import AlertListSection from "./AlertListSection";
@@ -14,9 +15,17 @@ import { useAuth } from "../../context/useAuth";
 import "./CreateAlertWorkspace.css";
 
 const CreateAlertWorkspace = () => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [editingAlert, setEditingAlert] = useState<Alert | null>(null);
+  const [pendingDeleteAlert, setPendingDeleteAlert] = useState<Alert | null>(null);
+  const [deletingAlertId, setDeletingAlertId] = useState<number | null>(null);
+  const canEditSelectedAlert =
+    Boolean(selectedAlert) &&
+    (isAdmin || (user?.id === selectedAlert?.id_usuario && selectedAlert?.id_estado === 1));
+  const canDeleteSelectedAlert =
+    Boolean(selectedAlert) &&
+    (isAdmin || (user?.id === selectedAlert?.id_usuario && selectedAlert?.id_estado === 1));
 
   const {
     titulo,
@@ -35,6 +44,7 @@ const CreateAlertWorkspace = () => {
     barrioId,
     onComunaChange,
     setBarrioId,
+    autoSelectAdministrativeLocation,
     loadingLocations,
     evidencias,
     submitting,
@@ -68,6 +78,7 @@ const CreateAlertWorkspace = () => {
     currentPage,
     loadAlerts,
     handleUpdateAlert,
+    handleDeleteAlert,
     onSearchChange,
     onPageChange,
   } = useAlertsManager({ renderActiveAlertsOnMap });
@@ -75,6 +86,11 @@ const CreateAlertWorkspace = () => {
   useEffect(() => {
     void loadAlerts();
   }, [loadAlerts]);
+
+  useEffect(() => {
+    if (!selectedCoords) return;
+    void autoSelectAdministrativeLocation(selectedCoords);
+  }, [autoSelectAdministrativeLocation, selectedCoords]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -88,6 +104,36 @@ const CreateAlertWorkspace = () => {
     });
   };
 
+  const requestDeleteAlert = (alert: Alert) => {
+    setPendingDeleteAlert(alert);
+  };
+
+  const cancelDeleteAlert = () => {
+    if (deletingAlertId !== null) return;
+    setPendingDeleteAlert(null);
+  };
+
+  const confirmDeleteAlert = async () => {
+    if (!pendingDeleteAlert || deletingAlertId !== null) return;
+
+    try {
+      setDeletingAlertId(pendingDeleteAlert.id_alerta);
+      await handleDeleteAlert(pendingDeleteAlert.id_alerta);
+
+      if (selectedAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
+        setSelectedAlert(null);
+      }
+
+      if (editingAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
+        setEditingAlert(null);
+      }
+
+      setPendingDeleteAlert(null);
+    } finally {
+      setDeletingAlertId(null);
+    }
+  };
+
   return (
     <div className="create-alert-page">
       <div className="create-alert-layout">
@@ -95,7 +141,7 @@ const CreateAlertWorkspace = () => {
           <ol className="breadcrumb">
             <li className="breadcrumb-item">
               <Link to="/admin" className="breadcrumb-link">
-                <i className="bi bi-house-door me-2" />
+                <i className="bi bi-house-door-fill me-2 create-alert-home-icon" />
                 Panel Principal
               </Link>
             </li>
@@ -155,14 +201,18 @@ const CreateAlertWorkspace = () => {
             onPageChange={onPageChange}
             onSelectAlert={setSelectedAlert}
             currentUserId={user?.id ?? null}
+            isAdmin={isAdmin}
+            onDeleteAlertRequest={requestDeleteAlert}
           />
         </div>
       </div>
       {selectedAlert && (
         <AlertDetailModal
           alert={selectedAlert}
-          canEdit={user?.id === selectedAlert.id_usuario && selectedAlert.id_estado === 1}
+          canEdit={canEditSelectedAlert}
+          canDelete={canDeleteSelectedAlert}
           onEdit={() => setEditingAlert(selectedAlert)}
+          onDeleteRequest={requestDeleteAlert}
           onClose={() => setSelectedAlert(null)}
         />
       )}
@@ -171,6 +221,14 @@ const CreateAlertWorkspace = () => {
           alert={editingAlert}
           onClose={() => setEditingAlert(null)}
           onSave={handleUpdateAlert}
+        />
+      )}
+      {pendingDeleteAlert && (
+        <AlertDeleteConfirmModal
+          alert={pendingDeleteAlert}
+          deleting={deletingAlertId === pendingDeleteAlert.id_alerta}
+          onCancel={cancelDeleteAlert}
+          onConfirm={() => void confirmDeleteAlert()}
         />
       )}
     </div>

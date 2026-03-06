@@ -43,4 +43,6 @@ export interface UpdateAlertPayload {
   id_barrio?: number;
   ubicacion?: string;
   evidencias?: File[];
+  evidencias_eliminadas?: number[];
+  eliminar_todas_evidencias?: boolean;
 }

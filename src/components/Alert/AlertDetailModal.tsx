@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { FormEvent, MouseEvent, UIEvent } from "react";
+import type { FormEvent, MouseEvent } from "react";
 import L from "leaflet";
 import type { Alert, AlertEvidence } from "../../types/Alert";
 import reactionsService from "../../services/reactionsService";
@@ -13,7 +13,9 @@ type Props = {
   alert: Alert;
   onClose: () => void;
   canEdit?: boolean;
+  canDelete?: boolean;
   onEdit?: () => void;
+  onDeleteRequest?: (alert: Alert) => void;
 };
 
 type Coords = {
@@ -71,7 +73,14 @@ const getStatusMeta = (idEstado: number) => {
   }
 };
 
-const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) => {
+const AlertDetailModal = ({
+  alert,
+  onClose,
+  canEdit = false,
+  canDelete = false,
+  onEdit,
+  onDeleteRequest,
+}: Props) => {
   const { user, isAdmin } = useAuth();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -86,7 +95,6 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
   const [editingCommentText, setEditingCommentText] = useState("");
   const [savingEditedComment, setSavingEditedComment] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
-  const [showCommentsContent, setShowCommentsContent] = useState(false);
   const [currentEvidenceIndex, setCurrentEvidenceIndex] = useState(0);
   const mapCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.ubicacion]);
   const readableLocation = useMemo(() => getReadableLocation(alert.ubicacion), [alert.ubicacion]);
@@ -159,7 +167,6 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
   }, [mapCoords]);
 
   useEffect(() => {
-    setShowCommentsContent(false);
     setCommentText("");
     setEditingCommentId(null);
     setEditingCommentText("");
@@ -249,11 +256,6 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
     }
   };
 
-  const handleModalScroll = (event: UIEvent<HTMLDivElement>) => {
-    const scrolled = event.currentTarget.scrollTop > 6;
-    setShowCommentsContent((current) => (current === scrolled ? current : scrolled));
-  };
-
   const handleCommentSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -326,6 +328,11 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
     }
   };
 
+  const handleDeleteAlert = () => {
+    if (!onDeleteRequest) return;
+    onDeleteRequest(alert);
+  };
+
   const showEvidenceNavigation = evidenceItems.length > 1;
 
   const showPreviousEvidence = (e: MouseEvent<HTMLButtonElement>) => {
@@ -346,7 +353,7 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
 
   return (
     <div className="alert-detail-backdrop" onClick={onClose}>
-      <div className="alert-detail-modal" onClick={(e) => e.stopPropagation()} onScroll={handleModalScroll}>
+      <div className="alert-detail-modal" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="alert-detail-close" onClick={onClose}>
           <i className="bi bi-x-lg" />
         </button>
@@ -457,35 +464,40 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
         </div>
 
         <section className="alert-detail-comments-section">
-          <div className={`alert-detail-comments-head ${canEdit ? "with-actions" : ""}`}>
+          <div className={`alert-detail-comments-head ${canEdit || canDelete ? "with-actions" : ""}`}>
             <article className="alert-detail-comments-pill">
               <i className="bi bi-chat-left-text" aria-hidden="true" />
               <span>Comentarios</span>
             </article>
 
-            {canEdit && (
+            {(canEdit || canDelete) && (
               <div className="alert-detail-comments-actions">
-                <button
-                  type="button"
-                  className="alert-detail-edit-btn"
-                  onClick={() => {
-                    onClose();
-                    onEdit?.();
-                  }}
-                >
-                  Editar
-                </button>
-                <button type="button" className="alert-detail-delete-btn">
-                  Eliminar
-                </button>
+                {canEdit && (
+                  <button
+                    type="button"
+                    className="alert-detail-edit-btn"
+                    onClick={() => {
+                      onClose();
+                      onEdit?.();
+                    }}
+                  >
+                    Editar
+                  </button>
+                )}
+                {canDelete && (
+                  <button
+                    type="button"
+                    className="alert-detail-delete-btn"
+                    onClick={() => void handleDeleteAlert()}
+                  >
+                    Eliminar
+                  </button>
+                )}
               </div>
             )}
           </div>
 
-          <div
-            className={`alert-detail-comments-list ${showCommentsContent ? "is-visible" : "is-hidden"}`}
-            aria-label="Comentarios de la alerta"
-          >
+          <div className="alert-detail-comments-list" aria-label="Comentarios de la alerta">
             <form className="alert-detail-comment-form" onSubmit={handleCommentSubmit}>
               <input
                 type="text"
@@ -507,81 +519,70 @@ const AlertDetailModal = ({ alert, onClose, canEdit = false, onEdit }: Props) =>
 
             {loadingComments && <span className="alert-detail-reactions-empty">Cargando comentarios...</span>}
 
-            {comments.length > 0 ? (
-              comments.map((comment) => (
-                <article key={comment.id_comentario} className="alert-detail-comment-item">
-                  <div className="alert-detail-comment-head">
-                    <p className="alert-detail-comment-author">{comment.nombre_usuario}</p>
-                    {canManageComment(comment) && (
-                      <div className="alert-detail-comment-tools">
-                        {editingCommentId === comment.id_comentario ? (
-                          <>
-                            <button
-                              type="button"
-                              className="alert-detail-comment-tool"
-                              disabled={savingEditedComment}
-                              onClick={() => void saveEditedComment(comment.id_comentario)}
-                            >
-                              Guardar
-                            </button>
-                            <button
-                              type="button"
-                              className="alert-detail-comment-tool"
-                              disabled={savingEditedComment}
-                              onClick={cancelEditComment}
-                            >
-                              Cancelar
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <button
-                              type="button"
-                              className="alert-detail-comment-tool"
-                              onClick={() => startEditComment(comment)}
-                            >
-                              Editar
-                            </button>
-                            <button
-                              type="button"
-                              className="alert-detail-comment-tool danger"
-                              disabled={deletingCommentId === comment.id_comentario}
-                              onClick={() => void deleteComment(comment.id_comentario)}
-                            >
-                              {deletingCommentId === comment.id_comentario ? "..." : "Eliminar"}
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {editingCommentId === comment.id_comentario ? (
-                    <input
-                      type="text"
-                      className="alert-detail-comment-edit-input"
-                      value={editingCommentText}
-                      onChange={(e) => setEditingCommentText(e.target.value)}
-                      maxLength={500}
-                      disabled={savingEditedComment}
-                    />
-                  ) : (
-                    <p className="alert-detail-comment-text">{comment.texto_comentario}</p>
+            {comments.map((comment) => (
+              <article key={comment.id_comentario} className="alert-detail-comment-item">
+                <div className="alert-detail-comment-head">
+                  <p className="alert-detail-comment-author">{comment.nombre_usuario}</p>
+                  {canManageComment(comment) && (
+                    <div className="alert-detail-comment-tools">
+                      {editingCommentId === comment.id_comentario ? (
+                        <>
+                          <button
+                            type="button"
+                            className="alert-detail-comment-tool"
+                            disabled={savingEditedComment}
+                            onClick={() => void saveEditedComment(comment.id_comentario)}
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            type="button"
+                            className="alert-detail-comment-tool"
+                            disabled={savingEditedComment}
+                            onClick={cancelEditComment}
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className="alert-detail-comment-tool"
+                            onClick={() => startEditComment(comment)}
+                          >
+                            Editar
+                          </button>
+                          <button
+                            type="button"
+                            className="alert-detail-comment-tool danger"
+                            disabled={deletingCommentId === comment.id_comentario}
+                            onClick={() => void deleteComment(comment.id_comentario)}
+                          >
+                            {deletingCommentId === comment.id_comentario ? "..." : "Eliminar"}
+                          </button>
+                        </>
+                      )}
+                    </div>
                   )}
+                </div>
 
-                  <span className="alert-detail-comment-date">{formatAlertDate(comment.created_at)}</span>
-                </article>
-              ))
-            ) : !loadingComments ? (
-              <>
-                <article className="alert-detail-comment-placeholder">
-                  <span>deja tu comentario</span>
-                </article>
-                <article className="alert-detail-comment-placeholder">
-                  <span>deja tu comentario</span>
-                </article>
-              </>
-            ) : null}
+                {editingCommentId === comment.id_comentario ? (
+                  <input
+                    type="text"
+                    className="alert-detail-comment-edit-input"
+                    value={editingCommentText}
+                    onChange={(e) => setEditingCommentText(e.target.value)}
+                    maxLength={500}
+                    disabled={savingEditedComment}
+                  />
+                ) : (
+                  <p className="alert-detail-comment-text">{comment.texto_comentario}</p>
+                )}
+
+                <span className="alert-detail-comment-date">{formatAlertDate(comment.created_at)}</span>
+              </article>
+            ))}
           </div>
         </section>
 
