@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import usersService from '../../services/users';
 import rolesService, { type Rol } from '../../services/rolesService';
 import type { User } from '../../types/User';
@@ -145,22 +145,12 @@ const UserTable = () => {
                     <UserModal user={selectedUser} onClose={handleModalClose} />
                 )}
 
-                <nav aria-label='breadcrumb' className='breadcrumb-nav'>
-                    <ol className='breadcrumb'>
-                        <li className='breadcrumb-item'>
-                            <Link to='/admin' className='breadcrumb-link'>
-                                <i className='bi bi-house-door-fill me-2' />
-                                Panel Principal
-                            </Link>
-                        </li>
-                        <li
-                            className='breadcrumb-item active'
-                            aria-current='page'
-                        >
-                            Gestión de Usuarios
-                        </li>
-                    </ol>
-                </nav>
+                <Breadcrumb
+                    items={[
+                        { label: 'Panel Principal', to: '/admin' },
+                        { label: 'Gestión de Usuarios' },
+                    ]}
+                />
 
                 {/* Header */}
                 <div className='header-section'>

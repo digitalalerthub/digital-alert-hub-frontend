@@ -51,6 +51,49 @@ nav.navbar {
     transition: transform 0.45s ease-in-out;
 }
 
+/* ── BREADCRUMB GLOBAL ── */
+.breadcrumb-nav { margin-bottom: 1.5rem; }
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    padding: 0 0.75rem;
+    color: #d1d5db;
+}
+
+.breadcrumb-link {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link:hover { color: #dc2626; }
+
+.breadcrumb-item.active {
+    color: #ffffff;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
 /* FONDOS PAGINAS */
 .register-background,
 .login-background {
@@ -69,24 +112,11 @@ nav.navbar {
     background-image: url('/FondoPassword.jpg');
 }
 
-.gestion-usuarios {
-    background-image: url('/public/Imagen.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    min-height: 100vh;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
 .register-background,
 .login-background,
 .edit-background,
 .alert-background,
-.change-background,
-.panel-admin {
+.change-background {
     background-size: cover; /* Ocupa toda el area sin deformarse */
     background-position: center;
     background-repeat: no-repeat;
@@ -97,9 +127,53 @@ nav.navbar {
     left: 0;
 }
 
-/* ================================
-   ADMIN
-   ================================ */
+.panel-admin {
+    min-height: 100vh;
+    background-color: rgba(0, 0, 0, 0.55);
+    background-blend-mode: darken;
+    background-image: url('/public/crearAlerta.avif');
+    background-size: cover;
+    background-position: center;
+}
+
+.gestion-usuarios {
+    background-image: url('/public/Gestion_Usuarios.jpg');
+    background-color: rgba(0, 0, 0, 0.55);
+    background-blend-mode: darken;
+}
+
+.roles {
+    background-image: url('/public/Roles.jpg');
+}
+
+.create-alert-page {
+    background-image: url('/public/AlertasV2.jpg');
+}
+
+.panel-jac {
+    background-image: url('/public/Jac.jpg');
+}
+
+.reportes-page{
+    background-image: url('/public/Power_Bi.jpg');
+}
+
+.gestion-usuarios,
+.roles,
+.create-alert-page,
+.panel-jac,
+.reportes-page {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* ================================ ADMIN ================================ */
 
 .container {
     padding-top: 9rem !important;
@@ -110,15 +184,13 @@ nav.navbar {
     font-size: 2.5rem;
 }
 
-/* ================================
-   FOOTER
-   ================================ */
+/* ================================ FOOTER ================================ */
 
 .footer-section {
     /* Fondo oscuro con overlay + imagen */
-    background:
-        linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-        url('/Fondo_Formularios.png') center/cover no-repeat;
+    background-image: url('/public/FooterV2.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
     padding: 50px 0;
 }
 

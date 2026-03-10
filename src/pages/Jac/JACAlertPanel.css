@@ -1,13 +1,21 @@
-/* En JACAlertPanel.css — reemplaza .jac-panel-page */
-.jac-panel-page {
-    padding: 140px 32px 32px 32px; /* 90px arriba para compensar el navbar fixed */
-    /* background: #f9fafb;*/
-    min-height: 100vh;
-    max-width: 1400px; /* limita el ancho máximo */
-    margin: 0 auto; /* centra el contenido */
+/* ── VARIABLES ── */
+:root {
+    --rojo: #dc2626;
+    --rojo-hover: #fef2f2;
+    --gris-borde: #f3f4f6;
+    --gris-texto: #374151;
+    --gris-suave: #9ca3af;
 }
 
-/* Stats más compactas */
+/* ── LAYOUT ── */
+.jac-panel-page {
+    padding: 140px 32px 32px;
+    min-height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* ── STATS ── */
 .jac-stats-grid {
     display: flex;
     justify-content: center;
@@ -16,62 +24,79 @@
 }
 
 .jac-stat-card {
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
     border-radius: 12px;
-    padding: 20px 16px;
-    display: flex; /* ← flex, no column */
-    flex-direction: column; /* ← apila verticalmente */
-    align-items: center; /* ← centra horizontalmente */
-    justify-content: center; /* ← centra verticalmente */
-    gap: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     width: 160px;
     min-width: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px 16px;
+    gap: 10px;
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s,
+        background 0.2s;
+    cursor: default;
+}
+
+.jac-stat-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    background: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
+    border-color: rgba(255, 255, 255, 0.45) !important;
 }
 
 .jac-stat-icon {
     width: 40px;
-    height: 38px; /* más pequeño */
+    height: 40px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    flex-shrink: 0;
+    font-size: 18px;
+    margin: 0 auto 4px;
 }
+
 .jac-stat-label {
     font-size: 14px;
-    color: #9ca3af;
+    color: #fff !important;
     margin: 0;
     font-weight: 500;
-    text-align: center;
 }
+
 .jac-stat-count {
     font-size: 26px;
     font-weight: 800;
-    color: #111827;
+    color: #fff !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     margin: 0;
     line-height: 1.1;
-    text-align: center;
 }
 
-/* Card principal más compacta */
+/* ── CARD PRINCIPAL ── */
 .jac-main-card {
     background: #fff;
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--rojo);
     border-radius: 16px;
-    padding: 22px 24px; /* menos padding */
+    padding: 22px 24px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
+
 .jac-title {
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 800;
-    color: #111827;
-    margin: 0 0 16px;
+    color: var(--rojo-hover);
+    margin: 0 0 30px;
 }
 
-/* Filtros más compactos */
+/* ── FILTROS ── */
 .jac-filters {
     display: flex;
     gap: 8px;
@@ -79,104 +104,120 @@
     margin-bottom: 16px;
     align-items: center;
 }
+
 .jac-search-wrap {
     position: relative;
     flex: 1;
     min-width: 180px;
 }
+
 .jac-search-icon {
     position: absolute;
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--gris-suave);
     pointer-events: none;
     font-size: 13px;
 }
-.jac-search {
-    padding-left: 32px !important;
+
+.jac-search,
+.jac-filter-select {
     border-radius: 8px !important;
     font-size: 13px;
     height: 36px;
+    color: var(--gris-texto);
 }
+
+.jac-search {
+    padding-left: 32px !important;
+}
+
 .jac-filter-select {
     width: auto;
     min-width: 130px;
-    border-radius: 8px !important;
     border-color: #d1d5db !important;
-    font-size: 13px;
-    color: #374151;
-    height: 36px;
     padding-top: 0;
     padding-bottom: 0;
 }
 
-/* Tabla más compacta */
+/* ── TABLA ── */
 .jac-table-wrap {
     overflow-x: auto;
 }
+
 .jac-table {
     width: 100%;
     border-collapse: collapse;
     min-width: 750px;
     font-size: 14px;
 }
+
 .jac-table thead tr {
-    border-bottom: 2px solid #f3f4f6;
+    background: #1f2937;
+    border-bottom: none;
 }
+
 .jac-table th {
-    padding: 8px 12px;
+    padding: 12px;
     text-align: left;
     font-size: 11px;
     font-weight: 700;
-    color: #9ca3af;
+    color: #fff;
     letter-spacing: 0.06em;
     white-space: nowrap;
 }
+
 .jac-table tbody tr {
-    border-bottom: 1px solid #f3f4f6;
-    transition: background 0.1s;
+    border-bottom: 1px solid var(--gris-borde);
+    transition: background 0.15s;
 }
+
 .jac-table tbody tr:hover {
-    background: #fafafa;
+    background: var(--rojo-hover) !important;
 }
+
 .jac-table td {
     padding: 10px 12px;
-    color: #374151;
+    color: var(--gris-texto);
     vertical-align: middle;
 }
+
 .jac-td-title {
-    font-weight: 600;
+    font-weight: 700;
     color: #111827;
     max-width: 180px;
 }
+
 .jac-td-date {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--gris-suave);
     white-space: nowrap;
 }
+
 .jac-row-updating {
     opacity: 0.45;
     pointer-events: none;
 }
+
 .jac-empty {
     text-align: center;
     padding: 40px;
-    color: #9ca3af;
+    color: var(--gris-suave);
     font-size: 13px;
 }
 
-/* Badge */
+/* ── BADGE ── */
 .jac-badge {
     display: inline-block;
-    padding: 2px 9px;
+    padding: 4px 12px;
     border-radius: 20px;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     white-space: nowrap;
 }
 
-/* Botones acción */
+/* ── BOTONES ACCIÓN ── */
 .jac-actions {
     display: flex;
     gap: 5px;
@@ -186,8 +227,7 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border-width: 1.5px;
-    border-style: solid;
+    border: 1.5px solid;
     cursor: pointer;
     font-size: 12px;
     display: flex;
@@ -201,12 +241,11 @@
 .jac-action-btn:hover:not(:disabled) {
     transform: scale(1.15);
 }
-
 .jac-action-btn:disabled {
     cursor: not-allowed;
 }
 
-/* Paginación */
+/* ── PAGINACIÓN ── */
 .jac-pagination-bar {
     margin-top: 14px;
     display: flex;
@@ -218,9 +257,8 @@
 
 .jac-pagination-info {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--gris-suave);
 }
-
 .jac-pagination {
     display: flex;
     gap: 5px;
@@ -232,27 +270,32 @@
     border-radius: 6px;
     border: 1.5px solid #e5e7eb;
     background: #fff;
-    color: #374151;
+    color: var(--gris-texto);
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
+    transition:
+        border-color 0.15s,
+        color 0.15s;
 }
+
+.jac-page-btn:hover:not(:disabled) {
+    border-color: var(--rojo);
+    color: var(--rojo);
+}
+
 .jac-page-btn.is-active {
-    background: #111827;
+    background: var(--rojo);
     color: #fff;
-    border-color: #111827;
+    border-color: var(--rojo);
 }
+
 .jac-page-btn:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
 
-/* Breadcrumb */
-.jac-breadcrumb {
-    margin-bottom: 16px;
-}
-
-/* Modal */
+/* ── MODAL ── */
 .jac-modal-backdrop {
     position: fixed;
     inset: 0;
@@ -262,6 +305,7 @@
     justify-content: center;
     z-index: 9999;
 }
+
 .jac-modal {
     background: #fff;
     border-radius: 14px;
@@ -270,6 +314,7 @@
     width: 90%;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
 }
+
 .jac-modal-title {
     font-size: 15px;
     font-weight: 700;
@@ -278,24 +323,19 @@
 }
 
 .jac-modal-body {
-    color: #6b7280;
+    color: var(--gris-suave);
     font-size: 13px;
     margin: 0 0 18px;
     line-height: 1.5;
 }
+
 .jac-modal-actions {
     display: flex;
     gap: 8px;
     justify-content: flex-end;
 }
 
-/* Responsive */
-@media (max-width: 900px) {
-    .jac-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
+/* ── RESPONSIVE ── */
 @media (max-width: 576px) {
     .jac-panel-page {
         padding: 80px 16px 24px;
