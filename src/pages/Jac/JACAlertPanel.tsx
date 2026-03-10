@@ -77,6 +77,7 @@ const JACAlertPanel = () => {
     const [filtroEstado, setFiltroEstado] = useState('Todos');
     const [filtroCategoria, setFiltroCategoria] = useState('Todas');
     const [filtroComuna, setFiltroComuna] = useState('Todas');
+    const [filtroBarrio, setFiltroBarrio] = useState('Todos');
     const [currentPage, setCurrentPage] = useState(1);
 
     const handleAlertUpdated = useCallback((updated: Alert) => {
@@ -111,12 +112,39 @@ const JACAlertPanel = () => {
     }, []);
 
     // ─── Filtrado y paginación ───────────────────────────────────
+    // Alertas pre-filtradas por estado y categoría (para opciones de comuna/barrio)
+    const alertasPreFiltradas = alerts.filter((a) => {
+        const estadoLabel = ESTADO_META[a.id_estado as EstadoId]?.label ?? '';
+        if (filtroEstado !== 'Todos' && estadoLabel !== filtroEstado)
+            return false;
+        if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
+            return false;
+        return true;
+    });
 
     const comunasDisponibles = [
         'Todas',
         ...Array.from(
             new Set(
-                alerts.map((a) => String(a.id_comuna ?? '')).filter(Boolean),
+                alertasPreFiltradas
+                    .map((a) => a.nombre_comuna ?? '')
+                    .filter(Boolean),
+            ),
+        ),
+    ];
+
+    const barriosDisponibles = [
+        'Todos',
+        ...Array.from(
+            new Set(
+                alertasPreFiltradas
+                    .filter(
+                        (a) =>
+                            filtroComuna === 'Todas' ||
+                            a.nombre_comuna === filtroComuna,
+                    )
+                    .map((a) => a.nombre_barrio ?? '')
+                    .filter(Boolean),
             ),
         ),
     ];
@@ -136,7 +164,9 @@ const JACAlertPanel = () => {
             return false;
         if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
             return false;
-        if (filtroComuna !== 'Todas' && String(a.id_comuna) !== filtroComuna)
+        if (filtroComuna !== 'Todas' && a.nombre_comuna !== filtroComuna)
+            return false;
+        if (filtroBarrio !== 'Todos' && a.nombre_barrio !== filtroBarrio)
             return false;
         if (search && !a.titulo.toLowerCase().includes(search.toLowerCase()))
             return false;
@@ -156,6 +186,11 @@ const JACAlertPanel = () => {
             setCurrentPage(1);
         };
 
+    const handleComunaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFiltroComuna(e.target.value);
+        setFiltroBarrio('Todos');
+        setCurrentPage(1);
+    };
     // ─── Render ─────────────────────────────────────────────────
 
     return (
@@ -196,54 +231,121 @@ const JACAlertPanel = () => {
                 {/* Card principal */}
                 <h2 className='jac-title'>Gestión de Alertas</h2>
                 <div className='jac-main-card'>
-
                     {/* Filtros */}
                     <div className='jac-filters'>
-                        <div className='jac-search-wrap'>
-                            <i className='bi bi-search jac-search-icon' />
-                            <input
-                                type='text'
-                                className='form-control jac-search'
-                                placeholder='Buscar por título...'
-                                value={search}
-                                onChange={(e) => {
-                                    setSearch(e.target.value);
-                                    setCurrentPage(1);
-                                }}
-                            />
+                        {/* Búsqueda */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Buscar</label>
+                            <div className='jac-search-wrap'>
+                                <i className='bi bi-search jac-search-icon' />
+                                <input
+                                    type='text'
+                                    className='form-control jac-search'
+                                    placeholder='Buscar por título...'
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
                         </div>
-                        <select
-                            className='form-select jac-filter-select'
-                            value={filtroEstado}
-                            onChange={onFilterChange(setFiltroEstado)}
-                        >
-                            {[
-                                'Todos',
-                                ...Object.values(ESTADO_META).map(
-                                    (e) => e.label,
-                                ),
-                            ].map((o) => (
-                                <option key={o}>{o}</option>
-                            ))}
-                        </select>
-                        <select
-                            className='form-select jac-filter-select'
-                            value={filtroCategoria}
-                            onChange={onFilterChange(setFiltroCategoria)}
-                        >
-                            {categoriasDisponibles.map((o) => (
-                                <option key={o}>{o}</option>
-                            ))}
-                        </select>
-                        <select
-                            className='form-select jac-filter-select'
-                            value={filtroComuna}
-                            onChange={onFilterChange(setFiltroComuna)}
-                        >
-                            {comunasDisponibles.map((o) => (
-                                <option key={o}>{o}</option>
-                            ))}
-                        </select>
+                        {/* Estado */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Estado</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroEstado}
+                                onChange={onFilterChange(setFiltroEstado)}
+                            >
+                                {[
+                                    'Todos',
+                                    ...Object.values(ESTADO_META).map(
+                                        (e) => e.label,
+                                    ),
+                                ].map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Categoría */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>
+                                Categoría
+                            </label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroCategoria}
+                                onChange={onFilterChange(setFiltroCategoria)}
+                            >
+                                {categoriasDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Comuna */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Comuna</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroComuna}
+                                onChange={handleComunaChange}
+                            >
+                                {comunasDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Barrio */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Barrio</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroBarrio}
+                                onChange={onFilterChange(setFiltroBarrio)}
+                                disabled={filtroComuna === 'Todas'}
+                            >
+                                {barriosDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Limpiar filtros */}
+                        {(filtroEstado !== 'Todos' ||
+                            filtroCategoria !== 'Todas' ||
+                            filtroComuna !== 'Todas' ||
+                            filtroBarrio !== 'Todos' ||
+                            search) && (
+                            <div
+                                className='jac-filter-group'
+                                style={{ justifyContent: 'flex-end' }}
+                            >
+                                <label
+                                    className='jac-filter-label'
+                                    style={{ opacity: 0 }}
+                                >
+                                    -
+                                </label>
+                                <button
+                                    className='jac-clear-btn'
+                                    onClick={() => {
+                                        setFiltroEstado('Todos');
+                                        setFiltroCategoria('Todas');
+                                        setFiltroComuna('Todas');
+                                        setFiltroBarrio('Todos');
+                                        setSearch('');
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <i className='bi bi-x-circle me-1' />
+                                    Limpiar
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Tabla */}

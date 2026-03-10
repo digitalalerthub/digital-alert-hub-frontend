@@ -66,9 +66,9 @@
 
 .jac-stat-label {
     font-size: 14px;
+    font-weight: 500;
     color: #fff !important;
     margin: 0;
-    font-weight: 500;
 }
 
 .jac-stat-count {
@@ -80,6 +80,14 @@
     line-height: 1.1;
 }
 
+/* ── TÍTULO ── */
+.jac-title {
+    font-size: 26px;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 20px;
+}
+
 /* ── CARD PRINCIPAL ── */
 .jac-main-card {
     background: #fff;
@@ -89,26 +97,38 @@
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
-.jac-title {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--rojo-hover);
-    margin: 0 0 30px;
-}
-
 /* ── FILTROS ── */
 .jac-filters {
     display: flex;
-    gap: 8px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
-    align-items: center;
+    align-items: flex-end;
+    margin-bottom: 20px;
+}
+
+.jac-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+}
+
+.jac-filter-group:first-child {
+    flex: 1;
+    min-width: 200px;
+}
+
+.jac-filter-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--rojo);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0;
 }
 
 .jac-search-wrap {
     position: relative;
-    flex: 1;
-    min-width: 180px;
 }
 
 .jac-search-icon {
@@ -125,20 +145,46 @@
 .jac-filter-select {
     border-radius: 8px !important;
     font-size: 13px;
-    height: 36px;
+    height: 38px;
     color: var(--gris-texto);
+    border: 1.5px solid var(--gris-borde) !important;
+    transition: border-color 0.2s;
+    width: 100%;
 }
 
 .jac-search {
     padding-left: 32px !important;
 }
 
-.jac-filter-select {
-    width: auto;
-    min-width: 130px;
-    border-color: #d1d5db !important;
-    padding-top: 0;
-    padding-bottom: 0;
+.jac-search:focus,
+.jac-filter-select:focus {
+    border-color: var(--rojo) !important;
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.08) !important;
+}
+
+.jac-filter-select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: var(--gris-borde) !important;
+}
+
+.jac-clear-btn {
+    height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1.5px solid var(--rojo);
+    background: transparent;
+    color: var(--rojo);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.jac-clear-btn:hover {
+    background: var(--rojo);
+    color: #fff;
 }
 
 /* ── TABLA ── */
@@ -259,6 +305,7 @@
     font-size: 12px;
     color: var(--gris-suave);
 }
+
 .jac-pagination {
     display: flex;
     gap: 5px;
@@ -268,7 +315,7 @@
     width: 30px;
     height: 30px;
     border-radius: 6px;
-    border: 1.5px solid #e5e7eb;
+    border: 1.5px solid var(--gris-borde);
     background: #fff;
     color: var(--gris-texto);
     font-size: 12px;
@@ -346,7 +393,7 @@
     .jac-filters {
         flex-direction: column;
     }
-    .jac-filter-select {
-        width: 100%;
+    .jac-filter-group {
+        min-width: 100%;
     }
 }

@@ -12,7 +12,8 @@ html,
 
 /* Titulos H2 mas grandes y centrados */
 h2 {
-    font-size: 25px;
+    color: #ffffff;
+    font-size: 24px;
     text-align: center;
 }
 
@@ -52,7 +53,9 @@ nav.navbar {
 }
 
 /* ── BREADCRUMB GLOBAL ── */
-.breadcrumb-nav { margin-bottom: 1.5rem; }
+.breadcrumb-nav {
+    margin-bottom: 1.5rem;
+}
 
 .breadcrumb {
     background: transparent;
@@ -84,7 +87,9 @@ nav.navbar {
     transition: color 0.2s;
 }
 
-.breadcrumb-link:hover { color: #dc2626; }
+.breadcrumb-link:hover {
+    color: #dc2626;
+}
 
 .breadcrumb-item.active {
     color: #ffffff;
@@ -128,7 +133,7 @@ nav.navbar {
 }
 
 .panel-admin {
-    min-height: 100vh;
+    min-height: auto;
     background-color: rgba(0, 0, 0, 0.55);
     background-blend-mode: darken;
     background-image: url('/public/crearAlerta.avif');
@@ -154,7 +159,7 @@ nav.navbar {
     background-image: url('/public/Jac.jpg');
 }
 
-.reportes-page{
+.reportes-page {
     background-image: url('/public/Power_Bi.jpg');
 }
 

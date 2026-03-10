@@ -3,7 +3,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 
-
 // Definimos una interfaz para las props del componente
 const PrivateRoute = () => {
     const { isLoggedIn, isLoading } = useAuth(); // Con él obtenemos el estado global de autenticación (isLoggedIn)
