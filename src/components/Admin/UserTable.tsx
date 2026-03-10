@@ -155,7 +155,7 @@ const UserTable = () => {
                 {/* Header */}
                 <div className='header-section'>
                     <div className='title-section'>
-                        <h1 className='main-title'>Gestión de Usuarios</h1>
+                        <h2 className='main-title'>Gestión de Usuarios</h2>
                         <p className='subtitle'>
                             Administra y controla los usuarios del sistema
                         </p>
