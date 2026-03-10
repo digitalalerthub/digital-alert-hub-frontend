@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import api from "../../services/api";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../../App.css";
 import GoogleButton from "./GoogleButton";
 
@@ -15,6 +15,9 @@ const RegisterForm = () => {
   const [telefono, setTelefono] = useState("");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
+  const loginUrl = redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +37,7 @@ const RegisterForm = () => {
       });
 
       setTimeout(() => {
-        navigate("/");
+        navigate(loginUrl, { replace: true });
       }, 1200);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -139,12 +142,12 @@ const RegisterForm = () => {
 
           <p className="text-center">
             ¿Ya tienes una cuenta?{" "}
-            <a
-              href="/login"
+            <Link
+              to={loginUrl}
               className="text-decoration-none fw-semibold text-primary"
             >
               Inicia sesión
-            </a>
+            </Link>
           </p>
         </form>
       </div>

@@ -71,6 +71,24 @@ export const useAlertsManager = ({ renderActiveAlertsOnMap }: UseAlertsManagerAr
     [loadAlerts]
   );
 
+  const handleDeleteAlert = useCallback(
+    async (id: number) => {
+      try {
+        await alertsService.delete(id);
+        toast.success("Alerta eliminada");
+        await loadAlerts();
+      } catch (error: unknown) {
+        if (axios.isAxiosError(error)) {
+          toast.error(error.response?.data?.message || "No se pudo eliminar la alerta");
+        } else {
+          toast.error("Error inesperado al eliminar");
+        }
+        throw error;
+      }
+    },
+    [loadAlerts]
+  );
+
   const onSearchChange = useCallback((value: string) => {
     setSearch(value);
     setCurrentPage(1);
@@ -84,6 +102,7 @@ export const useAlertsManager = ({ renderActiveAlertsOnMap }: UseAlertsManagerAr
     currentPage,
     loadAlerts,
     handleUpdateAlert,
+    handleDeleteAlert,
     onSearchChange,
     onPageChange: setCurrentPage,
   };

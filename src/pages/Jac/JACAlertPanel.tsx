@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { toast } from 'react-toastify';
 import type { Alert } from '../../types/Alert';
 import alertsService from '../../services/alertsService';
@@ -77,6 +77,7 @@ const JACAlertPanel = () => {
     const [filtroEstado, setFiltroEstado] = useState('Todos');
     const [filtroCategoria, setFiltroCategoria] = useState('Todas');
     const [filtroComuna, setFiltroComuna] = useState('Todas');
+    const [filtroBarrio, setFiltroBarrio] = useState('Todos');
     const [currentPage, setCurrentPage] = useState(1);
 
     const handleAlertUpdated = useCallback((updated: Alert) => {
@@ -111,12 +112,39 @@ const JACAlertPanel = () => {
     }, []);
 
     // ─── Filtrado y paginación ───────────────────────────────────
+    // Alertas pre-filtradas por estado y categoría (para opciones de comuna/barrio)
+    const alertasPreFiltradas = alerts.filter((a) => {
+        const estadoLabel = ESTADO_META[a.id_estado as EstadoId]?.label ?? '';
+        if (filtroEstado !== 'Todos' && estadoLabel !== filtroEstado)
+            return false;
+        if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
+            return false;
+        return true;
+    });
 
     const comunasDisponibles = [
         'Todas',
         ...Array.from(
             new Set(
-                alerts.map((a) => String(a.id_comuna ?? '')).filter(Boolean),
+                alertasPreFiltradas
+                    .map((a) => a.nombre_comuna ?? '')
+                    .filter(Boolean),
+            ),
+        ),
+    ];
+
+    const barriosDisponibles = [
+        'Todos',
+        ...Array.from(
+            new Set(
+                alertasPreFiltradas
+                    .filter(
+                        (a) =>
+                            filtroComuna === 'Todas' ||
+                            a.nombre_comuna === filtroComuna,
+                    )
+                    .map((a) => a.nombre_barrio ?? '')
+                    .filter(Boolean),
             ),
         ),
     ];
@@ -136,7 +164,9 @@ const JACAlertPanel = () => {
             return false;
         if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
             return false;
-        if (filtroComuna !== 'Todas' && String(a.id_comuna) !== filtroComuna)
+        if (filtroComuna !== 'Todas' && a.nombre_comuna !== filtroComuna)
+            return false;
+        if (filtroBarrio !== 'Todos' && a.nombre_barrio !== filtroBarrio)
             return false;
         if (search && !a.titulo.toLowerCase().includes(search.toLowerCase()))
             return false;
@@ -156,333 +186,413 @@ const JACAlertPanel = () => {
             setCurrentPage(1);
         };
 
+    const handleComunaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFiltroComuna(e.target.value);
+        setFiltroBarrio('Todos');
+        setCurrentPage(1);
+    };
     // ─── Render ─────────────────────────────────────────────────
 
     return (
-        <div className='jac-panel-page'>
-            {/* Breadcrumb */}
-            <nav aria-label='breadcrumb' className='jac-breadcrumb'>
-                <ol className='breadcrumb mb-0'>
-                    <li className='breadcrumb-item'>
-                        <Link to='/admin'>
-                            <i className='bi bi-house-door me-1' />
-                            Panel Principal
-                        </Link>
-                    </li>
-                    <li className='breadcrumb-item active' aria-current='page'>
-                        Panel JAC
-                    </li>
-                </ol>
-            </nav>
+        <div className='panel-jac'>
+            <div className='jac-panel-page'>
+                {/* Breadcrumb */}
+                <Breadcrumb
+                    items={[
+                        { label: 'Panel Principal', to: '/admin' },
+                        { label: 'Panel JAC' },
+                    ]}
+                />
 
-            {/* Stats */}
-            <div className='jac-stats-grid'>
-                {stats.map((s) => {
-                    const meta = ESTADO_META[s.id_estado];
-                    return (
-                        <div key={s.id_estado} className='jac-stat-card'>
-                            <div
-                                className='jac-stat-icon'
-                                style={{
-                                    color: meta.color,
-                                    background: meta.bg,
-                                }}
-                            >
-                                <i className={`bi ${s.icon}`} />
+                {/* Stats */}
+                <div className='jac-stats-grid'>
+                    {stats.map((s) => {
+                        const meta = ESTADO_META[s.id_estado];
+                        return (
+                            <div key={s.id_estado} className='jac-stat-card'>
+                                <div
+                                    className='jac-stat-icon'
+                                    style={{
+                                        color: meta.color,
+                                        background: meta.bg,
+                                    }}
+                                >
+                                    <i className={`bi ${s.icon}`} />
+                                </div>
+                                <div>
+                                    <p className='jac-stat-label'>{s.label}</p>
+                                    <p className='jac-stat-count'>{s.count}</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className='jac-stat-label'>{s.label}</p>
-                                <p className='jac-stat-count'>{s.count}</p>
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
-
-            {/* Card principal */}
-            <div className='jac-main-card'>
-                <h2 className='jac-title'>Gestión de Alertas</h2>
-
-                {/* Filtros */}
-                <div className='jac-filters'>
-                    <div className='jac-search-wrap'>
-                        <i className='bi bi-search jac-search-icon' />
-                        <input
-                            type='text'
-                            className='form-control jac-search'
-                            placeholder='Buscar por título...'
-                            value={search}
-                            onChange={(e) => {
-                                setSearch(e.target.value);
-                                setCurrentPage(1);
-                            }}
-                        />
-                    </div>
-                    <select
-                        className='form-select jac-filter-select'
-                        value={filtroEstado}
-                        onChange={onFilterChange(setFiltroEstado)}
-                    >
-                        {[
-                            'Todos',
-                            ...Object.values(ESTADO_META).map((e) => e.label),
-                        ].map((o) => (
-                            <option key={o}>{o}</option>
-                        ))}
-                    </select>
-                    <select
-                        className='form-select jac-filter-select'
-                        value={filtroCategoria}
-                        onChange={onFilterChange(setFiltroCategoria)}
-                    >
-                        {categoriasDisponibles.map((o) => (
-                            <option key={o}>{o}</option>
-                        ))}
-                    </select>
-                    <select
-                        className='form-select jac-filter-select'
-                        value={filtroComuna}
-                        onChange={onFilterChange(setFiltroComuna)}
-                    >
-                        {comunasDisponibles.map((o) => (
-                            <option key={o}>{o}</option>
-                        ))}
-                    </select>
+                        );
+                    })}
                 </div>
 
-                {/* Tabla */}
-                <div className='jac-table-wrap'>
-                    <table className='jac-table'>
-                        <thead>
-                            <tr>
-                                <th>ALERTA</th>
-                                <th>CATEGORÍA</th>
-                                <th>INFORMANTE</th>
-                                <th>ESTADO</th>
-                                <th>PRIORIDAD</th>
-                                <th>FECHA</th>
-                                <th>ACCIONES</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {loading && (
+                {/* Card principal */}
+                <h2 className='jac-title'>Gestión de Alertas</h2>
+                <div className='jac-main-card'>
+                    {/* Filtros */}
+                    <div className='jac-filters'>
+                        {/* Búsqueda */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Buscar</label>
+                            <div className='jac-search-wrap'>
+                                <i className='bi bi-search jac-search-icon' />
+                                <input
+                                    type='text'
+                                    className='form-control jac-search'
+                                    placeholder='Buscar por título...'
+                                    value={search}
+                                    onChange={(e) => {
+                                        setSearch(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        {/* Estado */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Estado</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroEstado}
+                                onChange={onFilterChange(setFiltroEstado)}
+                            >
+                                {[
+                                    'Todos',
+                                    ...Object.values(ESTADO_META).map(
+                                        (e) => e.label,
+                                    ),
+                                ].map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Categoría */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>
+                                Categoría
+                            </label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroCategoria}
+                                onChange={onFilterChange(setFiltroCategoria)}
+                            >
+                                {categoriasDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Comuna */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Comuna</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroComuna}
+                                onChange={handleComunaChange}
+                            >
+                                {comunasDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Barrio */}
+                        <div className='jac-filter-group'>
+                            <label className='jac-filter-label'>Barrio</label>
+                            <select
+                                className='form-select jac-filter-select'
+                                value={filtroBarrio}
+                                onChange={onFilterChange(setFiltroBarrio)}
+                                disabled={filtroComuna === 'Todas'}
+                            >
+                                {barriosDisponibles.map((o) => (
+                                    <option key={o}>{o}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Limpiar filtros */}
+                        {(filtroEstado !== 'Todos' ||
+                            filtroCategoria !== 'Todas' ||
+                            filtroComuna !== 'Todas' ||
+                            filtroBarrio !== 'Todos' ||
+                            search) && (
+                            <div
+                                className='jac-filter-group'
+                                style={{ justifyContent: 'flex-end' }}
+                            >
+                                <label
+                                    className='jac-filter-label'
+                                    style={{ opacity: 0 }}
+                                >
+                                    -
+                                </label>
+                                <button
+                                    className='jac-clear-btn'
+                                    onClick={() => {
+                                        setFiltroEstado('Todos');
+                                        setFiltroCategoria('Todas');
+                                        setFiltroComuna('Todas');
+                                        setFiltroBarrio('Todos');
+                                        setSearch('');
+                                        setCurrentPage(1);
+                                    }}
+                                >
+                                    <i className='bi bi-x-circle me-1' />
+                                    Limpiar
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Tabla */}
+                    <div className='jac-table-wrap'>
+                        <table className='jac-table'>
+                            <thead>
                                 <tr>
-                                    <td colSpan={7} className='jac-empty'>
-                                        Cargando alertas...
-                                    </td>
+                                    <th>ALERTA</th>
+                                    <th>CATEGORÍA</th>
+                                    <th>INFORMANTE</th>
+                                    <th>ESTADO</th>
+                                    <th>PRIORIDAD</th>
+                                    <th>FECHA</th>
+                                    <th>ACCIONES</th>
                                 </tr>
-                            )}
-                            {!loading && paged.length === 0 && (
-                                <tr>
-                                    <td colSpan={7} className='jac-empty'>
-                                        No hay alertas que coincidan.
-                                    </td>
-                                </tr>
-                            )}
-                            {paged.map((alert) => {
-                                const meta =
-                                    ESTADO_META[alert.id_estado as EstadoId] ??
-                                    ESTADO_META[1];
-                                const isUpdating =
-                                    updatingId === alert.id_alerta;
-                                return (
-                                    <tr
-                                        key={alert.id_alerta}
-                                        className={
-                                            isUpdating ? 'jac-row-updating' : ''
-                                        }
-                                    >
-                                        <td className='jac-td-title'>
-                                            {alert.titulo}
-                                        </td>
-                                        <td>{alert.categoria}</td>
-                                        <td>
-                                            {alert.nombre_usuario ??
-                                                `Usuario #${alert.id_usuario}`}
-                                        </td>
-                                        <td>
-                                            <span
-                                                className='jac-badge'
-                                                style={{
-                                                    color: meta.color,
-                                                    background: meta.bg,
-                                                    border: `1px solid ${meta.color}44`,
-                                                }}
-                                            >
-                                                {meta.label}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span
-                                                style={{
-                                                    fontWeight: 700,
-                                                    fontSize: 13,
-                                                    color:
-                                                        PRIORIDAD_COLOR[
-                                                            alert.prioridad ??
-                                                                ''
-                                                        ] ?? '#9ca3af',
-                                                }}
-                                            >
-                                                {alert.prioridad ?? '—'}
-                                            </span>
-                                        </td>
-                                        <td className='jac-td-date'>
-                                            {formatAlertDate(alert.created_at)}
-                                        </td>
-                                        <td>
-                                            <div className='jac-actions'>
-                                                {ACCIONES.map(
-                                                    ({
-                                                        nuevoEstado,
-                                                        label,
-                                                        icon,
-                                                        title,
-                                                    }) => {
-                                                        const accionMeta =
-                                                            ESTADO_META[
-                                                                nuevoEstado
-                                                            ];
-                                                        const yaEsEseEstado =
-                                                            alert.id_estado ===
-                                                            nuevoEstado;
-                                                        return (
-                                                            <button
-                                                                key={
-                                                                    nuevoEstado
-                                                                }
-                                                                type='button'
-                                                                className='jac-action-btn'
-                                                                title={title}
-                                                                disabled={
-                                                                    isUpdating ||
-                                                                    yaEsEseEstado
-                                                                }
-                                                                onClick={() =>
-                                                                    requestStatusChange(
-                                                                        alert,
-                                                                        nuevoEstado,
-                                                                        label,
-                                                                    )
-                                                                }
-                                                                style={{
-                                                                    borderColor:
-                                                                        accionMeta.color,
-                                                                    color: accionMeta.color,
-                                                                    background:
-                                                                        accionMeta.bg,
-                                                                    opacity:
-                                                                        yaEsEseEstado
-                                                                            ? 0.3
-                                                                            : 1,
-                                                                }}
-                                                            >
-                                                                <i
-                                                                    className={`bi ${icon}`}
-                                                                />
-                                                            </button>
-                                                        );
-                                                    },
-                                                )}
-                                            </div>
+                            </thead>
+                            <tbody>
+                                {loading && (
+                                    <tr>
+                                        <td colSpan={7} className='jac-empty'>
+                                            Cargando alertas...
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                                )}
+                                {!loading && paged.length === 0 && (
+                                    <tr>
+                                        <td colSpan={7} className='jac-empty'>
+                                            No hay alertas que coincidan.
+                                        </td>
+                                    </tr>
+                                )}
+                                {paged.map((alert) => {
+                                    const meta =
+                                        ESTADO_META[
+                                            alert.id_estado as EstadoId
+                                        ] ?? ESTADO_META[1];
+                                    const isUpdating =
+                                        updatingId === alert.id_alerta;
+                                    return (
+                                        <tr
+                                            key={alert.id_alerta}
+                                            className={
+                                                isUpdating
+                                                    ? 'jac-row-updating'
+                                                    : ''
+                                            }
+                                        >
+                                            <td className='jac-td-title'>
+                                                {alert.titulo}
+                                            </td>
+                                            <td>{alert.categoria}</td>
+                                            <td>
+                                                {alert.nombre_usuario ??
+                                                    `Usuario #${alert.id_usuario}`}
+                                            </td>
+                                            <td>
+                                                <span
+                                                    className='jac-badge'
+                                                    style={{
+                                                        color: meta.color,
+                                                        background: meta.bg,
+                                                        border: `1px solid ${meta.color}44`,
+                                                    }}
+                                                >
+                                                    {meta.label}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span
+                                                    style={{
+                                                        fontWeight: 700,
+                                                        fontSize: 13,
+                                                        color:
+                                                            PRIORIDAD_COLOR[
+                                                                alert.prioridad ??
+                                                                    ''
+                                                            ] ?? '#9ca3af',
+                                                    }}
+                                                >
+                                                    {alert.prioridad ?? '—'}
+                                                </span>
+                                            </td>
+                                            <td className='jac-td-date'>
+                                                {formatAlertDate(
+                                                    alert.created_at,
+                                                )}
+                                            </td>
+                                            <td>
+                                                <div className='jac-actions'>
+                                                    {ACCIONES.map(
+                                                        ({
+                                                            nuevoEstado,
+                                                            label,
+                                                            icon,
+                                                            title,
+                                                        }) => {
+                                                            const accionMeta =
+                                                                ESTADO_META[
+                                                                    nuevoEstado
+                                                                ];
+                                                            const yaEsEseEstado =
+                                                                alert.id_estado ===
+                                                                nuevoEstado;
+                                                            return (
+                                                                <button
+                                                                    key={
+                                                                        nuevoEstado
+                                                                    }
+                                                                    type='button'
+                                                                    className='jac-action-btn'
+                                                                    title={
+                                                                        title
+                                                                    }
+                                                                    disabled={
+                                                                        isUpdating ||
+                                                                        yaEsEseEstado
+                                                                    }
+                                                                    onClick={() =>
+                                                                        requestStatusChange(
+                                                                            alert,
+                                                                            nuevoEstado,
+                                                                            label,
+                                                                        )
+                                                                    }
+                                                                    style={{
+                                                                        borderColor:
+                                                                            accionMeta.color,
+                                                                        color: accionMeta.color,
+                                                                        background:
+                                                                            accionMeta.bg,
+                                                                        opacity:
+                                                                            yaEsEseEstado
+                                                                                ? 0.3
+                                                                                : 1,
+                                                                    }}
+                                                                >
+                                                                    <i
+                                                                        className={`bi ${icon}`}
+                                                                    />
+                                                                </button>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
 
-                {/* Paginación */}
-                <div className='jac-pagination-bar'>
-                    <span className='jac-pagination-info'>
-                        Mostrando {paged.length} de {filtered.length} alertas
-                    </span>
-                    {totalPages > 1 && (
-                        <div className='jac-pagination'>
-                            <button
-                                type='button'
-                                className='jac-page-btn'
-                                onClick={() =>
-                                    setCurrentPage((p) => Math.max(1, p - 1))
-                                }
-                                disabled={currentPage === 1}
-                            >
-                                &lt;
-                            </button>
-                            {Array.from(
-                                { length: totalPages },
-                                (_, i) => i + 1,
-                            ).map((p) => (
+                    {/* Paginación */}
+                    <div className='jac-pagination-bar'>
+                        <span className='jac-pagination-info'>
+                            Mostrando {paged.length} de {filtered.length}{' '}
+                            alertas
+                        </span>
+                        {totalPages > 1 && (
+                            <div className='jac-pagination'>
                                 <button
-                                    key={p}
                                     type='button'
-                                    className={`jac-page-btn ${p === currentPage ? 'is-active' : ''}`}
-                                    onClick={() => setCurrentPage(p)}
+                                    className='jac-page-btn'
+                                    onClick={() =>
+                                        setCurrentPage((p) =>
+                                            Math.max(1, p - 1),
+                                        )
+                                    }
+                                    disabled={currentPage === 1}
                                 >
-                                    {p}
+                                    &lt;
                                 </button>
-                            ))}
-                            <button
-                                type='button'
-                                className='jac-page-btn'
-                                onClick={() =>
-                                    setCurrentPage((p) =>
-                                        Math.min(totalPages, p + 1),
-                                    )
-                                }
-                                disabled={currentPage === totalPages}
-                            >
-                                &gt;
-                            </button>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Modal de confirmación */}
-            {confirmAction && (
-                <div className='jac-modal-backdrop' onClick={cancelAction}>
-                    <div
-                        className='jac-modal'
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <h3 className='jac-modal-title'>
-                            Confirmar cambio de estado
-                        </h3>
-                        <p className='jac-modal-body'>
-                            ¿Cambiar{' '}
-                            <strong>"{confirmAction.alert.titulo}"</strong> a{' '}
-                            <strong
-                                style={{
-                                    color: ESTADO_META[
-                                        confirmAction.nuevoEstado
-                                    ].color,
-                                }}
-                            >
-                                {confirmAction.label}
-                            </strong>
-                            ?
-                        </p>
-                        <div className='jac-modal-actions'>
-                            <button
-                                type='button'
-                                className='btn btn-outline-secondary btn-sm'
-                                onClick={cancelAction}
-                            >
-                                Cancelar
-                            </button>
-                            <button
-                                type='button'
-                                className='btn btn-dark btn-sm'
-                                onClick={() => void confirmStatusChange()}
-                            >
-                                Confirmar
-                            </button>
-                        </div>
+                                {Array.from(
+                                    { length: totalPages },
+                                    (_, i) => i + 1,
+                                ).map((p) => (
+                                    <button
+                                        key={p}
+                                        type='button'
+                                        className={`jac-page-btn ${p === currentPage ? 'is-active' : ''}`}
+                                        onClick={() => setCurrentPage(p)}
+                                    >
+                                        {p}
+                                    </button>
+                                ))}
+                                <button
+                                    type='button'
+                                    className='jac-page-btn'
+                                    onClick={() =>
+                                        setCurrentPage((p) =>
+                                            Math.min(totalPages, p + 1),
+                                        )
+                                    }
+                                    disabled={currentPage === totalPages}
+                                >
+                                    &gt;
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
+
+                {/* Modal de confirmación */}
+                {confirmAction && (
+                    <div className='jac-modal-backdrop' onClick={cancelAction}>
+                        <div
+                            className='jac-modal'
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h3 className='jac-modal-title'>
+                                Confirmar cambio de estado
+                            </h3>
+                            <p className='jac-modal-body'>
+                                ¿Cambiar{' '}
+                                <strong>"{confirmAction.alert.titulo}"</strong>{' '}
+                                a{' '}
+                                <strong
+                                    style={{
+                                        color: ESTADO_META[
+                                            confirmAction.nuevoEstado
+                                        ].color,
+                                    }}
+                                >
+                                    {confirmAction.label}
+                                </strong>
+                                ?
+                            </p>
+                            <div className='jac-modal-actions'>
+                                <button
+                                    type='button'
+                                    className='btn btn-outline-secondary btn-sm'
+                                    onClick={cancelAction}
+                                >
+                                    Cancelar
+                                </button>
+                                <button
+                                    type='button'
+                                    className='btn btn-dark btn-sm'
+                                    onClick={() => void confirmStatusChange()}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

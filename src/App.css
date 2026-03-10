@@ -6,131 +6,219 @@
 body,
 html,
 #root {
-  margin: 0;
-  height: 100%;
+    margin: 0;
+    height: 100%;
 }
 
 /* Titulos H2 mas grandes y centrados */
 h2 {
-  font-size: 25px;
-  text-align: center;
+    color: #ffffff;
+    font-size: 24px;
+    text-align: center;
 }
 
 /* Navbar transparente por defecto */
 .navbar {
-  background-color: #12182a00 !important;
-  /* El !important obliga a pisar estilos previos (util, pero mejor evitarlo si puedes) */
+    background-color: #12182a00 !important;
+    /* El !important obliga a pisar estilos previos (util, pero mejor evitarlo si puedes) */
 }
 
-/* Fondo de paginas Login y Registro */
+/* Tipografia general del navbar */
+.navbar {
+    font-weight: 700;
+    font-size: 18px;
+    background-color: #12182a00 !important;
+}
+
+/* Garantiza que el navbar quede por encima del contenido */
+.navbar-top {
+    z-index: 10;
+}
+
+/* Estilo al enfocar inputs */
+input.form-control:focus {
+    border-color: #0d6efd; /* Azul Bootstrap */
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Oculta el navbar moviendolo hacia arriba (hook useHideOnScroll) */
+.navbar-hidden {
+    transform: translateY(-100%);
+    transition: transform 0.45s ease-in-out;
+}
+
+/* Transicion suave para ocultar/mostrar el navbar */
+nav.navbar {
+    transition: transform 0.45s ease-in-out;
+}
+
+/* ── BREADCRUMB GLOBAL ── */
+.breadcrumb-nav {
+    margin-bottom: 1.5rem;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    list-style: none;
+}
+
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: '/';
+    padding: 0 0.75rem;
+    color: #d1d5db;
+}
+
+.breadcrumb-link {
+    color: #ffffff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+    color: #dc2626;
+}
+
+.breadcrumb-item.active {
+    color: #ffffff;
+    font-weight: 800;
+    background: rgba(255, 255, 255, 0.12);
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+/* FONDOS PAGINAS */
 .register-background,
 .login-background {
-  background-image: url("/FondoForm.jpg");
+    background-image: url('/FondoForm.jpg');
 }
 
 .edit-background {
-  background-image: url("/FondoDash.jpg");
+    background-image: url('/FondoDash.jpg');
 }
 
-.dashboard-background,
 .alert-background {
-  background-image: url("/Fondo.jpg");
+    background-image: url('/Fondo.jpg');
 }
 
 .change-background.change-background {
-  background-image: url("/FondoPassword.jpg");
+    background-image: url('/FondoPassword.jpg');
 }
 
 .register-background,
 .login-background,
 .edit-background,
-.dashboard-background,
 .alert-background,
 .change-background {
-  background-size: cover; /* Ocupa toda el area sin deformarse */
-  background-position: center;
-  background-repeat: no-repeat;
-  height: 100vh; /* Pantalla completa */
-  width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
+    background-size: cover; /* Ocupa toda el area sin deformarse */
+    background-position: center;
+    background-repeat: no-repeat;
+    height: 100vh; /* Pantalla completa */
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
-/* Tipografia general del navbar */
-.navbar {
-  font-weight: 700;
-  font-size: 18px;
-  background-color: #12182a00 !important;
+.panel-admin {
+    min-height: auto;
+    background-color: rgba(0, 0, 0, 0.55);
+    background-blend-mode: darken;
+    background-image: url('/public/crearAlerta.avif');
+    background-size: cover;
+    background-position: center;
 }
 
-/* Garantiza que el navbar quede por encima del contenido */
-.navbar-top {
-  z-index: 10;
+.gestion-usuarios {
+    background-image: url('/public/Gestion_Usuarios.jpg');
+    background-color: rgba(0, 0, 0, 0.55);
+    background-blend-mode: darken;
 }
 
-/* Estilo al enfocar inputs */
-input.form-control:focus {
-  border-color: #0d6efd; /* Azul Bootstrap */
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+.roles {
+    background-image: url('/public/Roles.jpg');
 }
 
-/* Oculta el navbar moviendolo hacia arriba (hook useHideOnScroll) */
-.navbar-hidden {
-  transform: translateY(-100%);
-  transition: transform 0.45s ease-in-out;
+.create-alert-page {
+    background-image: url('/public/AlertasV2.jpg');
 }
 
-/* Transicion suave para ocultar/mostrar el navbar */
-nav.navbar {
-  transition: transform 0.45s ease-in-out;
+.panel-jac {
+    background-image: url('/public/Jac.jpg');
 }
 
-/* ================================
-   ADMIN
-   ================================ */
+.reportes-page {
+    background-image: url('/public/Power_Bi.jpg');
+}
+
+.gestion-usuarios,
+.roles,
+.create-alert-page,
+.panel-jac,
+.reportes-page {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* ================================ ADMIN ================================ */
 
 .container {
-  padding-top: 9rem !important;
+    padding-top: 9rem !important;
 }
 
 .display-4 {
-  padding-bottom: 20px;
-  font-size: 2.5rem;
+    padding-bottom: 20px;
+    font-size: 2.5rem;
 }
 
-/* ================================
-   FOOTER
-   ================================ */
+/* ================================ FOOTER ================================ */
 
 .footer-section {
-  /* Fondo oscuro con overlay + imagen */
-  background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
-    url("/Fondo_Formularios.png") center/cover no-repeat;
-  padding: 50px 0;
+    /* Fondo oscuro con overlay + imagen */
+    background-image: url('/public/FooterV2.jpg');
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 50px 0;
 }
 
 /* Tamaño del logo en el footer */
 .footer-logo {
-  width: 160px;
+    width: 160px;
 }
 
 /* Estilos de los iconos de redes */
 .social-icons .social-icon {
-  font-size: 1.8rem;
-  color: #ffffff;
-  text-decoration: none;
-  transition: 0.3s ease;
+    font-size: 1.8rem;
+    color: #ffffff;
+    text-decoration: none;
+    transition: 0.3s ease;
 }
 
 /* Animacion al pasar el mouse */
 .social-icons .social-icon:hover {
-  color: #0dcaf0; /* Azul clarito */
-  transform: scale(1.15); /* Efecto de zoom */
+    color: #0dcaf0; /* Azul clarito */
+    transform: scale(1.15); /* Efecto de zoom */
 }
 
 /* Linea separadora final del footer */
 .footer-separator {
-  border-color: rgba(255, 0, 0, 1) !important;
+    border-color: rgba(255, 0, 0, 1) !important;
 }
-

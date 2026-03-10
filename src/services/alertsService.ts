@@ -39,6 +39,11 @@ const alertsService = {
         return data;
     },
 
+    getById: async (id: number): Promise<Alert> => {
+        const { data } = await api.get<Alert>(`/alerts/${id}`);
+        return data;
+    },
+
     update: async (id: number, payload: UpdateAlertPayload): Promise<Alert> => {
         const formData = new FormData();
 
@@ -56,6 +61,15 @@ const alertsService = {
             formData.append('id_barrio', String(payload.id_barrio));
         if (payload.ubicacion !== undefined)
             formData.append('ubicacion', payload.ubicacion);
+        if (payload.evidencias_eliminadas?.length) {
+            formData.append(
+                'evidencias_eliminadas',
+                JSON.stringify(payload.evidencias_eliminadas),
+            );
+        }
+        if (payload.eliminar_todas_evidencias) {
+            formData.append('eliminar_todas_evidencias', 'true');
+        }
         if (payload.evidencias?.length) {
             payload.evidencias.forEach((file) => {
                 formData.append('evidencias', file);
@@ -72,6 +86,10 @@ const alertsService = {
             },
         );
         return data.alert;
+    },
+
+    delete: async (id: number): Promise<void> => {
+        await api.delete(`/alerts/${id}`);
     },
 
     updateAlertStatus: async (

@@ -25,6 +25,13 @@ type Coords = {
   lng: number;
 };
 
+type ExistingEvidenceItem = {
+  key: string;
+  id: number | null;
+  url: string;
+  type: string | null;
+};
+
 const buildLocationValue = (
   ubicacion: string,
   selectedCoords: Coords | null,
@@ -44,6 +51,34 @@ const buildLocationValue = (
   return undefined;
 };
 
+const buildExistingEvidenceList = (alert: Alert): ExistingEvidenceItem[] => {
+  const fromArray = (alert.evidencias || [])
+    .filter((item) => Boolean(item?.url_evidencia))
+    .map((item, index) => ({
+      key: `evidence-${item.id_evidencia || index}-${item.url_evidencia}`,
+      id: item.id_evidencia || null,
+      url: item.url_evidencia,
+      type: item.tipo_evidencia || null,
+    }));
+
+  if (fromArray.length > 0) {
+    return fromArray;
+  }
+
+  if (alert.evidencia_url) {
+    return [
+      {
+        key: `legacy-${alert.id_alerta}-${alert.evidencia_url}`,
+        id: null,
+        url: alert.evidencia_url,
+        type: alert.evidencia_tipo || null,
+      },
+    ];
+  }
+
+  return [];
+};
+
 const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
   const [titulo, setTitulo] = useState(alert.titulo);
   const [descripcion, setDescripcion] = useState(alert.descripcion);
@@ -55,6 +90,11 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
   const [comunaId, setComunaId] = useState(alert.id_comuna ? String(alert.id_comuna) : "");
   const [barrioId, setBarrioId] = useState(alert.id_barrio ? String(alert.id_barrio) : "");
   const [loadingLocations, setLoadingLocations] = useState(false);
+  const [existingEvidences, setExistingEvidences] = useState<ExistingEvidenceItem[]>(
+    () => buildExistingEvidenceList(alert)
+  );
+  const [removedEvidenceIds, setRemovedEvidenceIds] = useState<number[]>([]);
+  const [removeAllEvidence, setRemoveAllEvidence] = useState(false);
   const [evidencias, setEvidencias] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const categoryOptions = useMemo(() => Array.from(new Set([categoria, ...CATEGORY_OPTIONS])), [categoria]);
@@ -95,6 +135,9 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     setUbicacion(alert.ubicacion || "");
     setComunaId(alert.id_comuna ? String(alert.id_comuna) : "");
     setBarrioId(alert.id_barrio ? String(alert.id_barrio) : "");
+    setExistingEvidences(buildExistingEvidenceList(alert));
+    setRemovedEvidenceIds([]);
+    setRemoveAllEvidence(false);
     setEvidencias([]);
     mapSeededRef.current = false;
   }, [alert]);
@@ -236,6 +279,23 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     e.preventDefault();
   };
 
+  const removeExistingEvidence = (item: ExistingEvidenceItem) => {
+    if (saving) return;
+
+    setExistingEvidences((current) => current.filter((evidence) => evidence.key !== item.key));
+
+    const evidenceId = item.id;
+
+    if (evidenceId !== null && Number.isInteger(evidenceId)) {
+      setRemovedEvidenceIds((current) =>
+        current.includes(evidenceId) ? current : [...current, evidenceId]
+      );
+      return;
+    }
+
+    setRemoveAllEvidence(true);
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -255,6 +315,14 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
       ubicacion: locationValue,
       evidencias: evidencias.length ? evidencias : undefined,
     };
+
+    if (removedEvidenceIds.length > 0) {
+      payload.evidencias_eliminadas = removedEvidenceIds;
+    }
+
+    if (removeAllEvidence) {
+      payload.eliminar_todas_evidencias = true;
+    }
 
     if (Number.isInteger(parsedComunaId) && parsedComunaId > 0) {
       payload.id_comuna = parsedComunaId;
@@ -434,7 +502,33 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
             </div>
           </div>
 
-          <label className="alert-edit-label">Nueva evidencia (opcional)</label>
+          <label className="alert-edit-label">Evidencias actuales</label>
+          {existingEvidences.length > 0 ? (
+            <div className="alert-edit-existing-grid">
+              {existingEvidences.map((item) => (
+                <article key={item.key} className="alert-edit-existing-item">
+                  {item.type?.startsWith("video/") ? (
+                    <video className="alert-edit-existing-media" src={item.url} controls />
+                  ) : (
+                    <img className="alert-edit-existing-media" src={item.url} alt="Evidencia cargada" />
+                  )}
+                  <button
+                    type="button"
+                    className="alert-edit-existing-remove"
+                    aria-label="Quitar evidencia"
+                    onClick={() => removeExistingEvidence(item)}
+                    disabled={saving}
+                  >
+                    <i className="bi bi-x-lg" />
+                  </button>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <small className="alert-edit-help-text">No hay evidencias cargadas actualmente.</small>
+          )}
+
+          <label className="alert-edit-label">Agregar nuevas evidencias (opcional)</label>
           <div className="alert-edit-dropzone-wrap">
             <label
               htmlFor="alert-edit-evidence"

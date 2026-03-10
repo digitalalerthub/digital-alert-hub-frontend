@@ -412,20 +412,6 @@
   padding: 0.6rem 0.75rem;
 }
 
-.alert-detail-comments-list.is-hidden {
-  min-height: 0;
-  max-height: 0;
-  border-width: 0;
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-}
-
-.alert-detail-comments-list.is-visible {
-  min-height: 118px;
-  max-height: 152px;
-}
-
 .alert-detail-comment-form {
   display: flex;
   align-items: center;
@@ -533,21 +519,6 @@
   display: inline-block;
   color: #6b7280;
   font-size: 0.66rem;
-}
-
-.alert-detail-comment-placeholder {
-  min-height: 48px;
-  border: 1px dashed #cbd5e1;
-  border-radius: 12px;
-  background: #f8fafc;
-  display: flex;
-  align-items: center;
-  padding: 0 0.55rem;
-}
-
-.alert-detail-comment-placeholder span {
-  color: #94a3b8;
-  font-size: 0.72rem;
 }
 
 .alert-detail-comments-list::-webkit-scrollbar {
