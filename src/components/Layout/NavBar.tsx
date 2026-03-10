@@ -21,13 +21,13 @@ const NavBar: React.FC = () => {
             case '/contacto':
                 return '#ffffff';
             case '/crear-alertas':
-                return '#ffffff';
             case '/perfil':
             case '/admin':
-                return '#ffffff'
             case '/admin/users':
             case '/jac/alertas':
-                return '#000000';
+            case '/admin/roles':
+            case '/reportes':
+                return '#ffffff';
             default:
                 return '#000000ff';
         }
@@ -42,7 +42,9 @@ const NavBar: React.FC = () => {
 
             case '/admin':
             case '/admin/users':
+            case '/admin/roles':
             case '/jac/alertas':
+            case '/reportes':
                 return '#ffffff';
 
             default:

@@ -21,6 +21,7 @@ import UserTable from './components/Admin/UserTable';
 import RoleTable from './components/Admin/RoleTable';
 import RoleRoute from './components/Route/RoleRoute';
 import JACAlertPanel from './pages/Jac/JACAlertPanel';
+import ReportesPage from './pages/Reportes/ReportesPage';
 
 // Componentes
 import NavBar from './components/Layout/NavBar';
@@ -67,6 +68,7 @@ function App() {
                             path='/perfil/cambiar-contrasena'
                             element={<ChangePasswordPage />}
                         />
+                        <Route path='/reportes' element={<ReportesPage />} />
                     </Route>
 
                     {/*RUTAS DE ADMIN*/}
@@ -82,6 +84,7 @@ function App() {
                             element={<JACAlertPanel />}
                         />
                     </Route>
+                    
                 </Routes>
                 <ToastContainer position='top-right' autoClose={3000} />
             </Router>
