@@ -3,7 +3,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
-// Páginas
+// Paginas
 import HomePage from './pages/Home/HomePage';
 import QuienesSomosPage from './pages/Home/QuienesSomosPage';
 import LoginPage from './pages/Auth/LoginPage';
@@ -36,7 +36,7 @@ function App() {
             <Router>
                 <NavBar />
                 <Routes>
-                    {/* Rutas Públicas */}
+                    {/* Rutas Publicas */}
                     <Route path='/' element={<HomePage />} />
                     <Route
                         path='/quienes-somos'
@@ -68,10 +68,9 @@ function App() {
                             path='/perfil/cambiar-contrasena'
                             element={<ChangePasswordPage />}
                         />
-                        <Route path='/reportes' element={<ReportesPage />} />
                     </Route>
 
-                    {/*RUTAS DE ADMIN*/}
+                    {/* RUTAS DE ADMIN */}
                     <Route element={<RoleRoute allowedRoles={[1]} />}>
                         <Route path='/admin/users' element={<UserTable />} />
                         <Route path='/admin/roles' element={<RoleTable />} />
@@ -83,8 +82,8 @@ function App() {
                             path='/jac/alertas'
                             element={<JACAlertPanel />}
                         />
+                        <Route path='/reportes' element={<ReportesPage />} />
                     </Route>
-                    
                 </Routes>
                 <ToastContainer position='top-right' autoClose={3000} />
             </Router>
