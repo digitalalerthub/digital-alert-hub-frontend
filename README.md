@@ -7,7 +7,7 @@ Plataforma web para gestión y visualización de alertas en tiempo real. Desarro
 - ✅ Autenticación con Google OAuth 2.0
 - ✅ Gestión de perfil de usuario
 - ✅ Creación y visualización de alertas en tiempo real
-- ✅ Dashboard administrativo con estadísticas
+- ✅ Dashboard administrativo con estadísticas`r`n- ✅ Ventana de reportes con filtros y gr�ficas din�micas
 - ✅ Roles y permisos (usuario regular vs administrador)
 - ✅ Recuperación de contraseña
 - ✅ Interfaz responsive con CSS modular
@@ -58,13 +58,13 @@ Obtén el `VITE_GOOGLE_CLIENT_ID` de [Google Cloud Console](https://console.deve
 
 | Dependencia | Versión | Propósito |
 |-------------|---------|-----------|
-| **React** | ^18.3.1 | Biblioteca UI declarativa |
-| **React Router DOM** | ^6.28.0 | Enrutamiento de páginas |
-| **TypeScript** | ^5.6.3 | Tipado estático |
-| **Axios** | ^1.7.9 | Cliente HTTP para peticiones API |
-| **@react-oauth/google** | ^0.12.1 | Integración Google OAuth 2.0 |
+| **React** | ^19.2.0 | Biblioteca UI declarativa |
+| **React Router DOM** | ^7.9.5 | Enrutamiento de p�ginas |
+| **TypeScript** | ~5.8.3 | Tipado est�tico |
+| **Axios** | ^1.13.2 | Cliente HTTP para peticiones API |`r`n| **Recharts** | ^3.8.0 | Librer�a de gr�ficas para reportes y dashboards |
+| **@react-oauth/google** | ^0.12.2 | Integraci�n Google OAuth 2.0 |
 | **jwt-decode** | ^4.0.0 | Decodificación de JWT tokens |
-| **Vite** | ^6.0.3 | Bundler y dev server rápido |
+| **Vite** | ^7.1.7 | Bundler y dev server r�pido |
 
 ### Dependencias de Desarrollo
 
@@ -241,3 +241,4 @@ npm run lint         # Ejecutar ESLint
 ## 📄 Licencia
 
 Proyecto de SENA - Digital Alert Hub 2025
+
