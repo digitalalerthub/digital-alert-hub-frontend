@@ -1,6 +1,6 @@
 import Hero from "../../components/Home/Hero";
 import Features from "../../components/Home/Features";
-import CarouselInfo from "../../components/Home/CarouselInfo";
+import StatsCounter from "../../components/Home/StatsCounter";
 import Footer from "../../components/Layout/Footer";
 
 const Home = () => {
@@ -8,7 +8,7 @@ const Home = () => {
     <>
       <Hero />
       <Features />
-      <CarouselInfo />
+      <StatsCounter/>
       <Footer />
     </>
   );

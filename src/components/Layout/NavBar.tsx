@@ -4,7 +4,6 @@ import { useHideOnScroll } from '../../hooks/useHideOnScroll';
 
 const NavBar: React.FC = () => {
     const hidden = useHideOnScroll();
-
     const { isLoggedIn, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -39,14 +38,12 @@ const NavBar: React.FC = () => {
             case '/quienes-somos':
             case '/contacto':
                 return 'transparent';
-
             case '/admin':
             case '/admin/users':
             case '/admin/roles':
             case '/jac/alertas':
             case '/reportes':
                 return '#ffffff';
-
             default:
                 return '#ffffffff';
         }
@@ -57,7 +54,7 @@ const NavBar: React.FC = () => {
 
     return (
         <nav
-            className={`navbar navbar-expand-lg bg-dark fixed-top px-4 py-2 ${
+            className={`navbar navbar-expand-lg fixed-top px-4 py-2 ${
                 hidden ? 'navbar-hidden' : ''
             }`}
             style={{
@@ -85,6 +82,9 @@ const NavBar: React.FC = () => {
                     type='button'
                     data-bs-toggle='collapse'
                     data-bs-target='#navbarNav'
+                    aria-controls='navbarNav'
+                    aria-expanded='false'
+                    aria-label='Toggle navigation'
                 >
                     <span className='navbar-toggler-icon' />
                 </button>
@@ -93,8 +93,51 @@ const NavBar: React.FC = () => {
                     <ul className='navbar-nav ms-auto align-items-center gap-2'>
                         {isLoggedIn ? (
                             <>
-                                {/* 👤 AVATAR + DROPDOWN */}
-                                <li className='nav-item dropdown'>
+                                {/* ================================
+                                    MÓVIL: links directos (d-lg-none)
+                                    ================================ */}
+                                <li className='nav-item d-lg-none'>
+                                    <button
+                                        className='nav-link btn btn-link text-start w-100'
+                                        onClick={() => navigate('/perfil')}
+                                    >
+                                        <i className='bi bi-person me-2' />
+                                        Mi perfil
+                                    </button>
+                                </li>
+
+                                <li className='nav-item d-lg-none'>
+                                    <button
+                                        className='nav-link btn btn-link text-start w-100'
+                                        onClick={() =>
+                                            navigate(
+                                                '/perfil/cambiar-contrasena',
+                                            )
+                                        }
+                                    >
+                                        <i className='bi bi-shield-lock me-2' />
+                                        Cambiar contraseña
+                                    </button>
+                                </li>
+
+                                <li className='nav-item d-lg-none'>
+                                    <hr className='dropdown-divider border-secondary' />
+                                </li>
+
+                                <li className='nav-item d-lg-none'>
+                                    <button
+                                        className='nav-link btn btn-link text-start text-danger w-100'
+                                        onClick={handleLogout}
+                                    >
+                                        <i className='bi bi-box-arrow-right me-2' />
+                                        Cerrar sesión
+                                    </button>
+                                </li>
+
+                                {/* ================================
+                                    DESKTOP: avatar + dropdown (d-none d-lg-block)
+                                    ================================ */}
+                                <li className='nav-item dropdown d-none d-lg-block'>
                                     <button
                                         className='btn border-0 bg-transparent p-0'
                                         data-bs-toggle='dropdown'
@@ -128,7 +171,6 @@ const NavBar: React.FC = () => {
                                                 Mi perfil
                                             </button>
                                         </li>
-
                                         <li>
                                             <button
                                                 className='dropdown-item'
@@ -142,11 +184,9 @@ const NavBar: React.FC = () => {
                                                 Cambiar contraseña
                                             </button>
                                         </li>
-
                                         <li>
                                             <hr className='dropdown-divider' />
                                         </li>
-
                                         <li>
                                             <button
                                                 className='dropdown-item text-danger'
@@ -161,7 +201,9 @@ const NavBar: React.FC = () => {
                             </>
                         ) : (
                             <>
-                                {/* MENÚ PÚBLICO */}
+                                {/* ================================
+                                    MENÚ PÚBLICO
+                                    ================================ */}
                                 <li className='nav-item'>
                                     <Link
                                         className='nav-link'
@@ -193,21 +235,27 @@ const NavBar: React.FC = () => {
                                 </li>
 
                                 {location.pathname !== '/login' && (
-                                    <button
-                                        className='btn btn-outline-light fw-semibold'
-                                        onClick={() => navigate('/login')}
-                                    >
-                                        Iniciar sesión
-                                    </button>
+                                    <li className='nav-item'>
+                                        <button
+                                            className='btn btn-outline-light fw-semibold'
+                                            onClick={() => navigate('/login')}
+                                        >
+                                            Iniciar sesión
+                                        </button>
+                                    </li>
                                 )}
 
                                 {location.pathname !== '/register' && (
-                                    <button
-                                        className='btn btn-danger fw-semibold'
-                                        onClick={() => navigate('/register')}
-                                    >
-                                        Crear cuenta
-                                    </button>
+                                    <li className='nav-item'>
+                                        <button
+                                            className='btn btn-danger fw-semibold'
+                                            onClick={() =>
+                                                navigate('/register')
+                                            }
+                                        >
+                                            Crear cuenta
+                                        </button>
+                                    </li>
                                 )}
                             </>
                         )}
