@@ -9,13 +9,13 @@ const ReportesPage = () => {
                     <Breadcrumb
                         items={[
                             { label: 'Panel Principal', to: '/admin' },
-                            { label: 'Reportes Power BI' },
+                            { label: 'Reporte Alertas' },
                         ]}
                     />
 
                     {/* Header */}
                     <div className='reportes-header'>
-                        <h1 className='reportes-title'>Reportes Power BI</h1>
+                        <h1 className='reportes-title'>Reporte Alertas</h1>
                         <p className='reportes-subtitle'>
                             Visualiza los datos del sistema en tiempo real
                         </p>
@@ -24,13 +24,13 @@ const ReportesPage = () => {
                     {/* Card contenedor del iframe */}
                     <div className='reportes-card'>
                         <div className='reportes-embed-wrap'>
-                            {/* Aquí va el iframe de Power BI cuando esté listo */}
+                            {/* Aqui va el iframe del reporte cuando este listo */}
                             <div className='reportes-placeholder'>
                                 <i className='bi bi-bar-chart-line reportes-placeholder-icon' />
                                 <h3>Reporte no disponible</h3>
                                 <p>
-                                    El reporte de Power BI estará disponible
-                                    próximamente.
+                                    El reporte de alertas estara disponible
+                                    proximamente.
                                 </p>
                             </div>
                         </div>

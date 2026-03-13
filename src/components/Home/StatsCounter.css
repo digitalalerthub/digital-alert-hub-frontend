@@ -1,0 +1,141 @@
+.sc-section {
+  background: #0f0f0f;
+  padding: 64px 32px;
+  text-align: center;
+}
+
+.sc-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #e03030;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.sc-title {
+  font-size: 26px;
+  font-weight: 500;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.sc-sub {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 48px;
+}
+
+.sc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.sc-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 0.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 28px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.sc-card:hover {
+  border-color: rgba(224, 48, 48, 0.4);
+  transform: translateY(-3px);
+}
+
+.sc-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #e03030;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.sc-card:hover::before {
+  opacity: 1;
+}
+
+.sc-icon {
+  font-size: 28px;
+  margin-bottom: 14px;
+  line-height: 1;
+}
+
+.sc-num {
+  font-size: 40px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -1px;
+}
+
+.sc-label {
+  font-size: 12px;
+  color: #666;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.sc-bar {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.sc-bar-fill {
+  height: 100%;
+  background: #e03030;
+  border-radius: 2px;
+  width: 0%;
+  transition: width 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sc-skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.sc-skeleton {
+  height: 150px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  animation: sc-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes sc-pulse {
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.7; }
+}
+
+@media (max-width: 768px) {
+  .sc-grid,
+  .sc-skeleton-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .sc-num {
+    font-size: 30px;
+  }
+}
+
+@media (max-width: 420px) {
+  .sc-grid,
+  .sc-skeleton-grid {
+    grid-template-columns: 1fr;
+  }
+}

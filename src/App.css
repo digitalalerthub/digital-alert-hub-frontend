@@ -20,39 +20,107 @@ h2 {
 /* Navbar transparente por defecto */
 .navbar {
     background-color: #12182a00 !important;
-    /* El !important obliga a pisar estilos previos (util, pero mejor evitarlo si puedes) */
-}
-
-/* Tipografia general del navbar */
-.navbar {
     font-weight: 700;
     font-size: 18px;
-    background-color: #12182a00 !important;
 }
 
-/* Garantiza que el navbar quede por encima del contenido */
 .navbar-top {
     z-index: 10;
 }
 
-/* Estilo al enfocar inputs */
 input.form-control:focus {
-    border-color: #0d6efd; /* Azul Bootstrap */
+    border-color: #0d6efd;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-/* Oculta el navbar moviendolo hacia arriba (hook useHideOnScroll) */
 .navbar-hidden {
     transform: translateY(-100%);
     transition: transform 0.45s ease-in-out;
 }
 
-/* Transicion suave para ocultar/mostrar el navbar */
 nav.navbar {
     transition: transform 0.45s ease-in-out;
 }
 
-/* ── BREADCRUMB GLOBAL ── */
+.navbar-toggler {
+    border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ================================
+   RESPONSIVE — menú desplegable
+   ================================ */
+@media (max-width: 991px) {
+    .navbar .navbar-collapse {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(10, 10, 10, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+    }
+
+    .navbar .navbar-nav {
+        align-items: stretch !important;
+        gap: 4px;
+    }
+
+    .navbar .nav-link,
+    .navbar .btn-link {
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 10px 12px;
+        border-radius: 8px;
+        transition: background 0.15s ease;
+    }
+
+    .navbar .nav-link:hover,
+    .navbar .btn-link:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar .nav-link,
+    .navbar .dropdown-toggle,
+    .navbar .btn {
+        width: 100%;
+    }
+
+    .navbar .btn-outline-light,
+    .navbar .btn-danger {
+        margin-top: 4px;
+        text-align: center;
+    }
+
+    /* Toggler borde blanco visible */
+    .navbar-toggler {
+        border: 1.5px solid rgba(255, 255, 255, 0.7) !important;
+        border-radius: 8px !important;
+        padding: 6px 10px !important;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.3) !important;
+    }
+
+    /* Líneas hamburguesa en blanco */
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255,255,255,1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2.5' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    }
+
+    /* Breadcrumb más abajo */
+    .breadcrumb-nav {
+        margin-top: 24px;
+        margin-bottom: 1.5rem;
+    }
+}
+/* ================================
+   BREADCRUMB GLOBAL
+   ================================ */
 .breadcrumb-nav {
     margin-bottom: 1.5rem;
 }
@@ -163,6 +231,7 @@ nav.navbar {
     background-image: url('/public/Power_Bi.jpg');
 }
 
+.panel-admin,
 .gestion-usuarios,
 .roles,
 .create-alert-page,
@@ -191,34 +260,158 @@ nav.navbar {
 
 /* ================================ FOOTER ================================ */
 
+/* Footer */
 .footer-section {
-    /* Fondo oscuro con overlay + imagen */
     background-image: url('/public/FooterV2.jpg');
+    background-size: cover;
     background-position: center;
-    background-repeat: no-repeat;
-    padding: 50px 0;
+    padding: 0 0 20px;
 }
 
-/* Tamaño del logo en el footer */
-.footer-logo {
-    width: 160px;
+.footer-top-heading {
+    margin-bottom: 80px;
 }
 
-/* Estilos de los iconos de redes */
-.social-icons .social-icon {
-    font-size: 1.8rem;
+.footer-main-title {
+    font-size: 2rem;
+    font-weight: 700;
     color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.footer-brand-block {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo-link {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.footer-logo {
+    height: 140px;
+    width: auto;
+}
+
+.footer-brand-text {
+    margin-top: 4px;
+    font-size: 1.15rem;
+    line-height: 1.6;
+    color: #ffffff;
+    max-width: 320px;
+}
+
+.footer-contact-item {
+    width: fit-content;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.footer-contact-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.footer-contact-text {
+    font-size: 1rem;
+    color: #ffffff;
+    text-align: left;
+}
+
+.footer-social-wrapper {
+    max-width: 520px;
+    margin: 0 auto;
+}
+
+.social-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(180px, 1fr));
+    gap: 12px;
+    justify-content: center;
+}
+
+.social-card-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 0.5px solid rgba(255, 255, 255, 0.1);
     text-decoration: none;
-    transition: 0.3s ease;
+    color: #cccccc;
+    font-size: 14px;
+    transition: all 0.15s ease;
 }
 
-/* Animacion al pasar el mouse */
-.social-icons .social-icon:hover {
-    color: #0dcaf0; /* Azul clarito */
-    transform: scale(1.15); /* Efecto de zoom */
+.social-card-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    transform: translateY(-2px);
 }
 
-/* Linea separadora final del footer */
+.letter-spacing-wide {
+    letter-spacing: 0.08em;
+}
+
 .footer-separator {
-    border-color: rgba(255, 0, 0, 1) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.footer-copy {
+    color: #ffffffc2;
+    font-size: 0.98rem;
+    margin-top: 22px;
+}
+
+@media (max-width: 991px) {
+    .footer-main-title {
+        font-size: 1.7rem;
+    }
+
+    .footer-brand-text {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 767px) {
+    .footer-section {
+        padding: 55px 0 20px;
+    }
+
+    .footer-main-title {
+        font-size: 1.45rem;
+    }
+
+    .footer-logo {
+        height: 78px;
+    }
+
+    .footer-brand-text {
+        font-size: 1rem;
+    }
+
+    .social-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .social-card-btn {
+        justify-content: center;
+    }
+
+    .footer-contact-text {
+        font-size: 0.96rem;
+    }
 }
