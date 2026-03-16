@@ -2,14 +2,18 @@ export interface ReportFilters {
   id_estado?: number;
   id_comuna?: number;
   id_barrio?: number;
+  year?: number;
   month?: string;
+  category?: string;
 }
 
 export interface ReportFilterState {
   idEstado: string;
   idComuna: string;
   idBarrio: string;
+  year: string;
   month: string;
+  category: string;
 }
 
 export interface ReportMetricItem {
@@ -50,7 +54,9 @@ export interface AlertReportResponse {
     id_estado: number | null;
     id_comuna: number | null;
     id_barrio: number | null;
+    year: number | null;
     month: string | null;
+    category: string | null;
   };
   kpis: {
     total: number;
@@ -69,6 +75,8 @@ export interface AlertReportResponse {
     estados: ReportCatalogEstado[];
     comunas: ReportCatalogComuna[];
     barrios: ReportCatalogBarrio[];
+    categorias: string[];
+    years: number[];
   };
   generated_at: string;
 }

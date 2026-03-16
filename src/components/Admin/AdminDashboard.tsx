@@ -100,7 +100,7 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                     )}
-                    {/* Tarjeta Power BI */}
+                    {/* Tarjeta Reportes */}
                     <div className='col-lg-4'>
                         <div
                             className='card shadow h-100'
@@ -109,10 +109,8 @@ const AdminDashboard = () => {
                         >
                             <div className='card-body text-center p-5'>
                                 <i className='bi bi-bar-chart fs-1 text-info mb-3'></i>
-                                <h3 className='fw-bold text-info'>
-                                    Reporte Alertas
-                                </h3>
-                                <p className='text-muted'>Reportes</p>
+                                <h3 className='fw-bold text-info'>Reportes</h3>
+                                <p className='text-muted'>Metricas e indicadores</p>
                             </div>
                         </div>
                     </div>
