@@ -26,20 +26,50 @@ import './ReportesPage.css';
 
 const AUTO_REFRESH_MS = 60000;
 const PIE_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
+const DEFAULT_CATEGORY_OPTIONS = [
+    'Agua',
+    'Energia',
+    'Gas',
+    'Movilidad',
+    'Seguridad',
+    'Residuos',
+    'Otro',
+];
 
 const INITIAL_FILTERS: ReportFilterState = {
     idEstado: '',
     idComuna: '',
     idBarrio: '',
+    year: '',
     month: '',
+    category: '',
 };
 
-const buildMonthOptions = () => {
+const buildMonthOptions = (selectedYear?: string) => {
     const formatter = new Intl.DateTimeFormat('es-CO', {
         month: 'long',
         year: 'numeric',
         timeZone: 'UTC',
     });
+
+    if (selectedYear) {
+        const numericYear = Number(selectedYear);
+        if (Number.isInteger(numericYear) && numericYear > 0) {
+            return Array.from({ length: 12 }, (_, index) => {
+                const monthNumber = 11 - index;
+                const date = new Date(Date.UTC(numericYear, monthNumber, 1));
+                const value = `${numericYear}-${String(monthNumber + 1).padStart(
+                    2,
+                    '0',
+                )}`;
+
+                return {
+                    value,
+                    label: formatter.format(date),
+                };
+            });
+        }
+    }
 
     return Array.from({ length: 12 }, (_, index) => {
         const date = new Date();
@@ -74,8 +104,23 @@ const ReportesPage = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState('');
 
-    const monthOptions = buildMonthOptions();
-    const topBarrios = report?.charts.alertasPorBarrio.slice(0, 8) ?? [];
+    const monthOptions = buildMonthOptions(filters.year);
+    const yearOptions =
+        report?.catalogos.years.length
+            ? report.catalogos.years
+            : Array.from({ length: 6 }, (_, index) => new Date().getFullYear() - index);
+    const categoryOptions = Array.from(
+        new Set([
+            ...DEFAULT_CATEGORY_OPTIONS,
+            ...(report?.catalogos.categorias ?? []),
+        ]),
+    );
+    const barrioSeries = report?.charts.alertasPorBarrio ?? [];
+    const topBarrios = (
+        barrioSeries.some((item) => item.label !== 'Sin barrio')
+            ? barrioSeries.filter((item) => item.label !== 'Sin barrio')
+            : barrioSeries
+    ).slice(0, 8);
     const trendData = report?.charts.tendenciaMensual ?? [];
     const statusData = report?.charts.alertasPorEstado ?? [];
     const topCategorias = report?.charts.alertasPorCategoria.slice(0, 6) ?? [];
@@ -140,7 +185,9 @@ const ReportesPage = () => {
                     id_barrio: filters.idBarrio
                         ? Number(filters.idBarrio)
                         : undefined,
+                    year: filters.year ? Number(filters.year) : undefined,
                     month: filters.month || undefined,
+                    category: filters.category || undefined,
                 });
 
                 if (!cancelled) {
@@ -170,7 +217,14 @@ const ReportesPage = () => {
             cancelled = true;
             window.clearInterval(intervalId);
         };
-    }, [filters.idBarrio, filters.idComuna, filters.idEstado, filters.month]);
+    }, [
+        filters.category,
+        filters.idBarrio,
+        filters.idComuna,
+        filters.idEstado,
+        filters.month,
+        filters.year,
+    ]);
 
     const handleSelectChange =
         (field: keyof ReportFilterState) =>
@@ -183,6 +237,19 @@ const ReportesPage = () => {
                         ...current,
                         idComuna: nextValue,
                         idBarrio: '',
+                    };
+                }
+
+                if (field === 'year') {
+                    const shouldResetMonth =
+                        current.month &&
+                        nextValue &&
+                        !current.month.startsWith(`${nextValue}-`);
+
+                    return {
+                        ...current,
+                        year: nextValue,
+                        month: shouldResetMonth ? '' : current.month,
                     };
                 }
 
@@ -275,6 +342,18 @@ const ReportesPage = () => {
                         </select>
 
                         <select
+                            value={filters.year}
+                            onChange={handleSelectChange('year')}
+                        >
+                            <option value=''>Filtro por Anio</option>
+                            {yearOptions.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
                             value={filters.month}
                             onChange={handleSelectChange('month')}
                         >
@@ -282,6 +361,18 @@ const ReportesPage = () => {
                             {monthOptions.map((month) => (
                                 <option key={month.value} value={month.value}>
                                     {month.label}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={filters.category}
+                            onChange={handleSelectChange('category')}
+                        >
+                            <option value=''>Filtro por Categoria</option>
+                            {categoryOptions.map((category) => (
+                                <option key={category} value={category}>
+                                    {category}
                                 </option>
                             ))}
                         </select>
@@ -309,7 +400,7 @@ const ReportesPage = () => {
                             <strong>{report?.kpis.porAtender ?? 0}</strong>
                         </article>
                         <article className='reportes-stat-card'>
-                            <span>Alertas solucionadas</span>
+                            <span>Alertas Resueltas</span>
                             <strong>{report?.kpis.resueltas ?? 0}</strong>
                         </article>
                         <article className='reportes-stat-card'>
@@ -325,23 +416,23 @@ const ReportesPage = () => {
                     <section className='reportes-chart-grid'>
                         <article className='reportes-panel'>
                             <div className='reportes-panel-head'>
-                                <h3>Alertas por Barrio</h3>
+                                <h3>Alertas Resueltas</h3>
                             </div>
                             <div className='reportes-chart-wrap'>
                                 {loading ? (
                                     <div className='reportes-empty'>Cargando...</div>
-                                ) : topBarrios.length === 0 ? (
+                                ) : trendData.length === 0 ? (
                                     <div className='reportes-empty'>Sin datos</div>
                                 ) : (
                                     <ResponsiveContainer width='100%' height='100%'>
-                                        <LineChart data={topBarrios}>
+                                        <LineChart data={trendData}>
                                             <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
                                             <XAxis dataKey='label' tick={{ fill: '#666', fontSize: 10 }} />
                                             <YAxis allowDecimals={false} tick={{ fill: '#666', fontSize: 10 }} />
                                             <Tooltip />
                                             <Line
                                                 type='monotone'
-                                                dataKey='total'
+                                                dataKey='resueltas'
                                                 stroke='#2563eb'
                                                 strokeWidth={2}
                                                 dot={{ r: 3, fill: '#ef4444' }}
@@ -354,22 +445,22 @@ const ReportesPage = () => {
 
                         <article className='reportes-panel'>
                             <div className='reportes-panel-head'>
-                                <h3>Alertas Resueltas</h3>
+                                <h3>Alertas por Barrio</h3>
                             </div>
                             <div className='reportes-chart-wrap'>
                                 {loading ? (
                                     <div className='reportes-empty'>Cargando...</div>
-                                ) : trendData.length === 0 ? (
+                                ) : topBarrios.length === 0 ? (
                                     <div className='reportes-empty'>Sin datos</div>
                                 ) : (
                                     <ResponsiveContainer width='100%' height='100%'>
-                                        <BarChart data={trendData}>
+                                        <BarChart data={topBarrios}>
                                             <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
                                             <XAxis dataKey='label' tick={{ fill: '#666', fontSize: 10 }} />
                                             <YAxis allowDecimals={false} tick={{ fill: '#666', fontSize: 10 }} />
                                             <Tooltip />
                                             <Bar
-                                                dataKey='resueltas'
+                                                dataKey='total'
                                                 fill='#f97316'
                                                 radius={[4, 4, 0, 0]}
                                             />
@@ -434,32 +525,30 @@ const ReportesPage = () => {
                                     <div className='reportes-empty'>Sin datos</div>
                                 ) : (
                                     <ResponsiveContainer width='100%' height='100%'>
-                                        <PieChart>
-                                            <Tooltip />
-                                            <Pie
-                                                data={topCategorias}
-                                                dataKey='total'
-                                                nameKey='label'
-                                                outerRadius={74}
-                                            >
-                                                {topCategorias.map((entry, index) => (
-                                                    <Cell
-                                                        key={entry.label}
-                                                        fill={
-                                                            PIE_COLORS[
-                                                                index %
-                                                                    PIE_COLORS.length
-                                                            ]
-                                                        }
-                                                    />
-                                                ))}
-                                            </Pie>
-                                            <Legend
-                                                verticalAlign='bottom'
-                                                height={36}
-                                                wrapperStyle={{ fontSize: '11px' }}
+                                        <BarChart
+                                            data={topCategorias}
+                                            layout='vertical'
+                                            margin={{ top: 4, right: 12, bottom: 4, left: 8 }}
+                                        >
+                                            <CartesianGrid strokeDasharray='3 3' stroke='#e5e7eb' />
+                                            <XAxis
+                                                type='number'
+                                                allowDecimals={false}
+                                                tick={{ fill: '#666', fontSize: 10 }}
                                             />
-                                        </PieChart>
+                                            <YAxis
+                                                type='category'
+                                                dataKey='label'
+                                                width={96}
+                                                tick={{ fill: '#666', fontSize: 10 }}
+                                            />
+                                            <Tooltip />
+                                            <Bar
+                                                dataKey='total'
+                                                fill='#0f766e'
+                                                radius={[0, 4, 4, 0]}
+                                            />
+                                        </BarChart>
                                     </ResponsiveContainer>
                                 )}
                             </div>
