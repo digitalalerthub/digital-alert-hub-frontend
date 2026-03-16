@@ -1,13 +1,7 @@
-// Hook de React Router para navegar programáticamente (redirecciones con JS)
 import { useNavigate } from "react-router-dom";
-
-// Card de React Bootstrap para mostrar contenido en tarjeta con diseño bonito
 import { Card } from "react-bootstrap";
-
 import "./Features.css";
 
-// Lista de elementos que formarán el carrusel infinito.
-// Cada ítem tiene imagen, título y texto descriptivo.
 const items = [
   {
     img: "/img01.jpg",
@@ -16,7 +10,7 @@ const items = [
   },
   {
     img: "/img02.jpeg",
-    title: "Incumplimiento de Normas de Construcción  y Riesgos Estructurales",
+    title: "Incumplimiento de Normas de Construcción y Riesgos Estructurales",
     text: "Medellín enfrenta problemas estructurales graves por fallas en la planificación, el control y el cumplimiento de normas de construcción, lo que ha puesto en riesgo vidas y evidenciado debilidades en la supervisión urbana. Esta situación ha generado consecuencias humanas y un llamado urgente a reforzar la seguridad, la responsabilidad de las constructoras y los estándares de calidad en la ciudad."
   },
   {
@@ -37,27 +31,23 @@ const items = [
 ];
 
 const Features = () => {
-  // Hook para navegar al hacer clic en cualquier tarjeta
   const navigate = useNavigate();
 
   return (
     <div className="carousel-infinite">
-      {/* Track que contiene todas las tarjetas duplicadas para simular un carrusel infinito */}
       <div className="carousel-track">
         {[...items, ...items].map((item, index) => (
-          // Cada tarjeta es clickeable: redirige al usuario al login
           <div
             key={index}
             className="carousel-card"
             onClick={() => navigate("/login")}
             style={{ cursor: "pointer" }}
           >
-            {/* Tarjeta visual con sombra y altura completa */}
             <Card className="shadow-sm h-100">
-              <Card.Img src={item.img} /> {/* Imagen del problema */}
+              <Card.Img src={item.img} />
               <Card.Body>
-                <Card.Title>{item.title}</Card.Title> {/* Título */}
-                <Card.Text>{item.text}</Card.Text>   {/* Descripción */}
+                <Card.Title>{item.title}</Card.Title>
+                <Card.Text>{item.text}</Card.Text>
               </Card.Body>
             </Card>
           </div>

@@ -20,6 +20,7 @@
     display: flex;
     justify-content: center;
     gap: 40px;
+    flex-wrap: wrap;
     margin-bottom: 40px;
 }
 
@@ -388,7 +389,12 @@
         padding: 80px 16px 24px;
     }
     .jac-stats-grid {
-        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        justify-content: stretch;
+    }
+    .jac-stat-card {
+        width: calc(50% - 8px);
+        min-width: 0;
     }
     .jac-filters {
         flex-direction: column;
