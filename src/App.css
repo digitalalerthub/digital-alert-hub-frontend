@@ -3,11 +3,43 @@
    ================================ */
 
 /* Eliminan margenes por defecto y aseguran que toda la app ocupe el alto completo */
+:root {
+    --page-max-width: 1400px;
+    --page-gutter: clamp(1rem, 2.5vw, 2rem);
+    --page-top-offset: clamp(84px, 9vw, 104px);
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body,
 html,
 #root {
     margin: 0;
-    height: 100%;
+    min-height: 100%;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+html.alert-detail-modal-open,
+body.alert-detail-modal-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+img,
+video {
+    max-width: 100%;
+    height: auto;
 }
 
 /* Titulos H2 mas grandes y centrados */
@@ -54,6 +86,12 @@ nav.navbar {
    RESPONSIVE — menú desplegable
    ================================ */
 @media (max-width: 991px) {
+    .alert-detail-modal-open .navbar.fixed-top {
+        transform: translateY(-100%);
+        opacity: 0;
+        pointer-events: none;
+    }
+
     .navbar .navbar-collapse {
         margin-top: 12px;
         padding: 12px 14px;
@@ -123,6 +161,7 @@ nav.navbar {
    ================================ */
 .breadcrumb-nav {
     margin-bottom: 1.5rem;
+    overflow-x: auto;
 }
 
 .breadcrumb {
@@ -131,6 +170,8 @@ nav.navbar {
     margin: 0;
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
+    row-gap: 0.35rem;
     list-style: none;
 }
 
@@ -193,11 +234,12 @@ nav.navbar {
     background-size: cover; /* Ocupa toda el area sin deformarse */
     background-position: center;
     background-repeat: no-repeat;
-    height: 100vh; /* Pantalla completa */
+    min-height: 100vh; /* Pantalla completa */
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
+    isolation: isolate;
+    padding: calc(var(--page-top-offset) + 0.5rem) var(--page-gutter) 2rem;
+    height: auto !important;
 }
 
 .panel-admin {
@@ -242,15 +284,15 @@ nav.navbar {
     background-repeat: no-repeat;
     min-height: 100vh;
     width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: relative;
+    isolation: isolate;
 }
 
 /* ================================ ADMIN ================================ */
 
-.container {
-    padding-top: 9rem !important;
+.panel-admin > .container {
+    padding-top: var(--page-top-offset) !important;
+    padding-bottom: 2rem !important;
 }
 
 .display-4 {
@@ -265,7 +307,7 @@ nav.navbar {
     background-image: url('/public/FooterV2.jpg');
     background-size: cover;
     background-position: center;
-    padding: 0 0 20px;
+    padding: 72px 0 20px;
 }
 
 .footer-top-heading {
@@ -387,6 +429,11 @@ nav.navbar {
 }
 
 @media (max-width: 767px) {
+    :root {
+        --page-gutter: 1rem;
+        --page-top-offset: 80px;
+    }
+
     .footer-section {
         padding: 55px 0 20px;
     }

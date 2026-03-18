@@ -51,11 +51,6 @@ const AlertDetailPage = () => {
   }, [id]);
 
   const handleClose = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
     navigate("/", { replace: true });
   };
 

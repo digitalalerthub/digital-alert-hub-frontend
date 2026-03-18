@@ -39,6 +39,11 @@ const alertsService = {
         return data;
     },
 
+    featured: async (): Promise<Alert[]> => {
+        const { data } = await api.get<Alert[]>('/alerts/featured');
+        return data;
+    },
+
     getById: async (id: number): Promise<Alert> => {
         const { data } = await api.get<Alert>(`/alerts/${id}`);
         return data;

@@ -147,6 +147,18 @@ const AlertDetailModal = ({
   }, [onClose]);
 
   useEffect(() => {
+    const { body, documentElement } = document;
+
+    body.classList.add("alert-detail-modal-open");
+    documentElement.classList.add("alert-detail-modal-open");
+
+    return () => {
+      body.classList.remove("alert-detail-modal-open");
+      documentElement.classList.remove("alert-detail-modal-open");
+    };
+  }, []);
+
+  useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
     const fallback: Coords = { lat: 6.2442, lng: -75.5812 };
@@ -380,12 +392,14 @@ const AlertDetailModal = ({
     );
   };
 
-  return (
-    <div className="alert-detail-backdrop" onClick={onClose}>
+    return (
+      <div className="alert-detail-backdrop" onClick={onClose}>
       <div className="alert-detail-modal" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="alert-detail-close" onClick={onClose}>
-          <i className="bi bi-x-lg" />
-        </button>
+        <div className="alert-detail-toolbar">
+          <button type="button" className="alert-detail-close" onClick={onClose}>
+            <i className="bi bi-x-lg" />
+          </button>
+        </div>
 
         <div className="alert-detail-top">
           <section className="alert-detail-media-box">

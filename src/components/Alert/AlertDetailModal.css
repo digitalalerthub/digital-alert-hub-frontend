@@ -7,6 +7,7 @@
   justify-content: center;
   padding: 1rem;
   background: rgba(17, 24, 39, 0.52);
+  overscroll-behavior: none;
 }
 
 .alert-detail-modal {
@@ -21,12 +22,21 @@
   background: #f4f5f7;
   box-shadow: 0 24px 48px rgba(17, 24, 39, 0.22);
   padding: 0.85rem 0.9rem 1.15rem;
+  overscroll-behavior: contain;
+}
+
+.alert-detail-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.55rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-bottom: 0.15rem;
+  background: linear-gradient(to bottom, #f4f5f7 78%, rgba(244, 245, 247, 0));
 }
 
 .alert-detail-close {
-  position: absolute;
-  right: 0.6rem;
-  top: 0.6rem;
   width: 28px;
   height: 28px;
   border-radius: 999px;
@@ -35,6 +45,9 @@
   background: #f9fafb;
   font-size: 0.72rem;
   line-height: 1;
+  flex-shrink: 0;
+  cursor: pointer;
+  pointer-events: auto;
 }
 
 .alert-detail-top {
@@ -542,22 +555,31 @@
 
   .alert-detail-top {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 
   .alert-detail-media-box {
-    max-width: 320px;
+    width: 100%;
+    max-width: none;
+    aspect-ratio: auto;
+    height: clamp(220px, 40vh, 360px);
   }
 
   .alert-detail-info {
     padding-right: 0;
   }
 
+  .alert-detail-title {
+    text-align: center;
+    font-size: clamp(2rem, 5vw, 2.35rem);
+  }
+
   .alert-detail-share-btn {
-    align-self: flex-start;
+    align-self: center;
   }
 
   .alert-detail-cta-row {
-    justify-content: flex-start;
+    justify-content: center;
     flex-wrap: wrap;
   }
 
@@ -571,5 +593,52 @@
 
   .alert-detail-comments-actions {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .alert-detail-backdrop {
+    padding: 0.75rem;
+  }
+
+  .alert-detail-modal {
+    padding: 0.75rem 0.75rem 1rem;
+    border-radius: 16px;
+  }
+
+  .alert-detail-media-box {
+    height: clamp(180px, 34vh, 280px);
+    border-radius: 22px;
+  }
+
+  .alert-detail-title {
+    font-size: 1.8rem;
+  }
+
+  .alert-detail-author-card {
+    flex-direction: column;
+    align-items: flex-start;
+    border-radius: 20px;
+  }
+
+  .alert-detail-author-state {
+    align-items: flex-start;
+  }
+
+  .alert-detail-map-wrap {
+    border-radius: 22px;
+  }
+
+  .alert-detail-map {
+    height: 210px;
+  }
+
+  .alert-detail-comment-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .alert-detail-comment-submit {
+    width: 100%;
   }
 }
