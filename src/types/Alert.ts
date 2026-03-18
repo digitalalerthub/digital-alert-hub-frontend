@@ -32,6 +32,7 @@ export interface Alert {
   evidencia_url?: string;
   evidencia_tipo?: string;
   evidencias?: AlertEvidence[];
+  total_reacciones?: number;
   created_at?: string;
   updated_at?: string;
 }

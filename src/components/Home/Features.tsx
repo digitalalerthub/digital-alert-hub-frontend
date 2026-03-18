@@ -1,55 +1,243 @@
+import { useEffect, useRef, useState } from "react";
+import type { MouseEvent, PointerEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card } from "react-bootstrap";
+import alertsService from "../../services/alertsService";
+import type { Alert } from "../../types/Alert";
 import "./Features.css";
 
-const items = [
-  {
-    img: "/img01.jpg",
-    title: "Deslizamientos de Tierra en Laderas Vulnerables",
-    text: "El crecimiento urbano desordenado y las lluvias han provocado frecuentes deslizamientos en Medellín, afectando sobre todo a barrios vulnerables cercanos a laderas y quebradas. Estos eventos representan el 74% de las pérdidas por desastres naturales en la ciudad, dejando viviendas destruidas y familias en alto riesgo."
-  },
-  {
-    img: "/img02.jpeg",
-    title: "Incumplimiento de Normas de Construcción y Riesgos Estructurales",
-    text: "Medellín enfrenta problemas estructurales graves por fallas en la planificación, el control y el cumplimiento de normas de construcción, lo que ha puesto en riesgo vidas y evidenciado debilidades en la supervisión urbana. Esta situación ha generado consecuencias humanas y un llamado urgente a reforzar la seguridad, la responsabilidad de las constructoras y los estándares de calidad en la ciudad."
-  },
-  {
-    img: "/img03.jpg",
-    title: "Contaminación y Gestión del Río Medellín",
-    text: "El río Medellín sigue en crisis por la mala gestión de residuos y la contaminación industrial y doméstica, lo que, sumado a las lluvias intensas, genera crecidas peligrosas y riesgo de desbordamientos. En octubre de 2025, las filtraciones obligaron a suspender el servicio en varias estaciones del Metro, dejando claro que el impacto ya no es solo ambiental, sino también directo sobre la movilidad y la infraestructura de la ciudad."
-  },
-  {
-    img: "/img04.jpg",
-    title: "Deterioro de la Malla Vial y Riesgos Urbanos",
-    text: "Medellín enfrenta una crisis en su malla vial: el deterioro por falta de mantenimiento, mal diseño y el clima ha llenado las vías de huecos y grietas que generan accidentes y daños vehiculares. Para frenar la situación, la Alcaldía invertirá más de $53.000 millones y promete tapar 5.000 huecos antes de finalizar el año con cuadrillas trabajando día y noche."
-  },
-  {
-    img: "/img05.jpeg",
-    title: "Inundaciones y Crecientes de Quebradas",
-    text: "Las lluvias intensas han desatado inundaciones y caos en Medellín, golpeando fuerte zonas como Belén y Altavista, donde el desbordamiento de quebradas ha dejado viviendas y negocios destruidos. La emergencia ha obligado a evacuaciones, suspensión de eventos y ha afectado seriamente la movilidad, dejando claro que la ciudad sigue vulnerable frente al impacto climático."
-  },
-];
+const AUTO_SCROLL_SPEED = 0.04;
+const FALLBACK_IMAGE = "/Imagen.png";
+
+const buildAlertMeta = (alert: Alert): string => {
+  const metadata = [
+    alert.categoria,
+    alert.prioridad ? `Prioridad ${alert.prioridad}` : null,
+    `${alert.total_reacciones ?? 0} reacciones`,
+  ].filter(Boolean);
+
+  return metadata.join(" | ");
+};
+
+const normalizeOffset = (offset: number, loopWidth: number): number => {
+  if (loopWidth <= 0) return offset;
+
+  let normalizedOffset = offset % loopWidth;
+  if (normalizedOffset > 0) {
+    normalizedOffset -= loopWidth;
+  }
+
+  return normalizedOffset;
+};
 
 const Features = () => {
   const navigate = useNavigate();
+  const [featuredAlerts, setFeaturedAlerts] = useState<Alert[]>([]);
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const firstSetRef = useRef<HTMLDivElement | null>(null);
+  const animationFrameRef = useRef<number | null>(null);
+  const lastFrameTimeRef = useRef(0);
+  const loopWidthRef = useRef(0);
+  const offsetRef = useRef(0);
+  const dragStartXRef = useRef(0);
+  const dragStartOffsetRef = useRef(0);
+  const hasDraggedRef = useRef(false);
+  const isDraggingRef = useRef(false);
+  const carouselItems = featuredAlerts.length > 0 ? featuredAlerts : [];
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadFeaturedAlerts = async () => {
+      try {
+        const data = await alertsService.featured();
+        if (!cancelled) {
+          setFeaturedAlerts(data.slice(0, 5));
+        }
+      } catch {
+        if (!cancelled) {
+          setFeaturedAlerts([]);
+        }
+      }
+    };
+
+    void loadFeaturedAlerts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    const firstSet = firstSetRef.current;
+    if (!track || !firstSet || carouselItems.length === 0) return;
+
+    const applyTransform = () => {
+      track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+    };
+
+    const updateLoopWidth = () => {
+      const trackStyles = window.getComputedStyle(track);
+      const trackGap = Number.parseFloat(trackStyles.columnGap || trackStyles.gap || "0");
+      const measuredLoopWidth = firstSet.offsetWidth + trackGap;
+
+      loopWidthRef.current = measuredLoopWidth;
+      offsetRef.current = normalizeOffset(offsetRef.current, measuredLoopWidth);
+      dragStartOffsetRef.current = normalizeOffset(
+        dragStartOffsetRef.current,
+        measuredLoopWidth
+      );
+      applyTransform();
+    };
+
+    updateLoopWidth();
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateLoopWidth();
+    });
+
+    resizeObserver.observe(track);
+    resizeObserver.observe(firstSet);
+
+    const tick = (timestamp: number) => {
+      if (!track) return;
+
+      if (!lastFrameTimeRef.current) {
+        lastFrameTimeRef.current = timestamp;
+      }
+
+      const delta = timestamp - lastFrameTimeRef.current;
+      lastFrameTimeRef.current = timestamp;
+
+      if (!isDraggingRef.current && loopWidthRef.current > 0) {
+        offsetRef.current -= delta * AUTO_SCROLL_SPEED;
+        offsetRef.current = normalizeOffset(offsetRef.current, loopWidthRef.current);
+        applyTransform();
+      }
+
+      animationFrameRef.current = window.requestAnimationFrame(tick);
+    };
+
+    applyTransform();
+    animationFrameRef.current = window.requestAnimationFrame(tick);
+
+    return () => {
+      resizeObserver.disconnect();
+      if (animationFrameRef.current !== null) {
+        window.cancelAnimationFrame(animationFrameRef.current);
+      }
+      lastFrameTimeRef.current = 0;
+    };
+  }, [carouselItems.length]);
+
+  const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    isDraggingRef.current = true;
+    hasDraggedRef.current = false;
+    dragStartXRef.current = event.clientX;
+    dragStartOffsetRef.current = offsetRef.current;
+    viewport.classList.add("is-dragging");
+    viewport.setPointerCapture(event.pointerId);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const track = trackRef.current;
+    if (!track || !isDraggingRef.current) return;
+
+    const deltaX = event.clientX - dragStartXRef.current;
+    if (Math.abs(deltaX) > 4) {
+      hasDraggedRef.current = true;
+    }
+
+    offsetRef.current = dragStartOffsetRef.current + deltaX;
+    if (loopWidthRef.current > 0) {
+      offsetRef.current = normalizeOffset(offsetRef.current, loopWidthRef.current);
+    }
+
+    track.style.transform = `translate3d(${offsetRef.current}px, 0, 0)`;
+  };
+
+  const finishDrag = (pointerId?: number) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+
+    isDraggingRef.current = false;
+    viewport.classList.remove("is-dragging");
+
+    if (
+      typeof pointerId === "number" &&
+      viewport.hasPointerCapture(pointerId)
+    ) {
+      viewport.releasePointerCapture(pointerId);
+    }
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    finishDrag(event.pointerId);
+  };
+
+  const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
+    finishDrag(event.pointerId);
+  };
+
+  const handlePointerLeave = () => {
+    if (!isDraggingRef.current) return;
+    finishDrag();
+  };
+
+  const handleCardClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (hasDraggedRef.current) {
+      event.preventDefault();
+      event.stopPropagation();
+      hasDraggedRef.current = false;
+      return;
+    }
+
+    navigate("/login");
+  };
 
   return (
-    <div className="carousel-infinite">
-      <div className="carousel-track">
-        {[...items, ...items].map((item, index) => (
+    <div
+      ref={viewportRef}
+      className="carousel-infinite"
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      onPointerLeave={handlePointerLeave}
+    >
+      <div ref={trackRef} className="carousel-track">
+        {[carouselItems, carouselItems].map((group, groupIndex) => (
           <div
-            key={index}
-            className="carousel-card"
-            onClick={() => navigate("/login")}
-            style={{ cursor: "pointer" }}
+            key={`featured-group-${groupIndex}`}
+            ref={groupIndex === 0 ? firstSetRef : undefined}
+            className="carousel-set"
           >
-            <Card className="shadow-sm h-100">
-              <Card.Img src={item.img} />
-              <Card.Body>
-                <Card.Title>{item.title}</Card.Title>
-                <Card.Text>{item.text}</Card.Text>
-              </Card.Body>
-            </Card>
+            {group.map((item, index) => (
+              <div
+                key={`${item.id_alerta}-${groupIndex}-${index}`}
+                className="carousel-card"
+                onClick={handleCardClick}
+                style={{ cursor: "pointer" }}
+              >
+                <Card className="shadow-sm h-100">
+                  <Card.Img src={item.evidencia_url || FALLBACK_IMAGE} />
+                  <Card.Body>
+                    <Card.Title>{item.titulo}</Card.Title>
+                    <Card.Text className="carousel-card-meta">
+                      {buildAlertMeta(item)}
+                    </Card.Text>
+                    <Card.Text className="carousel-card-description">
+                      {item.descripcion}
+                    </Card.Text>
+                  </Card.Body>
+                </Card>
+              </div>
+            ))}
           </div>
         ))}
       </div>

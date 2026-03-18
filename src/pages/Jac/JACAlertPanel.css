@@ -9,9 +9,9 @@
 
 /* ── LAYOUT ── */
 .jac-panel-page {
-    padding: 140px 32px 32px;
+    padding: calc(var(--page-top-offset, 100px) + 1rem) var(--page-gutter, 2rem) 2rem;
     min-height: 100vh;
-    max-width: 1400px;
+    max-width: var(--page-max-width, 1400px);
     margin: 0 auto;
 }
 
@@ -31,8 +31,9 @@
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
     border-radius: 12px;
-    width: 160px;
+    flex: 1 1 160px;
     min-width: 140px;
+    max-width: 220px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -94,8 +95,9 @@
     background: #fff;
     border: 1.5px solid var(--rojo);
     border-radius: 16px;
-    padding: 22px 24px;
+    padding: clamp(1rem, 2vw, 1.5rem);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
 }
 
 /* ── FILTROS ── */
@@ -111,6 +113,7 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+    flex: 1 1 180px;
     min-width: 140px;
 }
 
@@ -310,6 +313,7 @@
 .jac-pagination {
     display: flex;
     gap: 5px;
+    flex-wrap: wrap;
 }
 
 .jac-page-btn {
@@ -384,9 +388,24 @@
 }
 
 /* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .jac-panel-page {
+        padding: var(--page-top-offset, 80px) var(--page-gutter, 1rem) 1.5rem;
+    }
+
+    .jac-title {
+        font-size: 1.6rem;
+        margin-bottom: 1rem;
+    }
+
+    .jac-main-card {
+        border-radius: 14px;
+    }
+}
+
 @media (max-width: 576px) {
     .jac-panel-page {
-        padding: 80px 16px 24px;
+        padding: var(--page-top-offset, 80px) var(--page-gutter, 1rem) 1.25rem;
     }
     .jac-stats-grid {
         gap: 16px;

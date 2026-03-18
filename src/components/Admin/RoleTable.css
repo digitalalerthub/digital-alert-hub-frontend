@@ -1,8 +1,8 @@
 /* Contenedor principal */
 .role-table-container {
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 100px auto 2rem auto;
+    padding: var(--page-top-offset, 100px) var(--page-gutter, 2rem) 2rem;
+    max-width: var(--page-max-width, 1400px);
+    margin: 0 auto;
     font-family:
         -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
@@ -35,10 +35,7 @@
 .main-title {
     font-size: 2.5rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #ffffff;
     margin: 0;
 }
 
@@ -121,9 +118,9 @@
 /* Grid de roles */
 .roles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1.5rem;
-    padding: 2rem;
+    padding: clamp(1rem, 2.4vw, 2rem);
 }
 
 /* Tarjeta de rol */
@@ -293,8 +290,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .role-table-container {
-        padding: 1rem;
-        margin-top: 80px;
+        padding: var(--page-top-offset, 80px) var(--page-gutter, 1rem) 1.5rem;
     }
 
     .main-title {
