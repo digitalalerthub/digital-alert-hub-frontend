@@ -7,6 +7,7 @@
     --page-max-width: 1400px;
     --page-gutter: clamp(1rem, 2.5vw, 2rem);
     --page-top-offset: clamp(84px, 9vw, 104px);
+    --font-family-base: 'Segoe UI', Arial, sans-serif;
 }
 
 *,
@@ -28,6 +29,15 @@ html {
 
 body {
     overflow-x: hidden;
+    font-family: var(--font-family-base);
+}
+
+button,
+input,
+textarea,
+select,
+option {
+    font-family: inherit;
 }
 
 html.alert-detail-modal-open,
