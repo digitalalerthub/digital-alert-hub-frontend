@@ -1,11 +1,13 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import api from "../../services/api";
 import axios from "axios";
-import { toast } from "react-toastify";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import "../../App.css";
+import { isRecaptchaEnabled } from "../../config/recaptcha";
+import api from "../../services/api";
 import GoogleButton from "./GoogleButton";
+import ReCaptchaWidget from "./ReCaptchaWidget";
 
 const RegisterForm = () => {
   const [nombre, setNombre] = useState("");
@@ -13,14 +15,26 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [telefono, setTelefono] = useState("");
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
   const redirectTo = new URLSearchParams(location.search).get("redirect");
-  const loginUrl = redirectTo ? `/login?redirect=${encodeURIComponent(redirectTo)}` : "/login";
+  const loginUrl = redirectTo
+    ? `/login?redirect=${encodeURIComponent(redirectTo)}`
+    : "/login";
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (isRecaptchaEnabled && !captchaToken) {
+      toast.error("Confirma que no eres un robot.", {
+        position: "top-right",
+        autoClose: 3000,
+      });
+      return;
+    }
 
     try {
       const res = await api.post("/auth/register", {
@@ -29,6 +43,7 @@ const RegisterForm = () => {
         email,
         contrasena,
         telefono,
+        captchaToken,
       });
 
       toast.success(res.data.message || "Registro exitoso", {
@@ -51,6 +66,11 @@ const RegisterForm = () => {
           autoClose: 3000,
         });
       }
+    } finally {
+      if (isRecaptchaEnabled) {
+        setCaptchaToken(null);
+        setCaptchaResetSignal((current) => current + 1);
+      }
     }
   };
 
@@ -67,7 +87,6 @@ const RegisterForm = () => {
         <h3 className="text-center mb-4 fw-bold">Crear una Cuenta</h3>
 
         <form onSubmit={handleSubmit}>
-          {/* Inputs */}
           <div className="mb-3 position-relative">
             <i className="bi bi-person position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
             <input
@@ -97,7 +116,7 @@ const RegisterForm = () => {
             <input
               type="email"
               className="form-control ps-5"
-              placeholder="Correo electrónico"
+              placeholder="Correo electronico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -109,7 +128,7 @@ const RegisterForm = () => {
             <input
               type="password"
               className="form-control ps-5"
-              placeholder="Contraseña"
+              placeholder="Contrasena"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
               required
@@ -121,32 +140,43 @@ const RegisterForm = () => {
             <input
               type="text"
               className="form-control ps-5"
-              placeholder="Número de teléfono"
+              placeholder="Numero de telefono"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               required
             />
           </div>
 
-          {/* Botón principal */}
+          {isRecaptchaEnabled ? (
+            <div className="d-flex justify-content-center mb-4">
+              <ReCaptchaWidget
+                onVerify={setCaptchaToken}
+                resetSignal={captchaResetSignal}
+              />
+            </div>
+          ) : null}
+
           <div className="d-flex justify-content-center mb-3">
-            <button type="submit" className="btn btn-success w-50">
+            <button
+              type="submit"
+              className="btn btn-success w-50"
+              disabled={isRecaptchaEnabled && !captchaToken}
+            >
               Registrarse
             </button>
           </div>
 
-          {/* Google Login */}
           <div className="d-flex justify-content-center mb-3">
             <GoogleButton />
           </div>
 
           <p className="text-center">
-            ¿Ya tienes una cuenta?{" "}
+            Ya tienes una cuenta?{" "}
             <Link
               to={loginUrl}
               className="text-decoration-none fw-semibold text-primary"
             >
-              Inicia sesión
+              Inicia sesion
             </Link>
           </p>
         </form>

@@ -345,7 +345,7 @@ const ReportesPage = () => {
                             value={filters.year}
                             onChange={handleSelectChange('year')}
                         >
-                            <option value=''>Filtro por Anio</option>
+                            <option value=''>Filtro Anual</option>
                             {yearOptions.map((year) => (
                                 <option key={year} value={year}>
                                     {year}

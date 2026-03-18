@@ -1,15 +1,7 @@
 import RegisterForm from "../../components/Auth/RegisterForm";
 
-// Página de Registro (vista completa)
 const RegisterPage = () => {
-  return (
-    <div>
-      <h1>Registro</h1>
-      {/* Inserta el formulario de registro */}
-      <RegisterForm />
-    </div>
-  );
+  return <RegisterForm />;
 };
 
-// Exporta la página para poder usarla en el router
 export default RegisterPage;
