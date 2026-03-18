@@ -43,28 +43,19 @@ export default function ProfilePage() {
     }
 
     return (
-        <div className='container mt-4'>
-            <div className='row justify-content-center'>
-                <div className='col-md-6'>
-                    {!isEditing ? (
-                        <ProfileInfo
-                            user={user}
-                            onEdit={() => setIsEditing(true)}
-                        >
-                            <DeleteAccount />
-                        </ProfileInfo>
-                    ) : (
-                        <EditProfileForm
-                            user={user}
-                            onSave={(updatedUser) => {
-                                setUser(updatedUser);
-                                setIsEditing(false);
-                            }}
-                            onCancel={() => setIsEditing(false)}
-                        />
-                    )}
-                </div>
-            </div>
-        </div>
+        !isEditing ? (
+            <ProfileInfo user={user} onEdit={() => setIsEditing(true)}>
+                <DeleteAccount />
+            </ProfileInfo>
+        ) : (
+            <EditProfileForm
+                user={user}
+                onSave={(updatedUser) => {
+                    setUser(updatedUser);
+                    setIsEditing(false);
+                }}
+                onCancel={() => setIsEditing(false)}
+            />
+        )
     );
 }

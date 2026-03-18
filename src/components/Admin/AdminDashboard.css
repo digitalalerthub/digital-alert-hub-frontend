@@ -5,6 +5,16 @@
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
+.panel-admin .container {
+    max-width: var(--page-max-width, 1400px);
+    padding-left: var(--page-gutter, 2rem);
+    padding-right: var(--page-gutter, 2rem);
+}
+
+.panel-admin .row {
+    row-gap: 1.5rem;
+}
+
 /* CARDS: glassmorphism (vidrio esmerilado) */
 .panel-admin .card {
     background: rgba(255, 255, 255, 0.92) !important;
@@ -35,4 +45,19 @@
 .panel-admin .card-body .text-muted {
     font-size: 0.95rem;
     margin-top: 6px;
+}
+
+@media (max-width: 768px) {
+    .panel-admin .container {
+        padding-top: calc(var(--page-top-offset, 80px) + 2.25em) !important;
+    }
+
+    .panel-admin h1 {
+        font-size: 2rem;
+        margin-bottom: 1.5rem !important;
+    }
+
+    .panel-admin .card-body {
+        padding: 1.75rem 1.25rem !important;
+    }
 }

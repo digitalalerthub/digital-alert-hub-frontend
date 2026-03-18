@@ -76,8 +76,8 @@ function App() {
                         <Route path='/admin/roles' element={<RoleTable />} />
                     </Route>
 
-                    {/* RUTAS JAC + ADMIN */}
-                    <Route element={<RoleRoute allowedRoles={[1, 3]} />}>
+                    {/* RUTAS REPORTES: ADMIN + CIUDADANO + JAC */}
+                    <Route element={<RoleRoute allowedRoles={[1, 2, 3]} />}>
                         <Route
                             path='/jac/alertas'
                             element={<JACAlertPanel />}

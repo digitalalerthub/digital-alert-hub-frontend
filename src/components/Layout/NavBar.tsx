@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
 import { useHideOnScroll } from '../../hooks/useHideOnScroll';
@@ -7,8 +8,60 @@ const NavBar: React.FC = () => {
     const { isLoggedIn, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const [isDesktopMenuOpen, setIsDesktopMenuOpen] = useState(false);
+    const collapseRef = useRef<HTMLDivElement | null>(null);
+    const togglerRef = useRef<HTMLButtonElement | null>(null);
+    const desktopMenuRef = useRef<HTMLLIElement | null>(null);
+
+    const closeMobileMenu = () => {
+        if (window.innerWidth >= 992) return;
+
+        const collapseElement = collapseRef.current;
+        if (!collapseElement?.classList.contains('show')) return;
+
+        collapseElement.classList.remove('show');
+        togglerRef.current?.setAttribute('aria-expanded', 'false');
+    };
+
+    const closeDesktopMenu = () => setIsDesktopMenuOpen(false);
+
+    useEffect(() => {
+        closeMobileMenu();
+        closeDesktopMenu();
+    }, [location.pathname]);
+
+    useEffect(() => {
+        if (!isLoggedIn) {
+            setIsDesktopMenuOpen(false);
+        }
+    }, [isLoggedIn]);
+
+    useEffect(() => {
+        const handlePointerDown = (event: MouseEvent) => {
+            if (
+                desktopMenuRef.current &&
+                !desktopMenuRef.current.contains(event.target as Node)
+            ) {
+                setIsDesktopMenuOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handlePointerDown);
+
+        return () => {
+            document.removeEventListener('mousedown', handlePointerDown);
+        };
+    }, []);
+
+    const navigateTo = (path: string) => {
+        closeMobileMenu();
+        closeDesktopMenu();
+        navigate(path);
+    };
 
     const handleLogout = () => {
+        closeMobileMenu();
+        closeDesktopMenu();
         logout();
         navigate('/');
     };
@@ -78,6 +131,7 @@ const NavBar: React.FC = () => {
 
                 {/* TOGGLER */}
                 <button
+                    ref={togglerRef}
                     className='navbar-toggler'
                     type='button'
                     data-bs-toggle='collapse'
@@ -89,7 +143,11 @@ const NavBar: React.FC = () => {
                     <span className='navbar-toggler-icon' />
                 </button>
 
-                <div className='collapse navbar-collapse' id='navbarNav'>
+                <div
+                    ref={collapseRef}
+                    className='collapse navbar-collapse'
+                    id='navbarNav'
+                >
                     <ul className='navbar-nav ms-auto align-items-center gap-2'>
                         {isLoggedIn ? (
                             <>
@@ -99,7 +157,7 @@ const NavBar: React.FC = () => {
                                 <li className='nav-item d-lg-none'>
                                     <button
                                         className='nav-link btn btn-link text-start w-100'
-                                        onClick={() => navigate('/perfil')}
+                                        onClick={() => navigateTo('/perfil')}
                                     >
                                         <i className='bi bi-person me-2' />
                                         Mi perfil
@@ -110,7 +168,7 @@ const NavBar: React.FC = () => {
                                     <button
                                         className='nav-link btn btn-link text-start w-100'
                                         onClick={() =>
-                                            navigate(
+                                            navigateTo(
                                                 '/perfil/cambiar-contrasena',
                                             )
                                         }
@@ -137,11 +195,18 @@ const NavBar: React.FC = () => {
                                 {/* ================================
                                     DESKTOP: avatar + dropdown (d-none d-lg-block)
                                     ================================ */}
-                                <li className='nav-item dropdown d-none d-lg-block'>
+                                <li
+                                    ref={desktopMenuRef}
+                                    className='nav-item dropdown d-none d-lg-block position-relative'
+                                >
                                     <button
                                         className='btn border-0 bg-transparent p-0'
-                                        data-bs-toggle='dropdown'
-                                        aria-expanded='false'
+                                        aria-expanded={isDesktopMenuOpen}
+                                        onClick={() =>
+                                            setIsDesktopMenuOpen(
+                                                (current) => !current,
+                                            )
+                                        }
                                     >
                                         <div
                                             className='rounded-circle d-flex align-items-center justify-content-center'
@@ -159,12 +224,22 @@ const NavBar: React.FC = () => {
                                         </div>
                                     </button>
 
-                                    <ul className='dropdown-menu dropdown-menu-end shadow mt-2'>
+                                    <ul
+                                        className={`dropdown-menu shadow ${isDesktopMenuOpen ? 'show' : ''}`}
+                                        style={{
+                                            position: 'absolute',
+                                            top: 'calc(100% + 0.75rem)',
+                                            right: 0,
+                                            left: 'auto',
+                                            minWidth: '220px',
+                                            maxWidth: 'min(92vw, 260px)',
+                                        }}
+                                    >
                                         <li>
                                             <button
                                                 className='dropdown-item'
                                                 onClick={() =>
-                                                    navigate('/perfil')
+                                                    navigateTo('/perfil')
                                                 }
                                             >
                                                 <i className='bi bi-person me-2' />
@@ -175,7 +250,7 @@ const NavBar: React.FC = () => {
                                             <button
                                                 className='dropdown-item'
                                                 onClick={() =>
-                                                    navigate(
+                                                    navigateTo(
                                                         '/perfil/cambiar-contrasena',
                                                     )
                                                 }
@@ -208,6 +283,7 @@ const NavBar: React.FC = () => {
                                     <Link
                                         className='nav-link'
                                         to='/'
+                                        onClick={closeMobileMenu}
                                         style={{ color: textColor }}
                                     >
                                         Inicio
@@ -218,6 +294,7 @@ const NavBar: React.FC = () => {
                                     <Link
                                         className='nav-link'
                                         to='/quienes-somos'
+                                        onClick={closeMobileMenu}
                                         style={{ color: textColor }}
                                     >
                                         Quiénes somos
@@ -228,6 +305,7 @@ const NavBar: React.FC = () => {
                                     <Link
                                         className='nav-link'
                                         to='/contacto'
+                                        onClick={closeMobileMenu}
                                         style={{ color: textColor }}
                                     >
                                         Contacto
@@ -238,7 +316,9 @@ const NavBar: React.FC = () => {
                                     <li className='nav-item'>
                                         <button
                                             className='btn btn-outline-light fw-semibold'
-                                            onClick={() => navigate('/login')}
+                                            onClick={() =>
+                                                navigateTo('/login')
+                                            }
                                         >
                                             Iniciar sesión
                                         </button>
@@ -250,7 +330,7 @@ const NavBar: React.FC = () => {
                                         <button
                                             className='btn btn-danger fw-semibold'
                                             onClick={() =>
-                                                navigate('/register')
+                                                navigateTo('/register')
                                             }
                                         >
                                             Crear cuenta
