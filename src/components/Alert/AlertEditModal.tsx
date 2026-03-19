@@ -14,7 +14,7 @@ type Props = {
   onSave: (id: number, payload: UpdateAlertPayload) => Promise<void>;
 };
 
-const CATEGORY_OPTIONS = ["Agua", "Energia", "Gas", "Movilidad", "Seguridad", "Residuos", "Otro"] as const;
+const CATEGORY_OPTIONS = ["Agua", "Energ\u00EDa", "Gas", "Movilidad", "Seguridad", "Residuos", "Otro"] as const;
 const PRIORITY_OPTIONS = ["Baja", "Media", "Alta"] as const;
 const MAX_EVIDENCE_IMAGES = 10;
 const MAX_EVIDENCE_SIZE = 20 * 1024 * 1024;
@@ -237,14 +237,14 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     }
 
     if (files.length > MAX_EVIDENCE_IMAGES) {
-      toast.warning(`Puedes subir maximo ${MAX_EVIDENCE_IMAGES} imagenes`);
+      toast.warning(`Puedes subir m\u00E1ximo ${MAX_EVIDENCE_IMAGES} im\u00E1genes`);
       setEvidencias([]);
       return false;
     }
 
     const invalidType = files.some((file) => !ALLOWED_IMAGE_TYPES.includes(file.type));
     if (invalidType) {
-      toast.warning("Solo se permiten imagenes JPG, PNG o WEBP");
+      toast.warning("Solo se permiten im\u00E1genes JPG, PNG o WEBP");
       setEvidencias([]);
       return false;
     }
@@ -300,7 +300,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     e.preventDefault();
 
     if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
-      toast.error("Titulo, descripcion y categoria son obligatorios");
+      toast.error("T\u00EDtulo, descripci\u00F3n y categor\u00EDa son obligatorios");
       return;
     }
 
@@ -351,7 +351,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
         </div>
 
         <form onSubmit={handleSubmit} className="alert-edit-form">
-          <label className="alert-edit-label">Titulo de la alerta</label>
+          <label className="alert-edit-label">{"T\u00EDtulo de la alerta"}</label>
           <input
             className="alert-edit-input"
             value={titulo}
@@ -363,7 +363,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
 
           <div className="alert-edit-row">
             <div>
-              <label className="alert-edit-label">Categoria</label>
+              <label className="alert-edit-label">{"Categor\u00EDa"}</label>
               <select
                 className="alert-edit-select"
                 value={categoria}
@@ -396,30 +396,30 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
             </div>
           </div>
 
-          <label className="alert-edit-label">Descripcion del incidente</label>
+          <label className="alert-edit-label">{"Descripci\u00F3n del incidente"}</label>
           <textarea
             className="alert-edit-textarea"
             rows={3}
             value={descripcion}
-            placeholder="Describe los detalles de la situacion..."
+            placeholder={"Describe los detalles de la situaci\u00F3n..."}
             onChange={(e) => setDescripcion(e.target.value)}
             required
           />
 
-          <label className="alert-edit-label">Ubicacion del incidente</label>
+          <label className="alert-edit-label">{"Ubicaci\u00F3n del incidente"}</label>
           <input
             className="alert-edit-input"
             value={ubicacion}
             onChange={(e) => handleManualUbicacionChange(e.target.value)}
             onBlur={() => void handleAddressBlur()}
-            placeholder="Direccion de la alerta"
+            placeholder={"Direcci\u00F3n de la alerta"}
             maxLength={255}
             disabled={saving}
           />
 
           {(suggestionsLoading || reverseLoading) && (
             <small className="alert-edit-help-text">
-              {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo direccion..."}
+              {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo dirección..."}
             </small>
           )}
 
@@ -445,7 +445,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
               onClick={() => void verifyAddress()}
               disabled={saving || locatingUser}
             >
-              Verificar direccion
+              {"Verificar direcci\u00F3n"}
             </button>
             <button
               type="button"
@@ -453,7 +453,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
               onClick={() => void useMyLocation()}
               disabled={saving || locatingUser}
             >
-              {locatingUser ? "Ubicando..." : "Usar mi ubicacion"}
+              {locatingUser ? "Ubicando..." : "Usar mi ubicación"}
             </button>
           </div>
 
@@ -540,7 +540,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
               <span>
                 {evidencias.length > 0
                   ? `${evidencias.length} imagen(es) seleccionada(s)`
-                  : "Sube imagenes o arrastra y suelta"}
+                  : "Sube imágenes o arrastra y suelta"}
               </span>
               <small>PNG, JPG, WEBP</small>
             </label>
@@ -560,7 +560,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
               Cancelar
             </button>
             <button type="submit" className="alert-edit-save-btn" disabled={saving}>
-              {saving ? "Guardando..." : "Guardar Cambios"}
+              {saving ? "Guardando..." : "Guardar cambios"}
             </button>
           </div>
         </form>

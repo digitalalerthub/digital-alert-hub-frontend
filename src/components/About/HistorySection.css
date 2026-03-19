@@ -1,4 +1,10 @@
 /* Timeline Vertical */
+.history-title {
+  font-size: var(--text-h2);
+  font-weight: var(--font-bold);
+  color: #ff1100;
+}
+
 .timeline-vertical {
   position: relative;
   padding-left: 40px;
@@ -65,20 +71,20 @@
   display: inline-block;
   padding: 6px 16px;
   border-radius: 20px;
-  font-weight: 700;
-  font-size: 0.9rem;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-body-sm);
   letter-spacing: 0.5px;
 }
 
 .timeline-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #2c3e50;
+  font-size: var(--text-h3);
+  font-weight: var(--font-bold);
+  color: var(--color-title-on-light);
   margin-bottom: 10px;
 }
 
 .timeline-text {
-  font-size: 16px;
+  font-size: var(--text-body);
   color: #6c757d;
   line-height: 1.6;
 }

@@ -8,7 +8,9 @@ const ContactoPage: React.FC = () => {
     <>
       <BannerContact />
       <div className="container py-5">
-        <h2 className="text-center mb-5 fw-bold">Contacto</h2>
+        <h2 className="text-center mb-5 fw-bold" style={{ color: "#ff1100" }}>
+          Contacto
+        </h2>
         <div className="row g-5 align-items-start">
           <div className="col-lg-5">
             <ContactInfo />
@@ -20,7 +22,7 @@ const ContactoPage: React.FC = () => {
                 className="w-100 h-100 border-0 rounded-3"
                 allowFullScreen
                 loading="lazy"
-                title="Mapa de ubicación"
+                title={"Mapa de ubicaci\u00F3n"}
               />
             </div>
           </div>

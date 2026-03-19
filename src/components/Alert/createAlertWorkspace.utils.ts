@@ -32,12 +32,12 @@ type ReverseGeocodeResponse = {
 const COORDS_REGEX = /(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/;
 
 export const ALERTS_PER_PAGE = 3;
-export const MAP_SELECTION_TEXT = "Ubicacion seleccionada en el mapa";
+export const MAP_SELECTION_TEXT = "Ubicaci\u00F3n seleccionada en el mapa";
 
 export const getCurrentPosition = (): Promise<GeolocationPosition> =>
   new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
-      reject(new Error("Geolocalizacion no disponible"));
+      reject(new Error("Geolocalizaci\u00F3n no disponible"));
       return;
     }
 

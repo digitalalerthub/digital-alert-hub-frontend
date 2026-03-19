@@ -4,7 +4,7 @@ import type { BarrioOption, ComunaOption } from "../../types/Location";
 
 const CATEGORY_OPTIONS = [
   "Agua",
-  "Energia",
+  "Energ\u00EDa",
   "Gas",
   "Movilidad",
   "Seguridad",
@@ -98,7 +98,7 @@ const CreateAlertFormSection = ({
       <h2 className="create-alert-box-title">+ Reportar Nueva Alerta</h2>
 
       <form onSubmit={onSubmit} className="create-alert-form">
-        <label className="create-alert-label">Titulo de la alerta</label>
+        <label className="create-alert-label">{"T\u00EDtulo de la alerta"}</label>
         <input
           type="text"
           className="form-control create-alert-input"
@@ -111,7 +111,7 @@ const CreateAlertFormSection = ({
 
         <div className="create-alert-row">
           <div>
-            <label className="create-alert-label">Categoria</label>
+            <label className="create-alert-label">{"Categor\u00EDa"}</label>
             <select
               className="form-select create-alert-select"
               value={categoria}
@@ -144,17 +144,17 @@ const CreateAlertFormSection = ({
           </div>
         </div>
 
-        <label className="create-alert-label">Descripcion del incidente</label>
+        <label className="create-alert-label">{"Descripci\u00F3n del incidente"}</label>
         <textarea
           className="form-control create-alert-textarea"
           rows={3}
-          placeholder="Describe los detalles de la situacion..."
+          placeholder={"Describe los detalles de la situaci\u00F3n..."}
           value={descripcion}
           onChange={(e) => onDescripcionChange(e.target.value)}
           required
         />
 
-        <label className="create-alert-label">Ubicacion del incidente</label>
+        <label className="create-alert-label">{"Ubicaci\u00F3n del incidente"}</label>
         <input
           type="text"
           className="form-control create-alert-input"
@@ -162,13 +162,13 @@ const CreateAlertFormSection = ({
           onChange={(e) => onUbicacionChange(e.target.value)}
           onBlur={onAddressBlur}
           maxLength={255}
-          placeholder="Direccion de la alerta"
+          placeholder={"Direcci\u00F3n de la alerta"}
           disabled={submitting}
         />
 
         {(suggestionsLoading || reverseLoading) && (
           <small className="text-muted">
-            {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo direccion..."}
+            {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo dirección..."}
           </small>
         )}
 
@@ -194,7 +194,7 @@ const CreateAlertFormSection = ({
             onClick={onVerifyAddress}
             disabled={submitting || locatingUser}
           >
-            Verificar direccion
+            {"Verificar direcci\u00F3n"}
           </button>
           <button
             type="button"
@@ -202,7 +202,7 @@ const CreateAlertFormSection = ({
             onClick={onUseMyLocation}
             disabled={submitting || locatingUser}
           >
-            {locatingUser ? "Ubicando..." : "Usar mi ubicacion"}
+            {locatingUser ? "Ubicando..." : "Usar mi ubicación"}
           </button>
         </div>
 
@@ -251,7 +251,7 @@ const CreateAlertFormSection = ({
           </div>
         </div>
 
-        <label className="create-alert-label">Evidencia fotografica</label>
+        <label className="create-alert-label">{"Evidencia fotogr\u00E1fica"}</label>
         <div className="create-alert-dropzone-wrap">
             <label
               htmlFor="alert-evidence"
@@ -263,7 +263,7 @@ const CreateAlertFormSection = ({
               <span>
                 {evidencias.length > 0
                   ? `${evidencias.length} imagen(es) seleccionada(s)`
-                  : "Sube imagenes o arrastra y suelta"}
+                  : "Sube imágenes o arrastra y suelta"}
               </span>
               <small>PNG, JPG, WEBP</small>
             </label>

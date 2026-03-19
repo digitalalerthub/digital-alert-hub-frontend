@@ -7,6 +7,24 @@
     --page-max-width: 1400px;
     --page-gutter: clamp(1rem, 2.5vw, 2rem);
     --page-top-offset: clamp(84px, 9vw, 104px);
+    --font-family-base: 'Segoe UI', Arial, sans-serif;
+    --text-display: clamp(2.25rem, 1.8rem + 1.2vw, 2.75rem);
+    --text-h1: clamp(1.875rem, 1.55rem + 0.95vw, 2.25rem);
+    --text-h2: clamp(1.5rem, 1.3rem + 0.7vw, 1.875rem);
+    --text-h3: 1.125rem;
+    --text-body: 1rem;
+    --text-body-sm: 0.875rem;
+    --text-caption: 0.8125rem;
+    --text-label: 0.75rem;
+    --text-kpi: clamp(2rem, 1.75rem + 1vw, 2.5rem);
+    --font-regular: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    --color-title-on-light: #1f2937;
+    --color-title-on-dark: #ffffff;
+    --color-text-primary: #111827;
+    --color-text-secondary: #6b7280;
 }
 
 *,
@@ -28,6 +46,15 @@ html {
 
 body {
     overflow-x: hidden;
+    font-family: var(--font-family-base);
+}
+
+button,
+input,
+textarea,
+select,
+option {
+    font-family: inherit;
 }
 
 html.alert-detail-modal-open,
@@ -44,8 +71,10 @@ video {
 
 /* Titulos H2 mas grandes y centrados */
 h2 {
-    color: #ffffff;
-    font-size: 24px;
+    color: inherit;
+    font-size: var(--text-h2);
+    font-weight: var(--font-bold);
+    line-height: 1.2;
     text-align: center;
 }
 

@@ -11,7 +11,7 @@ const RoleTable = () => {
     const [selectedRole, setSelectedRole] = useState<Rol | null>(null);
 
     useEffect(() => {
-        loadData();
+        void loadData();
     }, []);
 
     const loadData = async () => {
@@ -38,7 +38,7 @@ const RoleTable = () => {
     const handleModalClose = () => {
         setShowModal(false);
         setSelectedRole(null);
-        loadData();
+        void loadData();
     };
 
     const handleDelete = async (id_rol: number, nombre_rol: string) => {
@@ -48,7 +48,7 @@ const RoleTable = () => {
 
         try {
             await rolesService.delete(id_rol);
-            loadData();
+            void loadData();
         } catch (err) {
             alert('Error eliminando el rol');
             console.error(err);
@@ -73,7 +73,6 @@ const RoleTable = () => {
                     ]}
                 />
 
-                {/* Header */}
                 <div className='header-section'>
                     <div className='title-section'>
                         <h1 className='main-title'>Gestión de Roles</h1>
@@ -83,9 +82,7 @@ const RoleTable = () => {
                     </div>
                 </div>
 
-                {/* Card contenedor */}
                 <div className='main-card'>
-                    {/* Header con botón */}
                     <div className='card-header-section'>
                         <div className='header-info'>
                             <h3 className='header-title'>Roles del Sistema</h3>
@@ -99,16 +96,13 @@ const RoleTable = () => {
                         </button>
                     </div>
 
-                    {/* Lista de roles */}
                     {roles.length > 0 ? (
                         <div className='roles-grid'>
                             {roles.map((role, index) => (
                                 <div
                                     key={role.id_rol}
                                     className='role-card'
-                                    style={{
-                                        animationDelay: `${index * 0.1}s`,
-                                    }}
+                                    style={{ animationDelay: `${index * 0.1}s` }}
                                 >
                                     <div className='role-card-header'>
                                         <div className='role-icon-wrapper'>

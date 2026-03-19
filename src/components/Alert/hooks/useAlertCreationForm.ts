@@ -241,14 +241,14 @@ export const useAlertCreationForm = () => {
     }
 
     if (files.length > MAX_EVIDENCE_IMAGES) {
-      toast.warning(`Puedes subir maximo ${MAX_EVIDENCE_IMAGES} imagenes`);
+      toast.warning(`Puedes subir m\u00E1ximo ${MAX_EVIDENCE_IMAGES} im\u00E1genes`);
       setEvidencias([]);
       return false;
     }
 
     const invalidType = files.some((file) => !ALLOWED_IMAGE_TYPES.includes(file.type));
     if (invalidType) {
-      toast.warning("Solo se permiten imagenes JPG, PNG o WEBP");
+      toast.warning("Solo se permiten im\u00E1genes JPG, PNG o WEBP");
       setEvidencias([]);
       return false;
     }
@@ -367,14 +367,14 @@ export const useAlertCreationForm = () => {
   const submitAlert = useCallback(
     async ({ selectedCoords, forceCoordsOnSubmit, onSuccess }: SubmitAlertOptions) => {
       if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
-        toast.error("Titulo, descripcion y categoria son obligatorios");
+        toast.error("T\u00EDtulo, descripci\u00F3n y categor\u00EDa son obligatorios");
         return;
       }
 
       const parsedComunaId = Number(comunaId);
       const parsedBarrioId = Number(barrioId);
       if (!Number.isInteger(parsedComunaId) || !Number.isInteger(parsedBarrioId)) {
-        toast.error("Selecciona una comuna y un barrio validos");
+        toast.error("Selecciona una comuna y un barrio v\u00E1lidos");
         return;
       }
 

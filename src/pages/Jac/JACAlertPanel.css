@@ -67,15 +67,15 @@
 }
 
 .jac-stat-label {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-medium);
     color: #fff !important;
     margin: 0;
 }
 
 .jac-stat-count {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: var(--text-kpi);
+    font-weight: var(--font-bold);
     color: #fff !important;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     margin: 0;
@@ -84,8 +84,8 @@
 
 /* ── TÍTULO ── */
 .jac-title {
-    font-size: 26px;
-    font-weight: 800;
+    font-size: var(--text-h1);
+    font-weight: var(--font-bold);
     color: #ffffff;
     margin: 0 0 20px;
 }
@@ -123,8 +123,8 @@
 }
 
 .jac-filter-label {
-    font-size: 10px;
-    font-weight: 700;
+    font-size: var(--text-label);
+    font-weight: var(--font-bold);
     color: var(--rojo);
     text-transform: uppercase;
     letter-spacing: 0.08em;
@@ -148,7 +148,7 @@
 .jac-search,
 .jac-filter-select {
     border-radius: 8px !important;
-    font-size: 13px;
+    font-size: var(--text-caption);
     height: 38px;
     color: var(--gris-texto);
     border: 1.5px solid var(--gris-borde) !important;
@@ -179,8 +179,8 @@
     border: 1.5px solid var(--rojo);
     background: transparent;
     color: var(--rojo);
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--text-caption);
+    font-weight: var(--font-semibold);
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
@@ -200,7 +200,7 @@
     width: 100%;
     border-collapse: collapse;
     min-width: 750px;
-    font-size: 14px;
+    font-size: var(--text-body-sm);
 }
 
 .jac-table thead tr {
@@ -211,8 +211,8 @@
 .jac-table th {
     padding: 12px;
     text-align: left;
-    font-size: 11px;
-    font-weight: 700;
+    font-size: var(--text-label);
+    font-weight: var(--font-bold);
     color: #fff;
     letter-spacing: 0.06em;
     white-space: nowrap;
@@ -234,13 +234,13 @@
 }
 
 .jac-td-title {
-    font-weight: 700;
+    font-weight: var(--font-bold);
     color: #111827;
     max-width: 180px;
 }
 
 .jac-td-date {
-    font-size: 12px;
+    font-size: var(--text-label);
     color: var(--gris-suave);
     white-space: nowrap;
 }
@@ -254,7 +254,7 @@
     text-align: center;
     padding: 40px;
     color: var(--gris-suave);
-    font-size: 13px;
+    font-size: var(--text-caption);
 }
 
 /* ── BADGE ── */
@@ -262,8 +262,8 @@
     display: inline-block;
     padding: 4px 12px;
     border-radius: 20px;
-    font-size: 12px;
-    font-weight: 700;
+    font-size: var(--text-label);
+    font-weight: var(--font-bold);
     white-space: nowrap;
 }
 
@@ -279,7 +279,7 @@
     border-radius: 50%;
     border: 1.5px solid;
     cursor: pointer;
-    font-size: 12px;
+    font-size: var(--text-label);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -306,7 +306,7 @@
 }
 
 .jac-pagination-info {
-    font-size: 12px;
+    font-size: var(--text-label);
     color: var(--gris-suave);
 }
 
@@ -323,8 +323,8 @@
     border: 1.5px solid var(--gris-borde);
     background: #fff;
     color: var(--gris-texto);
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--text-label);
+    font-weight: var(--font-semibold);
     cursor: pointer;
     transition:
         border-color 0.15s,
@@ -368,15 +368,15 @@
 }
 
 .jac-modal-title {
-    font-size: 15px;
-    font-weight: 700;
+    font-size: var(--text-h3);
+    font-weight: var(--font-semibold);
     color: #111827;
     margin: 0 0 8px;
 }
 
 .jac-modal-body {
     color: var(--gris-suave);
-    font-size: 13px;
+    font-size: var(--text-caption);
     margin: 0 0 18px;
     line-height: 1.5;
 }
@@ -394,7 +394,7 @@
     }
 
     .jac-title {
-        font-size: 1.6rem;
+        font-size: var(--text-h2);
         margin-bottom: 1rem;
     }
 
