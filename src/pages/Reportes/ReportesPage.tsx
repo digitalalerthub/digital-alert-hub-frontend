@@ -287,7 +287,7 @@ const ReportesPage = () => {
                 <div className='reportes-main-card'>
                     <div className='reportes-card-meta'>
                         <span className='reportes-meta-pill'>
-                            {refreshing ? 'Actualizando...' : 'Actualizacion automatica'}
+                            {refreshing ? 'Actualizando...' : 'Actualización automática'}
                         </span>
                         <span className='reportes-meta-pill'>
                             {formatDateTime(report?.generated_at)}
@@ -369,7 +369,7 @@ const ReportesPage = () => {
                             value={filters.category}
                             onChange={handleSelectChange('category')}
                         >
-                            <option value=''>Filtro por Categoria</option>
+                            <option value=''>Filtro por Categoría</option>
                             {categoryOptions.map((category) => (
                                 <option key={category} value={category}>
                                     {category}
@@ -516,7 +516,7 @@ const ReportesPage = () => {
 
                         <article className='reportes-panel'>
                             <div className='reportes-panel-head'>
-                                <h3>Alertas por Categoria</h3>
+                                <h3>Alertas por Categoría</h3>
                             </div>
                             <div className='reportes-chart-wrap'>
                                 {loading ? (

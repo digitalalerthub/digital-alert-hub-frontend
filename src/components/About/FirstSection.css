@@ -1,10 +1,21 @@
-h2{
+.principles-title {
   color: #ff1100;
-  font-weight: 700;
+  font-size: var(--text-h2);
+  font-weight: var(--font-bold);
 }
 
-h3{
+.principle-title {
   color: #1f5a9b;
+  font-size: var(--text-h3);
+  font-weight: var(--font-semibold);
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.principle-copy {
+  font-size: var(--text-body-sm);
+  line-height: 1.6;
+  margin-bottom: 0;
 }
 
 .principle-card {
@@ -22,8 +33,8 @@ h3{
   box-shadow: 0 10px 30px rgba(0,0,0,0.12);
 }
 
-i{
-  color: #ff0500;
+.principle-card i {
+  color: #ff1100;
 }
 
 .section-diagonal {

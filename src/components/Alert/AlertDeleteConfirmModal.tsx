@@ -24,15 +24,17 @@ const AlertDeleteConfirmModal = ({ alert, deleting, onCancel, onConfirm }: Props
 
         <p className="alert-delete-eyebrow">Eliminar alerta</p>
         <h3 id="alert-delete-title" className="alert-delete-title">
-          Esta accion quitara la alerta del listado
+          {"Esta acci\u00F3n quitar\u00E1 la alerta del listado"}
         </h3>
         <p className="alert-delete-body">
-          Se eliminara <strong>{alert.titulo}</strong> y ya no estara disponible para la comunidad.
+          {"Se eliminar\u00E1 "}
+          <strong>{alert.titulo}</strong>
+          {" y ya no estar\u00E1 disponible para la comunidad."}
         </p>
 
         <div className="alert-delete-note">
           <i className="bi bi-info-circle-fill" />
-          <span>Solo continua si estas seguro de eliminar este reporte.</span>
+          <span>{"Solo contin\u00FAa si est\u00E1s seguro de eliminar este reporte."}</span>
         </div>
 
         <div className="alert-delete-actions">
@@ -50,7 +52,7 @@ const AlertDeleteConfirmModal = ({ alert, deleting, onCancel, onConfirm }: Props
             onClick={onConfirm}
             disabled={deleting}
           >
-            {deleting ? "Eliminando..." : "Si, eliminar"}
+            {deleting ? "Eliminando..." : "Sí, eliminar"}
           </button>
         </div>
       </div>

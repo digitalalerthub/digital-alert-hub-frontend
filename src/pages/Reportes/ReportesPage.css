@@ -30,16 +30,16 @@
 }
 
 .reportes-main-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: var(--text-display);
+    font-weight: var(--font-bold);
     color: #ffffff;
     margin: 0;
 }
 
 .reportes-subtitle {
-    font-size: 1rem;
+    font-size: var(--text-body);
     color: #ffffff !important;
-    font-weight: 500;
+    font-weight: var(--font-medium);
     margin: 0;
     max-width: 500px;
 }
@@ -70,8 +70,8 @@
     border-radius: 999px;
     background: #f9fafb;
     color: #4b5563;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-filters-row {
@@ -95,7 +95,8 @@
     background-position: right 1rem center;
     background-size: 14px;
     color: #374151;
-    font-weight: 500;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-medium);
 }
 
 .reportes-filters-row select:disabled {
@@ -118,8 +119,8 @@
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
     cursor: pointer;
 }
 
@@ -131,7 +132,8 @@
     margin-bottom: 1rem;
     padding: 0.9rem 1rem;
     border-radius: 12px;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-feedback-error {
@@ -162,16 +164,16 @@
 
 .reportes-stat-card span {
     color: #4b5563;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-medium);
 }
 
 .reportes-stat-card strong {
     margin-top: 0.55rem;
     color: #111827;
-    font-size: 3rem;
+    font-size: var(--text-kpi);
     line-height: 1;
-    font-weight: 800;
+    font-weight: var(--font-bold);
 }
 
 .reportes-chart-grid {
@@ -200,8 +202,8 @@
 .reportes-panel-head h3 {
     margin: 0;
     color: #111827;
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: var(--text-h3);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-chart-wrap {
@@ -215,7 +217,8 @@
     justify-content: center;
     height: 100%;
     color: #6b7280;
-    font-weight: 700;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 @media (max-width: 768px) {
@@ -224,11 +227,11 @@
     }
 
     .reportes-main-title {
-        font-size: 2rem;
+        font-size: var(--text-h1);
     }
 
     .reportes-subtitle {
-        font-size: 0.9rem;
+        font-size: var(--text-body-sm);
     }
 
     .reportes-card-meta {

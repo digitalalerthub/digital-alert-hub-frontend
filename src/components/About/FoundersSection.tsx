@@ -3,21 +3,21 @@ import JenniferImage from "../../assets/Jennifer.jpg";
 import "./FoundersSection.css";
 
 export default function FoundersSection() {
-
-  // Array que contiene los datos a mostrar en la card
   const teamMembers = [
     {
-      name: "Andrés Monsalve",
+      name: "Andr\u00E9s Monsalve",
       role: "Co - Fundador & Product Owner",
-      description: "Guía la visión del producto, define prioridades y transforma ideas en soluciones valiosas.",
-      image: AndresImage
+      description:
+        "Gu\u00EDa la visi\u00F3n del producto, define prioridades y transforma ideas en soluciones valiosas.",
+      image: AndresImage,
     },
     {
-      name: "Jennifer Gómez",
+      name: "Jennifer G\u00F3mez",
       role: "Co - Fundador & Scrum Master",
-      description: "Organiza al equipo y asegura que cada proyecto avance con enfoque y eficiencia.",
-      image: JenniferImage
-    }
+      description:
+        "Organiza al equipo y asegura que cada proyecto avance con enfoque y eficiencia.",
+      image: JenniferImage,
+    },
   ];
 
   return (

@@ -38,7 +38,7 @@ const LoginForm = () => {
       });
       login(res.data.token);
 
-      toast.success("Inicio de sesion exitoso");
+      toast.success("Inicio de sesión exitoso");
       setTimeout(() => navigate(redirectTo, { replace: true }), 800);
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -62,10 +62,15 @@ const LoginForm = () => {
         style={{ width: "360px", borderRadius: "15px" }}
       >
         <div className="text-center mb-3">
-          <i className="bi bi-box-arrow-in-right fs-1 text-primary" />
+          <i
+            className="bi bi-box-arrow-in-right fs-1"
+            style={{ color: "#0d6efd" }}
+          />
         </div>
 
-        <h3 className="text-center mb-4 fw-bold">Iniciar Sesion</h3>
+        <h3 className="text-center mb-4 fw-bold" style={{ color: "#ff1100" }}>
+          Iniciar Sesión
+        </h3>
 
         <form onSubmit={handleSubmit}>
           <div className="position-relative mb-3">
@@ -73,7 +78,7 @@ const LoginForm = () => {
             <input
               type="email"
               className="form-control ps-5"
-              placeholder="Correo electronico"
+              placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -85,7 +90,7 @@ const LoginForm = () => {
             <input
               type="password"
               className="form-control ps-5"
-              placeholder="Contrasena"
+              placeholder="Contraseña"
               value={contrasena}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -120,14 +125,14 @@ const LoginForm = () => {
               to="/forgot-password"
               className="d-block text-secondary mb-1 small"
             >
-              Olvidaste la contrasena?
+              ¿Olvidaste la contraseña?
             </Link>
 
             <Link
               to={`/register${location.search}`}
               className="d-block fw-semibold text-primary small"
             >
-              Eres un usuario nuevo? Crear cuenta
+              ¿Eres un usuario nuevo? Crear cuenta
             </Link>
           </div>
         </form>

@@ -81,14 +81,19 @@ const RegisterForm = () => {
         style={{ width: "380px", borderRadius: "15px" }}
       >
         <div className="text-center mb-3">
-          <i className="bi bi-person-circle fs-1 text-success"></i>
+          <i
+            className="bi bi-person-circle fs-1"
+            style={{ color: "#0d6efd" }}
+          />
         </div>
 
-        <h3 className="text-center mb-4 fw-bold">Crear una Cuenta</h3>
+        <h3 className="text-center mb-4 fw-bold" style={{ color: "#ff1100" }}>
+          Crear una Cuenta
+        </h3>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3 position-relative">
-            <i className="bi bi-person position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-person position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="text"
               className="form-control ps-5"
@@ -100,7 +105,7 @@ const RegisterForm = () => {
           </div>
 
           <div className="mb-3 position-relative">
-            <i className="bi bi-person-lines-fill position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-person-lines-fill position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="text"
               className="form-control ps-5"
@@ -112,11 +117,11 @@ const RegisterForm = () => {
           </div>
 
           <div className="mb-3 position-relative">
-            <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-envelope position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="email"
               className="form-control ps-5"
-              placeholder="Correo electronico"
+              placeholder="Correo electrónico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -124,11 +129,11 @@ const RegisterForm = () => {
           </div>
 
           <div className="mb-3 position-relative">
-            <i className="bi bi-lock position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-lock position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="password"
               className="form-control ps-5"
-              placeholder="Contrasena"
+              placeholder="Contraseña"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
               required
@@ -136,11 +141,11 @@ const RegisterForm = () => {
           </div>
 
           <div className="mb-4 position-relative">
-            <i className="bi bi-telephone position-absolute top-50 translate-middle-y ms-3 text-secondary"></i>
+            <i className="bi bi-telephone position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
               type="text"
               className="form-control ps-5"
-              placeholder="Numero de telefono"
+              placeholder="Número de teléfono"
               value={telefono}
               onChange={(e) => setTelefono(e.target.value)}
               required
@@ -159,7 +164,7 @@ const RegisterForm = () => {
           <div className="d-flex justify-content-center mb-3">
             <button
               type="submit"
-              className="btn btn-success w-50"
+              className="btn btn-primary w-50"
               disabled={isRecaptchaEnabled && !captchaToken}
             >
               Registrarse
@@ -171,12 +176,12 @@ const RegisterForm = () => {
           </div>
 
           <p className="text-center">
-            Ya tienes una cuenta?{" "}
+            ¿Ya tienes una cuenta?{" "}
             <Link
               to={loginUrl}
               className="text-decoration-none fw-semibold text-primary"
             >
-              Inicia sesion
+              Inicia sesión
             </Link>
           </p>
         </form>

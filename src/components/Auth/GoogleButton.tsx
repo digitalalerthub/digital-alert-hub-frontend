@@ -9,8 +9,8 @@ const GoogleButton = () => {
         window.location.href = `${apiUrl}/auth/google`;
       }}
     >
-      <i className="bi bi-google me-2"></i>
-      Iniciar sesion con Google
+      <i className="bi bi-google me-2" style={{ color: "#ff1100" }} />
+      Iniciar sesión con Google
     </button>
   );
 };

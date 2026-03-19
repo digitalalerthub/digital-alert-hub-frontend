@@ -1,8 +1,14 @@
-h2{
-  font-size: 34px;
+.impact-title {
+  font-size: var(--text-h2);
   color: #ff1100;
+  font-weight: var(--font-bold);
+}
 
-  font-weight: 700;
+.impact-lead {
+  text-align: center;
+  font-size: var(--text-body);
+  margin: 0 auto;
+  max-width: 48rem;
 }
 
 .impact-box {
@@ -16,12 +22,22 @@ h2{
   text-align: center;
 }
 
-.lead{
-  text-align: center;
+.impact-item-title {
+  font-size: var(--text-h3);
+  color: #1f2937;
+  font-weight: var(--font-semibold);
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-h4{
-  font-weight: 600;
+.impact-item i {
+  color: #ff1100;
+}
+
+.impact-item-copy {
+  font-size: var(--text-body-sm);
+  line-height: 1.6;
+  margin-bottom: 0;
 }
 
 .btninfe{

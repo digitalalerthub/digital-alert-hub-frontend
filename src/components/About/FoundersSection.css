@@ -3,6 +3,12 @@
   background-color: #f5f7fa;
 }
 
+.founders-title {
+  font-size: var(--text-h2);
+  font-weight: var(--font-bold);
+  color: #ff1100;
+}
+
 
 /* Tarjeta individual */
 .founder-card {
@@ -38,25 +44,25 @@
 
 /* Nombre */
 .founder-name {
-  font-size: 20px;
-  font-weight: 600;
-  color: #2c3e50;
+  font-size: var(--text-h3);
+  font-weight: var(--font-semibold);
+  color: var(--color-title-on-light);
   margin-bottom: 8px;
   margin-top: 0;
 }
 
 /* Rol */
 .founder-role {
-  font-size: 14px;
+  font-size: var(--text-body-sm);
   color: #336B87;
-  font-weight: 600;
+  font-weight: var(--font-semibold);
   margin: 0 0 15px 0;
   letter-spacing: 0.3px;
 }
 
 /* Descripción */
 .founder-description {
-  font-size: 14px;
+  font-size: var(--text-body-sm);
   padding: 0 14px;
   color: #6c757d;
   line-height: 1.6;
