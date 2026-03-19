@@ -247,7 +247,7 @@ const AlertDetailModal = ({
   const redirectToLogin = (reason: "reaction" | "comment") => {
     const actionLabel = reason === "reaction" ? "reaccionar" : "comentar";
     const redirectPath = `${location.pathname}${location.search}${location.hash}`;
-    toast.info(`Debes iniciar sesion o crear una cuenta para ${actionLabel} esta alerta`);
+    toast.info(`Debes iniciar sesi\u00F3n o crear una cuenta para ${actionLabel} esta alerta`);
     navigate(`/login?redirect=${encodeURIComponent(redirectPath)}`);
   };
 
@@ -287,7 +287,7 @@ const AlertDetailModal = ({
         await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
       }
     } catch {
-      // Usuario cancelo o el navegador no permitio compartir/copiar.
+      // Usuario cancel\u00F3 o el navegador no permiti\u00F3 compartir/copiar.
     }
   };
 
@@ -459,21 +459,21 @@ const AlertDetailModal = ({
               </div>
             </article>
 
-            <h3 className="alert-detail-subtitle">Descripcion</h3>
+          <h3 className="alert-detail-subtitle">{"Descripci\u00F3n"}</h3>
             <p className="alert-detail-description">{alert.descripcion}</p>
 
             <h3 className="alert-detail-subtitle">Reacciones de la comunidad</h3>
             <div className="alert-detail-reactions">
               {loadingReactions && <span className="alert-detail-reactions-empty">Cargando...</span>}
               {!loadingReactions && reactions.length === 0 && (
-                <span className="alert-detail-reactions-empty">Sin reacciones aun</span>
+                <span className="alert-detail-reactions-empty">{"Sin reacciones a\u00FAn"}</span>
               )}
               {reactions.map((reaction) => (
                 <button
                   key={reaction.id_reaccion}
                   type="button"
                   className={`alert-detail-reaction-chip ${reaction.user_reacted ? "is-active" : ""}`}
-                  title={reaction.descrip_tipo_reaccion || "Reaccion"}
+                  title={reaction.descrip_tipo_reaccion || "Reacción"}
                   onClick={() => void handleReactionToggle(reaction.id_reaccion)}
                   disabled={pendingReactionId === reaction.id_reaccion}
                 >
@@ -493,7 +493,7 @@ const AlertDetailModal = ({
         </div>
 
         <div className="alert-detail-map-section">
-          <h3 className="alert-detail-subtitle">Ubicacion exacta de la alerta</h3>
+          <h3 className="alert-detail-subtitle">{"Ubicaci\u00F3n exacta de la alerta"}</h3>
           <p className="alert-detail-location">{readableLocation}</p>
           {mapCoords && (
             <p className="alert-detail-location-meta">
@@ -545,7 +545,7 @@ const AlertDetailModal = ({
               <input
                 type="text"
                 className="alert-detail-comment-input"
-                placeholder="deja tu comentario"
+                placeholder="Deja tu comentario"
                 value={commentText}
                 onChange={(e) => setCommentText(e.target.value)}
                 maxLength={500}
@@ -561,7 +561,7 @@ const AlertDetailModal = ({
             </form>
             {!isLoggedIn && (
               <p className="alert-detail-reactions-empty">
-                Inicia sesion o crea una cuenta para comentar o reaccionar.
+                {"Inicia sesi\u00F3n o crea una cuenta para comentar o reaccionar."}
               </p>
             )}
 

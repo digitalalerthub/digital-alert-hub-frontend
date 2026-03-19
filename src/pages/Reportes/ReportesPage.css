@@ -10,8 +10,6 @@
     padding: var(--page-top-offset, 100px) var(--page-gutter, 2rem) 2rem;
     max-width: var(--page-max-width, 1400px);
     margin: 0 auto;
-    font-family:
-        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .reportes-header-section {
@@ -32,16 +30,16 @@
 }
 
 .reportes-main-title {
-    font-size: 2.5rem;
-    font-weight: 700;
+    font-size: var(--text-display);
+    font-weight: var(--font-bold);
     color: #ffffff;
     margin: 0;
 }
 
 .reportes-subtitle {
-    font-size: 1rem;
+    font-size: var(--text-body);
     color: #ffffff !important;
-    font-weight: 500;
+    font-weight: var(--font-medium);
     margin: 0;
     max-width: 500px;
 }
@@ -72,8 +70,8 @@
     border-radius: 999px;
     background: #f9fafb;
     color: #4b5563;
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-filters-row {
@@ -85,12 +83,20 @@
 
 .reportes-filters-row select {
     min-height: 46px;
-    padding: 0.75rem 0.9rem;
+    padding: 0.75rem 3rem 0.75rem 0.9rem;
     border-radius: 10px;
     border: 1px solid #d1d5db;
-    background: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-color: #ffffff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5.25L7 9.25L11 5.25' stroke='%236b7280' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 14px;
     color: #374151;
-    font-weight: 500;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-medium);
 }
 
 .reportes-filters-row select:disabled {
@@ -113,8 +119,8 @@
     color: white;
     border: none;
     border-radius: 10px;
-    font-size: 0.92rem;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
     cursor: pointer;
 }
 
@@ -126,7 +132,8 @@
     margin-bottom: 1rem;
     padding: 0.9rem 1rem;
     border-radius: 12px;
-    font-weight: 600;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-feedback-error {
@@ -157,16 +164,16 @@
 
 .reportes-stat-card span {
     color: #4b5563;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-medium);
 }
 
 .reportes-stat-card strong {
     margin-top: 0.55rem;
     color: #111827;
-    font-size: 3rem;
+    font-size: var(--text-kpi);
     line-height: 1;
-    font-weight: 800;
+    font-weight: var(--font-bold);
 }
 
 .reportes-chart-grid {
@@ -195,8 +202,8 @@
 .reportes-panel-head h3 {
     margin: 0;
     color: #111827;
-    font-size: 0.95rem;
-    font-weight: 700;
+    font-size: var(--text-h3);
+    font-weight: var(--font-semibold);
 }
 
 .reportes-chart-wrap {
@@ -210,7 +217,8 @@
     justify-content: center;
     height: 100%;
     color: #6b7280;
-    font-weight: 700;
+    font-size: var(--text-body-sm);
+    font-weight: var(--font-semibold);
 }
 
 @media (max-width: 768px) {
@@ -219,11 +227,11 @@
     }
 
     .reportes-main-title {
-        font-size: 2rem;
+        font-size: var(--text-h1);
     }
 
     .reportes-subtitle {
-        font-size: 0.9rem;
+        font-size: var(--text-body-sm);
     }
 
     .reportes-card-meta {

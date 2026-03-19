@@ -7,7 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2196F3;
+  color: #ff1100;
   font-size: 1.5rem;
 }
 
@@ -19,7 +19,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6c757d;
+  color: #ff1100;
   font-size: 1.3rem;
   text-decoration: none;
   transition: all 0.3s ease;
@@ -27,7 +27,7 @@
 
 .social-link:hover {
   background: #E0E0E0;
-  color: #2c3e50;
+  color: #ff1100;
   transform: translateY(-3px);
 }
 

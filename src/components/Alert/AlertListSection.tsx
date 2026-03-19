@@ -112,7 +112,7 @@ const AlertListSection = ({
         [alertId]: summary,
       }));
     } catch {
-      toast.error("No se pudo registrar la reaccion");
+      toast.error("No se pudo registrar la reacci\u00F3n");
     } finally {
       setPendingReaction((current) => (current === pendingKey ? null : current));
     }
@@ -163,7 +163,7 @@ const AlertListSection = ({
         <input
           type="text"
           className="form-control create-alert-search"
-          placeholder="Buscar alertas por titulos"
+          placeholder={"Buscar alertas por t\u00EDtulos"}
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
         />
@@ -270,7 +270,7 @@ const AlertListSection = ({
                                 key={reaction.id_reaccion}
                                 type="button"
                                 className={`create-alert-reaction-chip ${reaction.user_reacted ? "is-active" : ""}`}
-                                title={reaction.descrip_tipo_reaccion || "Reaccion"}
+                                title={reaction.descrip_tipo_reaccion || "Reacción"}
                                 onClick={(event) =>
                                   void handleReactionClick(event, alert.id_alerta, reaction.id_reaccion)
                                 }

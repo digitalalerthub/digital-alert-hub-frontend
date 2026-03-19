@@ -153,7 +153,7 @@ const CreateAlertWorkspace = () => {
                 <div className='create-alert-header-section'>
                     <div className='create-alert-title-section'>
                         <h1 className='create-alert-page-title'>
-                            Gestion de Alertas
+                            Gestión de Alertas
                         </h1>
                         <p className='create-alert-page-subtitle'>
                             Administra y controla las alertas del sistema

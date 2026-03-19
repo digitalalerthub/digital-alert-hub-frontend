@@ -47,8 +47,8 @@ const buildColombiaAddressAttempts = (query: string): string[] => {
 
   const withCityHints = attempts.flatMap((item) => [
     item,
-    `${item}, Medellin, Antioquia, Colombia`,
-    `${item}, Medellin, Colombia`,
+    `${item}, Medell\u00EDn, Antioquia, Colombia`,
+    `${item}, Medell\u00EDn, Colombia`,
   ]);
 
   return Array.from(new Set(withCityHints));
@@ -248,7 +248,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
     const query = ubicacion.trim();
 
     if (!query) {
-      toast.info("Escribe una direccion para verificarla");
+      toast.info("Escribe una direcci\u00F3n para verificarla");
       return;
     }
 
@@ -268,16 +268,16 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
       }
 
       if (!coords) {
-        toast.warning("No encontramos esa direccion, pero puedes registrar la alerta igual");
+        toast.warning("No encontramos esa direcci\u00F3n, pero puedes registrar la alerta igual");
         return;
       }
 
       setSelectedCoords(coords);
       setSelectedMarker(coords.lat, coords.lng);
       setForceCoordsOnSubmit(false);
-      toast.success("Direccion ubicada en el mapa");
+      toast.success("Direcci\u00F3n ubicada en el mapa");
     } catch {
-      toast.warning("No se pudo verificar la direccion, puedes continuar de todos modos");
+      toast.warning("No se pudo verificar la direcci\u00F3n, puedes continuar de todos modos");
     }
   }, [setSelectedMarker, ubicacion]);
 
@@ -288,9 +288,9 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
       const lat = Number(position.coords.latitude.toFixed(6));
       const lng = Number(position.coords.longitude.toFixed(6));
       await setLocationFromCoords(lat, lng);
-      toast.success("Ubicacion actual detectada");
+      toast.success("Ubicaci\u00F3n actual detectada");
     } catch {
-      toast.warning("No se pudo obtener tu ubicacion actual");
+      toast.warning("No se pudo obtener tu ubicaci\u00F3n actual");
     } finally {
       setLocatingUser(false);
     }
