@@ -3,6 +3,7 @@ import api from "./api";
 export interface Rol {
   id_rol: number;
   nombre_rol: string;
+  usuarios_asignados?: number;
 }
 
 const rolesService = {

@@ -1,0 +1,145 @@
+.user-status-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.45);
+}
+
+.user-status-modal {
+    width: min(460px, 100%);
+    border: 1px solid #bfdbfe;
+    border-radius: 24px;
+    background:
+        radial-gradient(circle at top, rgba(219, 234, 254, 0.9), transparent 45%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+    padding: 1.5rem;
+}
+
+.user-status-icon-wrap {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #dbeafe;
+    color: #2563eb;
+    font-size: 1.25rem;
+}
+
+.user-status-eyebrow {
+    margin: 1rem 0 0;
+    color: #1d4ed8;
+    font-size: 0.76rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.user-status-title {
+    margin: 0.35rem 0 0;
+    color: #111827;
+    font-size: 1.25rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.user-status-body {
+    margin: 0.75rem 0 0;
+    color: #475569;
+    font-size: 0.92rem;
+    line-height: 1.55;
+}
+
+.user-status-note {
+    margin-top: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.88);
+    color: #1e3a8a;
+    padding: 0.85rem 0.95rem;
+    font-size: 0.82rem;
+    line-height: 1.45;
+}
+
+.user-status-note i {
+    margin-top: 0.08rem;
+}
+
+.user-status-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.65rem;
+}
+
+.user-status-cancel-btn,
+.user-status-confirm-btn {
+    min-width: 120px;
+    height: 2.6rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        background 0.15s ease;
+}
+
+.user-status-cancel-btn {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #334155;
+}
+
+.user-status-confirm-btn {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+}
+
+.user-status-cancel-btn:hover:not(:disabled),
+.user-status-confirm-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.user-status-cancel-btn:hover:not(:disabled) {
+    background: #f8fafc;
+}
+
+.user-status-confirm-btn:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.user-status-cancel-btn:disabled,
+.user-status-confirm-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+@media (max-width: 640px) {
+    .user-status-modal {
+        padding: 1.2rem;
+        border-radius: 20px;
+    }
+
+    .user-status-actions {
+        flex-direction: column-reverse;
+    }
+
+    .user-status-cancel-btn,
+    .user-status-confirm-btn {
+        width: 100%;
+    }
+}

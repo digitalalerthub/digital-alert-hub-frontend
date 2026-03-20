@@ -22,11 +22,18 @@ const CreateAlertWorkspace = () => {
         null,
     );
     const [deletingAlertId, setDeletingAlertId] = useState<number | null>(null);
+    const isOwnerSelectedAlert =
+        Boolean(selectedAlert) && user?.id === selectedAlert?.id_usuario;
+    const isSelectedAlertEvidenceOnly =
+        Boolean(selectedAlert) &&
+        !isAdmin &&
+        isOwnerSelectedAlert &&
+        selectedAlert?.id_estado === 2;
     const canEditSelectedAlert =
         Boolean(selectedAlert) &&
         (isAdmin ||
             (user?.id === selectedAlert?.id_usuario &&
-                selectedAlert?.id_estado === 1));
+                [1, 2].includes(selectedAlert?.id_estado ?? 0)));
     const canDeleteSelectedAlert =
         Boolean(selectedAlert) &&
         (isAdmin ||
@@ -217,6 +224,11 @@ const CreateAlertWorkspace = () => {
                     alert={selectedAlert}
                     canEdit={canEditSelectedAlert}
                     canDelete={canDeleteSelectedAlert}
+                    editLabel={
+                        isSelectedAlertEvidenceOnly
+                            ? 'Agregar evidencia'
+                            : 'Editar'
+                    }
                     onEdit={() => setEditingAlert(selectedAlert)}
                     onDeleteRequest={requestDeleteAlert}
                     onClose={() => setSelectedAlert(null)}
@@ -225,6 +237,13 @@ const CreateAlertWorkspace = () => {
             {editingAlert && (
                 <AlertEditModal
                     alert={editingAlert}
+                    mode={
+                        !isAdmin &&
+                        user?.id === editingAlert.id_usuario &&
+                        editingAlert.id_estado === 2
+                            ? 'evidence-only'
+                            : 'full'
+                    }
                     onClose={() => setEditingAlert(null)}
                     onSave={handleUpdateAlert}
                 />
