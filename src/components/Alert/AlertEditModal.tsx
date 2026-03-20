@@ -10,11 +10,12 @@ import "./AlertEditModal.css";
 
 type Props = {
   alert: Alert;
+  mode?: "full" | "evidence-only";
   onClose: () => void;
   onSave: (id: number, payload: UpdateAlertPayload) => Promise<void>;
 };
 
-const CATEGORY_OPTIONS = ["Agua", "Energ\u00EDa", "Gas", "Movilidad", "Seguridad", "Residuos", "Otro"] as const;
+const CATEGORY_OPTIONS = ["Agua", "Energía", "Gas", "Movilidad", "Seguridad", "Residuos", "Otro"] as const;
 const PRIORITY_OPTIONS = ["Baja", "Media", "Alta"] as const;
 const MAX_EVIDENCE_IMAGES = 10;
 const MAX_EVIDENCE_SIZE = 20 * 1024 * 1024;
@@ -79,7 +80,8 @@ const buildExistingEvidenceList = (alert: Alert): ExistingEvidenceItem[] => {
   return [];
 };
 
-const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
+const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
+  const isEvidenceOnlyMode = mode === "evidence-only";
   const [titulo, setTitulo] = useState(alert.titulo);
   const [descripcion, setDescripcion] = useState(alert.descripcion);
   const [categoria, setCategoria] = useState(alert.categoria);
@@ -143,6 +145,8 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
   }, [alert]);
 
   useEffect(() => {
+    if (isEvidenceOnlyMode) return;
+
     let cancelled = false;
 
     const loadComunas = async () => {
@@ -177,9 +181,11 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [alert.id_alerta, alert.id_comuna]);
+  }, [alert.id_alerta, alert.id_comuna, isEvidenceOnlyMode]);
 
   useEffect(() => {
+    if (isEvidenceOnlyMode) return;
+
     const parsedComuna = Number(comunaId);
     if (!Number.isInteger(parsedComuna) || parsedComuna <= 0) {
       setBarrios([]);
@@ -214,10 +220,10 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [alert.id_barrio, comunaId]);
+  }, [alert.id_barrio, comunaId, isEvidenceOnlyMode]);
 
   useEffect(() => {
-    if (!isMapReady || mapSeededRef.current) return;
+    if (isEvidenceOnlyMode || !isMapReady || mapSeededRef.current) return;
     mapSeededRef.current = true;
 
     if (initialCoords) {
@@ -228,7 +234,15 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     if (alert.ubicacion?.trim()) {
       void handleAddressBlur();
     }
-  }, [alert.id_alerta, alert.ubicacion, handleAddressBlur, initialCoords, isMapReady, setLocationFromCoords]);
+  }, [
+    alert.id_alerta,
+    alert.ubicacion,
+    handleAddressBlur,
+    initialCoords,
+    isEvidenceOnlyMode,
+    isMapReady,
+    setLocationFromCoords,
+  ]);
 
   const selectEvidence = (files: File[]): boolean => {
     if (!files.length) {
@@ -237,14 +251,14 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     }
 
     if (files.length > MAX_EVIDENCE_IMAGES) {
-      toast.warning(`Puedes subir m\u00E1ximo ${MAX_EVIDENCE_IMAGES} im\u00E1genes`);
+      toast.warning(`Puedes subir máximo ${MAX_EVIDENCE_IMAGES} imágenes`);
       setEvidencias([]);
       return false;
     }
 
     const invalidType = files.some((file) => !ALLOWED_IMAGE_TYPES.includes(file.type));
     if (invalidType) {
-      toast.warning("Solo se permiten im\u00E1genes JPG, PNG o WEBP");
+      toast.warning("Solo se permiten imágenes JPG, PNG o WEBP");
       setEvidencias([]);
       return false;
     }
@@ -280,7 +294,7 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
   };
 
   const removeExistingEvidence = (item: ExistingEvidenceItem) => {
-    if (saving) return;
+    if (saving || isEvidenceOnlyMode) return;
 
     setExistingEvidences((current) => current.filter((evidence) => evidence.key !== item.key));
 
@@ -299,35 +313,44 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
-      toast.error("T\u00EDtulo, descripci\u00F3n y categor\u00EDa son obligatorios");
+    if (isEvidenceOnlyMode) {
+      if (!evidencias.length) {
+        toast.error("Agrega al menos una nueva evidencia");
+        return;
+      }
+    } else if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
+      toast.error("Título, descripción y categoría son obligatorios");
       return;
     }
 
     const parsedComunaId = Number(comunaId);
     const parsedBarrioId = Number(barrioId);
     const locationValue = buildLocationValue(ubicacion, selectedCoords, forceCoordsOnSubmit);
-    const payload: UpdateAlertPayload = {
-      titulo: titulo.trim(),
-      descripcion: descripcion.trim(),
-      categoria: categoria.trim(),
-      prioridad: prioridad.trim(),
-      ubicacion: locationValue,
-      evidencias: evidencias.length ? evidencias : undefined,
-    };
+    const payload: UpdateAlertPayload = isEvidenceOnlyMode
+      ? {
+          evidencias: evidencias.length ? evidencias : undefined,
+        }
+      : {
+          titulo: titulo.trim(),
+          descripcion: descripcion.trim(),
+          categoria: categoria.trim(),
+          prioridad: prioridad.trim(),
+          ubicacion: locationValue,
+          evidencias: evidencias.length ? evidencias : undefined,
+        };
 
-    if (removedEvidenceIds.length > 0) {
+    if (!isEvidenceOnlyMode && removedEvidenceIds.length > 0) {
       payload.evidencias_eliminadas = removedEvidenceIds;
     }
 
-    if (removeAllEvidence) {
+    if (!isEvidenceOnlyMode && removeAllEvidence) {
       payload.eliminar_todas_evidencias = true;
     }
 
-    if (Number.isInteger(parsedComunaId) && parsedComunaId > 0) {
+    if (!isEvidenceOnlyMode && Number.isInteger(parsedComunaId) && parsedComunaId > 0) {
       payload.id_comuna = parsedComunaId;
     }
-    if (Number.isInteger(parsedBarrioId) && parsedBarrioId > 0) {
+    if (!isEvidenceOnlyMode && Number.isInteger(parsedBarrioId) && parsedBarrioId > 0) {
       payload.id_barrio = parsedBarrioId;
     }
 
@@ -344,163 +367,179 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
     <div className="alert-edit-backdrop" onClick={onClose}>
       <div className="alert-edit-modal" onClick={(e) => e.stopPropagation()}>
         <div className="alert-edit-header">
-          <h3 className="alert-edit-title">+ Editar Alerta</h3>
+          <h3 className="alert-edit-title">
+            {isEvidenceOnlyMode ? "+ Agregar Evidencia" : "+ Editar Alerta"}
+          </h3>
           <button type="button" className="alert-edit-close" onClick={onClose} aria-label="Cerrar modal">
             <i className="bi bi-x-lg" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="alert-edit-form">
-          <label className="alert-edit-label">{"T\u00EDtulo de la alerta"}</label>
-          <input
-            className="alert-edit-input"
-            value={titulo}
-            placeholder="Fuga de agua"
-            onChange={(e) => setTitulo(e.target.value)}
-            maxLength={200}
-            required
-          />
-
-          <div className="alert-edit-row">
-            <div>
-              <label className="alert-edit-label">{"Categor\u00EDa"}</label>
-              <select
-                className="alert-edit-select"
-                value={categoria}
-                onChange={(e) => setCategoria(e.target.value)}
-                required
-              >
-                {categoryOptions.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="alert-edit-label">Prioridad</label>
-              <div className="alert-edit-priority-group" role="group" aria-label="Prioridad">
-                {priorityOptions.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    className={`alert-edit-priority-chip ${prioridad === option ? "is-active" : ""}`}
-                    onClick={() => setPrioridad(option)}
-                    aria-pressed={prioridad === option}
-                  >
-                    {option}
-                  </button>
-                ))}
+          {isEvidenceOnlyMode ? (
+            <div className="alert-edit-mode-note">
+              <i className="bi bi-info-circle-fill" />
+              <div>
+                <strong>Alerta en progreso</strong>
+                <span>
+                  Puedes agregar nuevas evidencias, pero no modificar ni eliminar el contenido actual.
+                </span>
               </div>
             </div>
-          </div>
+          ) : (
+            <>
+              <label className="alert-edit-label">Título de la alerta</label>
+              <input
+                className="alert-edit-input"
+                value={titulo}
+                placeholder="Fuga de agua"
+                onChange={(e) => setTitulo(e.target.value)}
+                maxLength={200}
+                required
+              />
 
-          <label className="alert-edit-label">{"Descripci\u00F3n del incidente"}</label>
-          <textarea
-            className="alert-edit-textarea"
-            rows={3}
-            value={descripcion}
-            placeholder={"Describe los detalles de la situaci\u00F3n..."}
-            onChange={(e) => setDescripcion(e.target.value)}
-            required
-          />
+              <div className="alert-edit-row">
+                <div>
+                  <label className="alert-edit-label">Categoría</label>
+                  <select
+                    className="alert-edit-select"
+                    value={categoria}
+                    onChange={(e) => setCategoria(e.target.value)}
+                    required
+                  >
+                    {categoryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-          <label className="alert-edit-label">{"Ubicaci\u00F3n del incidente"}</label>
-          <input
-            className="alert-edit-input"
-            value={ubicacion}
-            onChange={(e) => handleManualUbicacionChange(e.target.value)}
-            onBlur={() => void handleAddressBlur()}
-            placeholder={"Direcci\u00F3n de la alerta"}
-            maxLength={255}
-            disabled={saving}
-          />
+                <div>
+                  <label className="alert-edit-label">Prioridad</label>
+                  <div className="alert-edit-priority-group" role="group" aria-label="Prioridad">
+                    {priorityOptions.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={`alert-edit-priority-chip ${prioridad === option ? "is-active" : ""}`}
+                        onClick={() => setPrioridad(option)}
+                        aria-pressed={prioridad === option}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
 
-          {(suggestionsLoading || reverseLoading) && (
-            <small className="alert-edit-help-text">
-              {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo dirección..."}
-            </small>
-          )}
+              <label className="alert-edit-label">Descripción del incidente</label>
+              <textarea
+                className="alert-edit-textarea"
+                rows={3}
+                value={descripcion}
+                placeholder="Describe los detalles de la situación..."
+                onChange={(e) => setDescripcion(e.target.value)}
+                required
+              />
 
-          {suggestions.length > 0 && (
-            <div className="alert-edit-suggestions">
-              {suggestions.map((item) => (
+              <label className="alert-edit-label">Ubicación del incidente</label>
+              <input
+                className="alert-edit-input"
+                value={ubicacion}
+                onChange={(e) => handleManualUbicacionChange(e.target.value)}
+                onBlur={() => void handleAddressBlur()}
+                placeholder="Dirección de la alerta"
+                maxLength={255}
+                disabled={saving}
+              />
+
+              {(suggestionsLoading || reverseLoading) && (
+                <small className="alert-edit-help-text">
+                  {suggestionsLoading ? "Buscando sugerencias..." : "Obteniendo dirección..."}
+                </small>
+              )}
+
+              {suggestions.length > 0 && (
+                <div className="alert-edit-suggestions">
+                  {suggestions.map((item) => (
+                    <button
+                      type="button"
+                      key={`${item.lat}-${item.lon}-${item.display_name}`}
+                      className="alert-edit-suggestion-item"
+                      onClick={() => handleSelectSuggestion(item)}
+                    >
+                      {item.display_name}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="alert-edit-location-actions">
                 <button
                   type="button"
-                  key={`${item.lat}-${item.lon}-${item.display_name}`}
-                  className="alert-edit-suggestion-item"
-                  onClick={() => handleSelectSuggestion(item)}
+                  className="alert-edit-location-btn"
+                  onClick={() => void verifyAddress()}
+                  disabled={saving || locatingUser}
                 >
-                  {item.display_name}
+                  Verificar dirección
                 </button>
-              ))}
-            </div>
+                <button
+                  type="button"
+                  className="alert-edit-location-btn"
+                  onClick={() => void useMyLocation()}
+                  disabled={saving || locatingUser}
+                >
+                  {locatingUser ? "Ubicando..." : "Usar mi ubicación"}
+                </button>
+              </div>
+
+              <div className="alert-edit-map-wrap">
+                <div ref={mapContainerRef} className="alert-edit-map" />
+                {selectedCoords && (
+                  <small className="alert-edit-map-status">
+                    Punto seleccionado: {selectedCoords.lat}, {selectedCoords.lng}
+                  </small>
+                )}
+              </div>
+
+              <div className="alert-edit-row">
+                <div>
+                  <label className="alert-edit-label">Comuna</label>
+                  <select
+                    className="alert-edit-select"
+                    value={comunaId}
+                    onChange={(e) => setComunaId(e.target.value)}
+                    disabled={loadingLocations || saving}
+                  >
+                    {comunas.length === 0 && <option value="">Cargando...</option>}
+                    {comunas.map((item) => (
+                      <option key={item.id_comuna} value={item.id_comuna}>
+                        {item.id_comuna} - {item.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="alert-edit-label">Barrio</label>
+                  <select
+                    className="alert-edit-select"
+                    value={barrioId}
+                    onChange={(e) => setBarrioId(e.target.value)}
+                    disabled={barrios.length === 0 || loadingLocations || saving}
+                  >
+                    {barrios.length === 0 && <option value="">Selecciona comuna</option>}
+                    {barrios.map((item) => (
+                      <option key={item.id_barrio} value={item.id_barrio}>
+                        {item.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </>
           )}
-
-          <div className="alert-edit-location-actions">
-            <button
-              type="button"
-              className="alert-edit-location-btn"
-              onClick={() => void verifyAddress()}
-              disabled={saving || locatingUser}
-            >
-              {"Verificar direcci\u00F3n"}
-            </button>
-            <button
-              type="button"
-              className="alert-edit-location-btn"
-              onClick={() => void useMyLocation()}
-              disabled={saving || locatingUser}
-            >
-              {locatingUser ? "Ubicando..." : "Usar mi ubicación"}
-            </button>
-          </div>
-
-          <div className="alert-edit-map-wrap">
-            <div ref={mapContainerRef} className="alert-edit-map" />
-            {selectedCoords && (
-              <small className="alert-edit-map-status">
-                Punto seleccionado: {selectedCoords.lat}, {selectedCoords.lng}
-              </small>
-            )}
-          </div>
-
-          <div className="alert-edit-row">
-            <div>
-              <label className="alert-edit-label">Comuna</label>
-              <select
-                className="alert-edit-select"
-                value={comunaId}
-                onChange={(e) => setComunaId(e.target.value)}
-                disabled={loadingLocations || saving}
-              >
-                {comunas.length === 0 && <option value="">Cargando...</option>}
-                {comunas.map((item) => (
-                  <option key={item.id_comuna} value={item.id_comuna}>
-                    {item.id_comuna} - {item.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="alert-edit-label">Barrio</label>
-              <select
-                className="alert-edit-select"
-                value={barrioId}
-                onChange={(e) => setBarrioId(e.target.value)}
-                disabled={barrios.length === 0 || loadingLocations || saving}
-              >
-                {barrios.length === 0 && <option value="">Selecciona comuna</option>}
-                {barrios.map((item) => (
-                  <option key={item.id_barrio} value={item.id_barrio}>
-                    {item.nombre}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
 
           <label className="alert-edit-label">Evidencias actuales</label>
           {existingEvidences.length > 0 ? (
@@ -512,15 +551,17 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
                   ) : (
                     <img className="alert-edit-existing-media" src={item.url} alt="Evidencia cargada" />
                   )}
-                  <button
-                    type="button"
-                    className="alert-edit-existing-remove"
-                    aria-label="Quitar evidencia"
-                    onClick={() => removeExistingEvidence(item)}
-                    disabled={saving}
-                  >
-                    <i className="bi bi-x-lg" />
-                  </button>
+                  {!isEvidenceOnlyMode && (
+                    <button
+                      type="button"
+                      className="alert-edit-existing-remove"
+                      aria-label="Quitar evidencia"
+                      onClick={() => removeExistingEvidence(item)}
+                      disabled={saving}
+                    >
+                      <i className="bi bi-x-lg" />
+                    </button>
+                  )}
                 </article>
               ))}
             </div>
@@ -528,7 +569,9 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
             <small className="alert-edit-help-text">No hay evidencias cargadas actualmente.</small>
           )}
 
-          <label className="alert-edit-label">Agregar nuevas evidencias (opcional)</label>
+          <label className="alert-edit-label">
+            {isEvidenceOnlyMode ? "Agregar nuevas evidencias" : "Agregar nuevas evidencias (opcional)"}
+          </label>
           <div className="alert-edit-dropzone-wrap">
             <label
               htmlFor="alert-edit-evidence"
@@ -560,7 +603,11 @@ const AlertEditModal = ({ alert, onClose, onSave }: Props) => {
               Cancelar
             </button>
             <button type="submit" className="alert-edit-save-btn" disabled={saving}>
-              {saving ? "Guardando..." : "Guardar cambios"}
+              {saving
+                ? "Guardando..."
+                : isEvidenceOnlyMode
+                  ? "Agregar evidencia"
+                  : "Guardar cambios"}
             </button>
           </div>
         </form>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -21,6 +21,15 @@ const LoginForm = () => {
   const { login } = useAuth();
   const redirectTo =
     new URLSearchParams(location.search).get("redirect") || "/admin";
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("inactive") === "1") {
+      toast.error(
+        "Tu cuenta esta inactiva. Contacta al administrador para reactivarla."
+      );
+    }
+  }, [location.search]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -17,6 +17,7 @@ type Props = {
   onClose: () => void;
   canEdit?: boolean;
   canDelete?: boolean;
+  editLabel?: string;
   onEdit?: () => void;
   onDeleteRequest?: (alert: Alert) => void;
 };
@@ -81,6 +82,7 @@ const AlertDetailModal = ({
   onClose,
   canEdit = false,
   canDelete = false,
+  editLabel = "Editar",
   onEdit,
   onDeleteRequest,
 }: Props) => {
@@ -524,7 +526,7 @@ const AlertDetailModal = ({
                       onEdit?.();
                     }}
                   >
-                    Editar
+                    {editLabel}
                   </button>
                 )}
                 {canDelete && (

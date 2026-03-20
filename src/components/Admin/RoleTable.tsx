@@ -1,6 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import rolesService, { type Rol } from '../../services/rolesService';
+import RoleDeleteConfirmModal from './RoleDeleteConfirmModal';
 import RoleModal from './RoleModal';
 import './RoleTable.css';
 
@@ -9,6 +12,8 @@ const RoleTable = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState<Rol | null>(null);
+    const [roleToDelete, setRoleToDelete] = useState<Rol | null>(null);
+    const [deleting, setDeleting] = useState(false);
 
     useEffect(() => {
         void loadData();
@@ -18,8 +23,8 @@ const RoleTable = () => {
         try {
             const rolesList = await rolesService.getAll();
             setRoles(rolesList);
-        } catch (err) {
-            console.error('Error cargando roles', err);
+        } catch (error) {
+            console.error('Error cargando roles', error);
         } finally {
             setLoading(false);
         }
@@ -38,20 +43,55 @@ const RoleTable = () => {
     const handleModalClose = () => {
         setShowModal(false);
         setSelectedRole(null);
+    };
+
+    const handleRoleSaved = () => {
+        setShowModal(false);
+        setSelectedRole(null);
         void loadData();
     };
 
-    const handleDelete = async (id_rol: number, nombre_rol: string) => {
-        if (!confirm(`¿Estás seguro de eliminar el rol "${nombre_rol}"?`)) {
+    const requestDelete = (role: Rol) => {
+        const usuariosAsignados = role.usuarios_asignados ?? 0;
+
+        if (usuariosAsignados > 0) {
+            toast.info(
+                `No puedes eliminar este rol porque tiene ${usuariosAsignados} usuario${usuariosAsignados === 1 ? '' : 's'} asignado${usuariosAsignados === 1 ? '' : 's'}.`,
+            );
             return;
         }
 
+        setRoleToDelete(role);
+    };
+
+    const handleDeleteCancel = () => {
+        if (deleting) return;
+        setRoleToDelete(null);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (!roleToDelete) return;
+
+        setDeleting(true);
+
         try {
-            await rolesService.delete(id_rol);
+            await rolesService.delete(roleToDelete.id_rol);
+            toast.success('Rol eliminado correctamente');
+            setRoleToDelete(null);
             void loadData();
-        } catch (err) {
-            alert('Error eliminando el rol');
-            console.error(err);
+        } catch (error: unknown) {
+            console.error(error);
+
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'No se pudo eliminar el rol',
+                );
+            } else {
+                toast.error('Error inesperado al eliminar el rol');
+            }
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -63,7 +103,20 @@ const RoleTable = () => {
         <div className='roles'>
             <div className='role-table-container'>
                 {showModal && (
-                    <RoleModal role={selectedRole} onClose={handleModalClose} />
+                    <RoleModal
+                        role={selectedRole}
+                        onClose={handleModalClose}
+                        onSaved={handleRoleSaved}
+                    />
+                )}
+
+                {roleToDelete && (
+                    <RoleDeleteConfirmModal
+                        roleName={roleToDelete.nombre_rol}
+                        deleting={deleting}
+                        onCancel={handleDeleteCancel}
+                        onConfirm={() => void handleDeleteConfirm()}
+                    />
                 )}
 
                 <Breadcrumb
@@ -118,13 +171,21 @@ const RoleTable = () => {
                                             </button>
                                             <button
                                                 className='action-btn-delete'
-                                                onClick={() =>
-                                                    handleDelete(
-                                                        role.id_rol,
-                                                        role.nombre_rol,
-                                                    )
+                                                onClick={() => requestDelete(role)}
+                                                disabled={
+                                                    (role.usuarios_asignados ??
+                                                        0) > 0
                                                 }
-                                                title='Eliminar rol'
+                                                aria-disabled={
+                                                    (role.usuarios_asignados ??
+                                                        0) > 0
+                                                }
+                                                title={
+                                                    (role.usuarios_asignados ??
+                                                        0) > 0
+                                                        ? 'No se puede eliminar porque tiene usuarios asignados'
+                                                        : 'Eliminar rol'
+                                                }
                                             >
                                                 <i className='bi bi-trash' />
                                             </button>
@@ -135,6 +196,12 @@ const RoleTable = () => {
                                         <h4 className='role-name'>
                                             {role.nombre_rol}
                                         </h4>
+                                        <p className='role-usage-text'>
+                                            Usuarios asignados:{' '}
+                                            <strong>
+                                                {role.usuarios_asignados ?? 0}
+                                            </strong>
+                                        </p>
                                         <p className='role-id-text'>
                                             ID: {role.id_rol}
                                         </p>
