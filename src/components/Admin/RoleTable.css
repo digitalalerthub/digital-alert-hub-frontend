@@ -179,6 +179,12 @@
     margin: 0 0 0.5rem 0;
 }
 
+.role-usage-text {
+    font-size: 0.9rem;
+    color: #475569;
+    margin: 0 0 0.35rem 0;
+}
+
 .role-id-text {
     font-size: 0.85rem;
     color: #9ca3af;
@@ -221,6 +227,14 @@
     background-color: #fecaca;
     transform: translateY(-2px);
     box-shadow: 0 2px 8px rgba(153, 27, 27, 0.2);
+}
+
+.action-btn-delete:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 /* Estado vacío */

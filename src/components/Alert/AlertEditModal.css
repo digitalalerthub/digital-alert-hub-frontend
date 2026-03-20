@@ -115,6 +115,39 @@
   font-size: 0.68rem;
 }
 
+.alert-edit-mode-note {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  border: 1px solid #fed7aa;
+  border-radius: 14px;
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 0.85rem 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+.alert-edit-mode-note i {
+  font-size: 1rem;
+  margin-top: 0.08rem;
+}
+
+.alert-edit-mode-note strong,
+.alert-edit-mode-note span {
+  display: block;
+}
+
+.alert-edit-mode-note strong {
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.alert-edit-mode-note span {
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin-top: 0.15rem;
+}
+
 .alert-edit-priority-group {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

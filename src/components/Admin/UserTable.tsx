@@ -1,9 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import usersService from '../../services/users';
 import rolesService, { type Rol } from '../../services/rolesService';
 import type { User } from '../../types/User';
 import UserModal from './UserModal';
+import UserStatusConfirmModal from './UserStatusConfirmModal';
 import './UserTable.css';
 
 const UserTable = () => {
@@ -13,13 +16,15 @@ const UserTable = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [userToToggle, setUserToToggle] = useState<User | null>(null);
+    const [togglingStatus, setTogglingStatus] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
 
     const itemsPerPage = 10;
 
     useEffect(() => {
-        loadData();
+        void loadData();
     }, []);
 
     const loadData = async () => {
@@ -52,7 +57,6 @@ const UserTable = () => {
         setLoading(false);
     };
 
-    // Filtrado de usuarios
     const filteredUsers = useMemo(() => {
         if (!searchTerm.trim()) return users;
 
@@ -67,7 +71,6 @@ const UserTable = () => {
         });
     }, [users, searchTerm]);
 
-    // Resetear página cuando cambia la búsqueda
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
@@ -93,18 +96,45 @@ const UserTable = () => {
         }
     };
 
-    const toggleStatus = async (id_usuario: number, estado: boolean) => {
-        if (
-            !confirm(`¿Desea ${estado ? 'inactivar' : 'activar'} este usuario?`)
-        ) {
-            return;
-        }
+    const requestToggleStatus = (user: User) => {
+        setUserToToggle(user);
+    };
+
+    const handleToggleCancel = () => {
+        if (togglingStatus) return;
+        setUserToToggle(null);
+    };
+
+    const confirmToggleStatus = async () => {
+        if (!userToToggle) return;
+
+        setTogglingStatus(true);
 
         try {
-            await usersService.toggleStatus(id_usuario, !estado);
-            loadData();
-        } catch {
-            alert('Error cambiando el estado');
+            await usersService.toggleStatus(
+                userToToggle.id_usuario,
+                !userToToggle.estado,
+            );
+            toast.success(
+                userToToggle.estado
+                    ? 'Usuario inactivado correctamente'
+                    : 'Usuario activado correctamente',
+            );
+            setUserToToggle(null);
+            void loadData();
+        } catch (error: unknown) {
+            console.error(error);
+
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'No se pudo cambiar el estado del usuario',
+                );
+            } else {
+                toast.error('Error inesperado al cambiar el estado');
+            }
+        } finally {
+            setTogglingStatus(false);
         }
     };
 
@@ -121,7 +151,12 @@ const UserTable = () => {
     const handleModalClose = () => {
         setShowModal(false);
         setSelectedUser(null);
-        loadData();
+    };
+
+    const handleUserSaved = () => {
+        setShowModal(false);
+        setSelectedUser(null);
+        void loadData();
     };
 
     const clearSearch = () => {
@@ -132,7 +167,6 @@ const UserTable = () => {
         return <div className='text-center mt-5'>Cargando...</div>;
     }
 
-    // Paginación
     const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = Math.min(startIndex + itemsPerPage, filteredUsers.length);
@@ -142,7 +176,20 @@ const UserTable = () => {
         <div className='gestion-usuarios'>
             <div className='user-table-container'>
                 {showModal && (
-                    <UserModal user={selectedUser} onClose={handleModalClose} />
+                    <UserModal
+                        user={selectedUser}
+                        onClose={handleModalClose}
+                        onSaved={handleUserSaved}
+                    />
+                )}
+
+                {userToToggle && (
+                    <UserStatusConfirmModal
+                        user={userToToggle}
+                        processing={togglingStatus}
+                        onCancel={handleToggleCancel}
+                        onConfirm={() => void confirmToggleStatus()}
+                    />
                 )}
 
                 <Breadcrumb
@@ -152,7 +199,6 @@ const UserTable = () => {
                     ]}
                 />
 
-                {/* Header */}
                 <div className='header-section'>
                     <div className='title-section'>
                         <h2 className='main-title'>Gestión de Usuarios</h2>
@@ -162,9 +208,7 @@ const UserTable = () => {
                     </div>
                 </div>
 
-                {/* Card contenedor */}
                 <div className='main-card'>
-                    {/* Barra de búsqueda con botón */}
                     <div className='search-section'>
                         <div className='search-box-wrapper'>
                             <svg
@@ -229,7 +273,6 @@ const UserTable = () => {
                         </div>
                     )}
 
-                    {/* Tabla */}
                     <div className='table-container'>
                         {paginatedUsers.length === 0 ? (
                             <div className='empty-state'>
@@ -361,9 +404,8 @@ const UserTable = () => {
                                                                 : 'Activar usuario'
                                                         }
                                                         onClick={() =>
-                                                            toggleStatus(
-                                                                user.id_usuario,
-                                                                user.estado,
+                                                            requestToggleStatus(
+                                                                user,
                                                             )
                                                         }
                                                     >
@@ -409,7 +451,6 @@ const UserTable = () => {
                         )}
                     </div>
 
-                    {/* Paginación */}
                     {filteredUsers.length > 0 && totalPages > 1 && (
                         <div className='pagination-section'>
                             <div className='pagination-info'>

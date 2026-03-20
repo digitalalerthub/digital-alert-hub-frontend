@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import usersService from '../../services/users';
 import rolesService, { type Rol } from '../../services/rolesService';
 import './UserModal.css';
@@ -12,9 +14,10 @@ import type {
 interface Props {
     user: User | null;
     onClose: () => void;
+    onSaved: () => void;
 }
 
-const UserModal = ({ user, onClose }: Props) => {
+const UserModal = ({ user, onClose, onSaved }: Props) => {
     const isEditing = Boolean(user);
 
     const [form, setForm] = useState({
@@ -101,6 +104,7 @@ const UserModal = ({ user, onClose }: Props) => {
                 };
 
                 await usersService.update(user!.id_usuario, payload);
+                toast.success('Usuario actualizado correctamente');
             } else {
                 const payload: CreateUserPayload = {
                     nombre: form.nombre,
@@ -112,12 +116,21 @@ const UserModal = ({ user, onClose }: Props) => {
                 };
 
                 await usersService.create(payload);
+                toast.success('Usuario creado correctamente');
             }
 
-            onClose();
-        } catch (err) {
-            console.error(err);
-            alert('Error guardando el usuario');
+            onSaved();
+        } catch (error: unknown) {
+            console.error(error);
+
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'No se pudo guardar el usuario',
+                );
+            } else {
+                toast.error('Error inesperado al guardar el usuario');
+            }
         } finally {
             setSaving(false);
         }

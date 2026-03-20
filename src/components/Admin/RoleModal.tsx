@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import rolesService, { type Rol } from '../../services/rolesService';
 import './RoleModal.css';
 
 interface Props {
     role: Rol | null;
     onClose: () => void;
+    onSaved: () => void;
 }
 
-const RoleModal = ({ role, onClose }: Props) => {
+const RoleModal = ({ role, onClose, onSaved }: Props) => {
     const isEditing = Boolean(role);
 
     const [nombreRol, setNombreRol] = useState('');
@@ -41,14 +44,24 @@ const RoleModal = ({ role, onClose }: Props) => {
         try {
             if (isEditing) {
                 await rolesService.update(role!.id_rol, { nombre_rol: nombreRol });
+                toast.success('Rol actualizado correctamente');
             } else {
                 await rolesService.create({ nombre_rol: nombreRol });
+                toast.success('Rol creado correctamente');
             }
 
-            onClose();
-        } catch (err) {
-            console.error(err);
-            alert('Error guardando el rol');
+            onSaved();
+        } catch (error: unknown) {
+            console.error(error);
+
+            if (axios.isAxiosError(error)) {
+                toast.error(
+                    error.response?.data?.message ||
+                        'No se pudo guardar el rol',
+                );
+            } else {
+                toast.error('Error inesperado al guardar el rol');
+            }
         } finally {
             setSaving(false);
         }
@@ -126,7 +139,7 @@ const RoleModal = ({ role, onClose }: Props) => {
                                     Guardando...
                                 </>
                             ) : (
-                                <>\uD83D\uDCBE Guardar</>
+                                <>{'\uD83D\uDCBE Guardar'}</>
                             )}
                         </button>
                     </div>
