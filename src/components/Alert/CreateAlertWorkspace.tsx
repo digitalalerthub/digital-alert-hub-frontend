@@ -129,19 +129,23 @@ const CreateAlertWorkspace = () => {
     const confirmDeleteAlert = async () => {
         if (!pendingDeleteAlert || deletingAlertId !== null) return;
 
+        const alertToDelete = pendingDeleteAlert;
+
         try {
-            setDeletingAlertId(pendingDeleteAlert.id_alerta);
-            await handleDeleteAlert(pendingDeleteAlert.id_alerta);
+            setDeletingAlertId(alertToDelete.id_alerta);
+            await handleDeleteAlert(alertToDelete.id_alerta, {
+                onSuccess: () => {
+                    if (selectedAlert?.id_alerta === alertToDelete.id_alerta) {
+                        setSelectedAlert(null);
+                    }
 
-            if (selectedAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
-                setSelectedAlert(null);
-            }
+                    if (editingAlert?.id_alerta === alertToDelete.id_alerta) {
+                        setEditingAlert(null);
+                    }
 
-            if (editingAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
-                setEditingAlert(null);
-            }
-
-            setPendingDeleteAlert(null);
+                    setPendingDeleteAlert(null);
+                },
+            });
         } finally {
             setDeletingAlertId(null);
         }
