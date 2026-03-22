@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { updateProfile } from '../../services/profileService';
 import { toast } from 'react-toastify';
+import { updateProfile } from '../../services/profileService';
 import type { User } from '../../types/User';
 
 interface Props {
@@ -9,6 +9,9 @@ interface Props {
     onSave: (data: User) => void;
     onCancel: () => void;
 }
+
+const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{2,100}$/;
+const PHONE_REGEX = /^\d{7,15}$/;
 
 export default function EditProfileForm({ user, onSave, onCancel }: Props) {
     const navigate = useNavigate();
@@ -19,15 +22,60 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
     });
     const [isLoading, setIsLoading] = useState(false);
 
+    const validateForm = (): string | null => {
+        const nombre = formData.nombre.trim();
+        const apellido = formData.apellido.trim();
+        const telefono = formData.telefono.trim();
+
+        if (!nombre || !apellido) {
+            return 'Nombre y apellido son requeridos.';
+        }
+
+        if (!NAME_REGEX.test(nombre)) {
+            return 'El nombre solo puede contener letras, espacios, apostrofes o guiones, y debe tener al menos 2 caracteres.';
+        }
+
+        if (!NAME_REGEX.test(apellido)) {
+            return 'El apellido solo puede contener letras, espacios, apostrofes o guiones, y debe tener al menos 2 caracteres.';
+        }
+
+        if (telefono && !PHONE_REGEX.test(telefono)) {
+            return 'El telefono debe tener solo numeros y entre 7 y 15 digitos.';
+        }
+
+        return null;
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+
+        if (name === 'telefono') {
+            setFormData({
+                ...formData,
+                telefono: value.replace(/\D/g, '').slice(0, 15),
+            });
+            return;
+        }
+
+        setFormData({ ...formData, [name]: value });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        const validationError = validateForm();
+        if (validationError) {
+            toast.error(validationError);
+            return;
+        }
+
         try {
             setIsLoading(true);
-            const updatedUser = await updateProfile(formData);
+            const updatedUser = await updateProfile({
+                nombre: formData.nombre.trim(),
+                apellido: formData.apellido.trim(),
+                telefono: formData.telefono.trim(),
+            });
             toast.success('Perfil actualizado correctamente');
             onSave(updatedUser);
         } catch (error) {
@@ -50,7 +98,6 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                 className='card shadow p-4 bg-light bg-opacity-76'
                 style={{ width: '370px', borderRadius: '16px' }}
             >
-                {/* Avatar y título */}
                 <div className='text-center mb-3'>
                     <div
                         className='rounded-circle d-inline-flex align-items-center justify-content-center mb-2'
@@ -69,12 +116,11 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                         className='text-muted mb-0'
                         style={{ fontSize: '0.8rem' }}
                     >
-                        Actualiza tu información personal
+                        Actualiza tu informacion personal
                     </p>
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    {/* Nombre */}
                     <div className='mb-3'>
                         <label className='form-label small mb-1'>Nombres</label>
                         <div className='input-group'>
@@ -86,13 +132,14 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                                 name='nombre'
                                 value={formData.nombre}
                                 onChange={handleChange}
+                                minLength={2}
+                                maxLength={100}
                                 required
                                 className='form-control'
                             />
                         </div>
                     </div>
 
-                    {/* Apellido */}
                     <div className='mb-3'>
                         <label className='form-label small mb-1'>
                             Apellidos
@@ -106,16 +153,17 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                                 name='apellido'
                                 value={formData.apellido}
                                 onChange={handleChange}
+                                minLength={2}
+                                maxLength={100}
                                 required
                                 className='form-control'
                             />
                         </div>
                     </div>
 
-                    {/* Email */}
                     <div className='mb-3'>
                         <label className='form-label small mb-1'>
-                            Correo electrónico - No Modificable
+                            Correo electronico - No modificable
                         </label>
                         <div className='input-group'>
                             <span className='input-group-text'>
@@ -130,10 +178,9 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                         </div>
                     </div>
 
-                    {/* Teléfono */}
                     <div className='mb-4'>
                         <label className='form-label small mb-1'>
-                            Teléfono
+                            Telefono
                         </label>
                         <div className='input-group'>
                             <span className='input-group-text'>
@@ -146,11 +193,14 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                                 onChange={handleChange}
                                 className='form-control'
                                 placeholder='Opcional'
+                                inputMode='numeric'
+                                pattern='\d{7,15}'
+                                minLength={7}
+                                maxLength={15}
                             />
                         </div>
                     </div>
 
-                    {/* Botones */}
                     <div className='d-flex justify-content-center gap-2 mb-3'>
                         <button
                             type='submit'
@@ -177,7 +227,7 @@ export default function EditProfileForm({ user, onSave, onCancel }: Props) {
                             }
                             className='btn btn-success btn-sm'
                         >
-                            Cambiar contraseña
+                            Cambiar contrasena
                         </button>
                     </div>
                 </form>

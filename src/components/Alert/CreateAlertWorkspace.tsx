@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
-import 'leaflet/dist/leaflet.css';
 import type { Alert } from '../../types/Alert';
 import AlertDeleteConfirmModal from './AlertDeleteConfirmModal';
 import AlertDetailModal from './AlertDetailModal';
@@ -60,6 +59,7 @@ const CreateAlertWorkspace = () => {
         autoSelectAdministrativeLocation,
         loadingLocations,
         evidencias,
+        fieldErrors,
         submitting,
         handleEvidenceChange,
         handleEvidenceDrop,
@@ -129,19 +129,23 @@ const CreateAlertWorkspace = () => {
     const confirmDeleteAlert = async () => {
         if (!pendingDeleteAlert || deletingAlertId !== null) return;
 
+        const alertToDelete = pendingDeleteAlert;
+
         try {
-            setDeletingAlertId(pendingDeleteAlert.id_alerta);
-            await handleDeleteAlert(pendingDeleteAlert.id_alerta);
+            setDeletingAlertId(alertToDelete.id_alerta);
+            await handleDeleteAlert(alertToDelete.id_alerta, {
+                onSuccess: () => {
+                    if (selectedAlert?.id_alerta === alertToDelete.id_alerta) {
+                        setSelectedAlert(null);
+                    }
 
-            if (selectedAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
-                setSelectedAlert(null);
-            }
+                    if (editingAlert?.id_alerta === alertToDelete.id_alerta) {
+                        setEditingAlert(null);
+                    }
 
-            if (editingAlert?.id_alerta === pendingDeleteAlert.id_alerta) {
-                setEditingAlert(null);
-            }
-
-            setPendingDeleteAlert(null);
+                    setPendingDeleteAlert(null);
+                },
+            });
         } finally {
             setDeletingAlertId(null);
         }
@@ -200,6 +204,7 @@ const CreateAlertWorkspace = () => {
                         selectedCoords={selectedCoords}
                         submitting={submitting}
                         evidencias={evidencias}
+                        fieldErrors={fieldErrors}
                         onEvidenceChange={handleEvidenceChange}
                         onEvidenceDrop={handleEvidenceDrop}
                     />

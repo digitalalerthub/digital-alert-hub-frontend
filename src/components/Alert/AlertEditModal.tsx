@@ -1,11 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, FormEvent } from "react";
 import { toast } from "react-toastify";
 import locationsService from "../../services/locationsService";
 import type { Alert, UpdateAlertPayload } from "../../types/Alert";
 import type { BarrioOption, ComunaOption } from "../../types/Location";
-import { extractCoordsFromText } from "./createAlertWorkspace.utils";
+import {
+  extractCoordsFromText,
+  reverseGeocode,
+} from "./createAlertWorkspace.utils";
 import { useAlertMap } from "./hooks/useAlertMap";
+import { resolveAdministrativeLocation } from "./locationResolver.utils";
 import "./AlertEditModal.css";
 
 type Props = {
@@ -101,8 +105,10 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
   const [saving, setSaving] = useState(false);
   const categoryOptions = useMemo(() => Array.from(new Set([categoria, ...CATEGORY_OPTIONS])), [categoria]);
   const priorityOptions = useMemo(() => Array.from(new Set([prioridad, ...PRIORITY_OPTIONS])), [prioridad]);
-  const initialCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.id_alerta, alert.ubicacion]);
+  const initialCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.ubicacion]);
   const mapSeededRef = useRef(false);
+  const barriosCacheRef = useRef<Map<number, BarrioOption[]>>(new Map());
+  const autoResolutionRequestRef = useRef(0);
 
   const {
     mapContainerRef,
@@ -116,7 +122,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     handleManualUbicacionChange,
     handleSelectSuggestion,
     verifyAddress,
-    useMyLocation,
+    useMyLocation: triggerMyLocation,
     handleAddressBlur,
     setLocationFromCoords,
   } = useAlertMap({ ubicacion, setUbicacion });
@@ -142,7 +148,19 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     setRemoveAllEvidence(false);
     setEvidencias([]);
     mapSeededRef.current = false;
+    autoResolutionRequestRef.current = 0;
   }, [alert]);
+
+  const getBarriosByComuna = useCallback(async (idComuna: number): Promise<BarrioOption[]> => {
+    const cached = barriosCacheRef.current.get(idComuna);
+    if (cached) {
+      return cached;
+    }
+
+    const data = await locationsService.listBarriosByComuna(idComuna);
+    barriosCacheRef.current.set(idComuna, data);
+    return data;
+  }, []);
 
   useEffect(() => {
     if (isEvidenceOnlyMode) return;
@@ -155,6 +173,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
         const data = await locationsService.listComunas();
         if (cancelled) return;
         setComunas(data);
+        barriosCacheRef.current.clear();
 
         setComunaId((current) => {
           const parsedCurrent = Number(current);
@@ -196,7 +215,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     let cancelled = false;
     const loadBarrios = async () => {
       try {
-        const data = await locationsService.listBarriosByComuna(parsedComuna);
+        const data = await getBarriosByComuna(parsedComuna);
         if (cancelled) return;
         setBarrios(data);
 
@@ -220,7 +239,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     return () => {
       cancelled = true;
     };
-  }, [alert.id_barrio, comunaId, isEvidenceOnlyMode]);
+  }, [alert.id_barrio, comunaId, getBarriosByComuna, isEvidenceOnlyMode]);
 
   useEffect(() => {
     if (isEvidenceOnlyMode || !isMapReady || mapSeededRef.current) return;
@@ -243,6 +262,58 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     isMapReady,
     setLocationFromCoords,
   ]);
+
+  useEffect(() => {
+    if (isEvidenceOnlyMode || !selectedCoords || comunas.length === 0) return;
+
+    let cancelled = false;
+
+    const syncAdministrativeLocation = async () => {
+      const requestId = autoResolutionRequestRef.current + 1;
+      autoResolutionRequestRef.current = requestId;
+
+      const reversePayload = await reverseGeocode(
+        selectedCoords.lat,
+        selectedCoords.lng
+      );
+
+      if (
+        cancelled ||
+        autoResolutionRequestRef.current !== requestId ||
+        !reversePayload
+      ) {
+        return;
+      }
+
+      const currentComuna = Number(comunaId);
+      const resolvedLocation = await resolveAdministrativeLocation({
+        payload: reversePayload,
+        comunas,
+        currentComunaId:
+          Number.isInteger(currentComuna) && currentComuna > 0
+            ? currentComuna
+            : null,
+        getBarriosByComuna,
+      });
+
+      if (
+        cancelled ||
+        autoResolutionRequestRef.current !== requestId ||
+        !resolvedLocation
+      ) {
+        return;
+      }
+
+      setComunaId(String(resolvedLocation.comunaId));
+      setBarrioId(String(resolvedLocation.barrioId));
+    };
+
+    void syncAdministrativeLocation();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [comunaId, comunas, getBarriosByComuna, isEvidenceOnlyMode, selectedCoords]);
 
   const selectEvidence = (files: File[]): boolean => {
     if (!files.length) {
@@ -465,9 +536,9 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
                   {suggestions.map((item) => (
                     <button
                       type="button"
-                      key={`${item.lat}-${item.lon}-${item.display_name}`}
+                      key={`${item.place_id}-${item.display_name}`}
                       className="alert-edit-suggestion-item"
-                      onClick={() => handleSelectSuggestion(item)}
+                      onClick={() => void handleSelectSuggestion(item)}
                     >
                       {item.display_name}
                     </button>
@@ -487,7 +558,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
                 <button
                   type="button"
                   className="alert-edit-location-btn"
-                  onClick={() => void useMyLocation()}
+                  onClick={() => void triggerMyLocation()}
                   disabled={saving || locatingUser}
                 >
                   {locatingUser ? "Ubicando..." : "Usar mi ubicación"}
