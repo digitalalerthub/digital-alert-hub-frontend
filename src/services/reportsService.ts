@@ -9,7 +9,7 @@ const reportsService = {
     if (filters.id_comuna !== undefined) params.id_comuna = filters.id_comuna;
     if (filters.id_barrio !== undefined) params.id_barrio = filters.id_barrio;
     if (filters.year !== undefined) params.year = filters.year;
-    if (filters.month) params.month = filters.month;
+    if (filters.months?.length) params.months = filters.months.join(",");
     if (filters.category) params.category = filters.category;
 
     const { data } = await api.get<AlertReportResponse>("/reports/alerts", {

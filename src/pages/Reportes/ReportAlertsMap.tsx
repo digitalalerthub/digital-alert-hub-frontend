@@ -90,7 +90,7 @@ const alertMatchesFilters = (alert: Alert, filters: ReportFilterState) => {
         return false;
     }
 
-    if (filters.year || filters.month) {
+    if (filters.year || filters.months.length > 0) {
         if (!alert.created_at) {
             return false;
         }
@@ -107,11 +107,11 @@ const alertMatchesFilters = (alert: Alert, filters: ReportFilterState) => {
             return false;
         }
 
-        if (filters.month) {
+        if (filters.months.length > 0) {
             const alertMonth = `${createdAt.getUTCFullYear()}-${String(
                 createdAt.getUTCMonth() + 1,
             ).padStart(2, '0')}`;
-            if (alertMonth !== filters.month) {
+            if (!filters.months.includes(alertMonth)) {
                 return false;
             }
         }

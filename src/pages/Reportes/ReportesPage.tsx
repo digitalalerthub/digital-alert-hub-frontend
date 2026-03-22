@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import {
     Bar,
     BarChart,
@@ -42,47 +42,25 @@ const INITIAL_FILTERS: ReportFilterState = {
     idComuna: '',
     idBarrio: '',
     year: '',
-    month: '',
+    months: [],
     category: '',
 };
 
 const buildMonthOptions = (selectedYear?: string) => {
     const formatter = new Intl.DateTimeFormat('es-CO', {
         month: 'long',
-        year: 'numeric',
         timeZone: 'UTC',
     });
 
-    if (selectedYear) {
-        const numericYear = Number(selectedYear);
-        if (Number.isInteger(numericYear) && numericYear > 0) {
-            return Array.from({ length: 12 }, (_, index) => {
-                const monthNumber = 11 - index;
-                const date = new Date(Date.UTC(numericYear, monthNumber, 1));
-                const value = `${numericYear}-${String(monthNumber + 1).padStart(
-                    2,
-                    '0',
-                )}`;
-
-                return {
-                    value,
-                    label: formatter.format(date),
-                };
-            });
-        }
-    }
-
+    const numericYear = Number(selectedYear || '2026');
     return Array.from({ length: 12 }, (_, index) => {
-        const date = new Date();
-        date.setUTCDate(1);
-        date.setUTCMonth(date.getUTCMonth() - index);
-        const value = `${date.getUTCFullYear()}-${String(
-            date.getUTCMonth() + 1,
-        ).padStart(2, '0')}`;
+        const date = new Date(Date.UTC(numericYear, index, 1));
+        const value = `${numericYear}-${String(index + 1).padStart(2, '0')}`;
+        const label = formatter.format(date);
 
         return {
             value,
-            label: formatter.format(date),
+            label: label.charAt(0).toUpperCase() + label.slice(1),
         };
     });
 };
@@ -104,12 +82,29 @@ const ReportesPage = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const [error, setError] = useState('');
+    const [monthsDropdownOpen, setMonthsDropdownOpen] = useState(false);
+    const monthsDropdownRef = useRef<HTMLDivElement | null>(null);
+    const effectiveYear = filters.year || '2026';
 
-    const monthOptions = buildMonthOptions(filters.year);
-    const yearOptions =
-        report?.catalogos.years.length
-            ? report.catalogos.years
-            : Array.from({ length: 6 }, (_, index) => new Date().getFullYear() - index);
+    const monthOptions = buildMonthOptions(effectiveYear);
+    const selectedMonthLabels = useMemo(
+        () =>
+            monthOptions
+                .filter((month) => filters.months.includes(month.value))
+                .map((month) => month.label),
+        [filters.months, monthOptions],
+    );
+    const monthsTriggerLabel = useMemo(() => {
+        if (selectedMonthLabels.length === 0) {
+            return 'Filtro por Mes';
+        }
+
+        if (selectedMonthLabels.length <= 2) {
+            return selectedMonthLabels.join(', ');
+        }
+
+        return `${selectedMonthLabels.slice(0, 2).join(', ')} +${selectedMonthLabels.length - 2}`;
+    }, [selectedMonthLabels]);
     const categoryOptions = Array.from(
         new Set([
             ...DEFAULT_CATEGORY_OPTIONS,
@@ -166,6 +161,22 @@ const ReportesPage = () => {
     }, [filters.idComuna]);
 
     useEffect(() => {
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (
+                monthsDropdownRef.current &&
+                !monthsDropdownRef.current.contains(event.target as Node)
+            ) {
+                setMonthsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleOutsideClick);
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick);
+        };
+    }, []);
+
+    useEffect(() => {
         let cancelled = false;
 
         const loadReport = async (silent = false) => {
@@ -186,8 +197,8 @@ const ReportesPage = () => {
                     id_barrio: filters.idBarrio
                         ? Number(filters.idBarrio)
                         : undefined,
-                    year: filters.year ? Number(filters.year) : undefined,
-                    month: filters.month || undefined,
+                    year: Number(effectiveYear),
+                    months: filters.months,
                     category: filters.category || undefined,
                 });
 
@@ -223,8 +234,8 @@ const ReportesPage = () => {
         filters.idBarrio,
         filters.idComuna,
         filters.idEstado,
-        filters.month,
-        filters.year,
+        filters.months,
+        effectiveYear,
     ]);
 
     const handleSelectChange =
@@ -241,25 +252,25 @@ const ReportesPage = () => {
                     };
                 }
 
-                if (field === 'year') {
-                    const shouldResetMonth =
-                        current.month &&
-                        nextValue &&
-                        !current.month.startsWith(`${nextValue}-`);
-
-                    return {
-                        ...current,
-                        year: nextValue,
-                        month: shouldResetMonth ? '' : current.month,
-                    };
-                }
-
                 return {
                     ...current,
                     [field]: nextValue,
                 };
             });
         };
+
+    const handleMonthToggle = (monthValue: string) => {
+        setFilters((current) => {
+            const alreadySelected = current.months.includes(monthValue);
+
+            return {
+                ...current,
+                months: alreadySelected
+                    ? current.months.filter((item) => item !== monthValue)
+                    : [...current.months, monthValue].sort(),
+            };
+        });
+    };
 
     const handleResetFilters = () => {
         setFilters(INITIAL_FILTERS);
@@ -347,24 +358,59 @@ const ReportesPage = () => {
                             onChange={handleSelectChange('year')}
                         >
                             <option value=''>Filtro Anual</option>
-                            {yearOptions.map((year) => (
-                                <option key={year} value={year}>
-                                    {year}
-                                </option>
-                            ))}
+                            <option value='2026'>2026</option>
                         </select>
 
-                        <select
-                            value={filters.month}
-                            onChange={handleSelectChange('month')}
+                        <div
+                            className='reportes-multi-select'
+                            ref={monthsDropdownRef}
                         >
-                            <option value=''>Filtro por Mes</option>
-                            {monthOptions.map((month) => (
-                                <option key={month.value} value={month.value}>
-                                    {month.label}
-                                </option>
-                            ))}
-                        </select>
+                            <button
+                                type='button'
+                                className={`reportes-multi-select-trigger ${monthsDropdownOpen ? 'is-open' : ''}`}
+                                onClick={() =>
+                                    setMonthsDropdownOpen((current) => !current)
+                                }
+                            >
+                                <span>{monthsTriggerLabel}</span>
+                            </button>
+
+                            {monthsDropdownOpen && (
+                                <div className='reportes-multi-select-menu'>
+                                    <label className='reportes-multi-select-option'>
+                                        <input
+                                            type='checkbox'
+                                            checked={filters.months.length === 0}
+                                            onChange={() =>
+                                                setFilters((current) => ({
+                                                    ...current,
+                                                    months: [],
+                                                }))
+                                            }
+                                        />
+                                        <span>Todos los meses</span>
+                                    </label>
+
+                                    {monthOptions.map((month) => (
+                                        <label
+                                            key={month.value}
+                                            className='reportes-multi-select-option'
+                                        >
+                                            <input
+                                                type='checkbox'
+                                                checked={filters.months.includes(
+                                                    month.value,
+                                                )}
+                                                onChange={() =>
+                                                    handleMonthToggle(month.value)
+                                                }
+                                            />
+                                            <span>{month.label}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
 
                         <select
                             value={filters.category}
@@ -556,7 +602,7 @@ const ReportesPage = () => {
                         </article>
                     </section>
 
-                    <ReportAlertsMap filters={filters} />
+                    <ReportAlertsMap filters={{ ...filters, year: effectiveYear }} />
                 </div>
             </div>
         </div>

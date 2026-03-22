@@ -3,7 +3,7 @@ export interface ReportFilters {
   id_comuna?: number;
   id_barrio?: number;
   year?: number;
-  month?: string;
+  months?: string[];
   category?: string;
 }
 
@@ -12,7 +12,7 @@ export interface ReportFilterState {
   idComuna: string;
   idBarrio: string;
   year: string;
-  month: string;
+  months: string[];
   category: string;
 }
 
@@ -55,7 +55,7 @@ export interface AlertReportResponse {
     id_comuna: number | null;
     id_barrio: number | null;
     year: number | null;
-    month: string | null;
+    months: string[];
     category: string | null;
   };
   kpis: {
