@@ -17,7 +17,7 @@ export interface CreateAlertPayload {
 
 export interface Alert {
   id_alerta: number;
-  id_usuario: number;
+  id_usuario: number | null;
   nombre_usuario?: string;
   nombre_comuna?: string;
   nombre_barrio?: string;
@@ -33,6 +33,7 @@ export interface Alert {
   evidencia_tipo?: string;
   evidencias?: AlertEvidence[];
   total_reacciones?: number;
+  total_comentarios?: number;
   created_at?: string;
   updated_at?: string;
 }

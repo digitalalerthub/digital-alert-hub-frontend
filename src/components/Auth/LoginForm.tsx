@@ -4,17 +4,14 @@ import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../../App.css";
-import { isRecaptchaEnabled } from "../../config/recaptcha";
+import { getRecaptchaToken, isRecaptchaEnabled } from "../../config/recaptcha";
 import { useAuth } from "../../context/useAuth";
 import api from "../../services/api";
 import GoogleButton from "./GoogleButton";
-import ReCaptchaWidget from "./ReCaptchaWidget";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [contrasena, setPassword] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -29,17 +26,31 @@ const LoginForm = () => {
         "Tu cuenta esta inactiva. Contacta al administrador para reactivarla."
       );
     }
+
+    const lockedUntil = params.get("locked_until");
+    if (lockedUntil) {
+      const lockDate = new Date(lockedUntil);
+      const formattedTime = Number.isNaN(lockDate.getTime())
+        ? "unos minutos"
+        : lockDate.toLocaleTimeString("es-CO", {
+            hour: "2-digit",
+            minute: "2-digit",
+          });
+
+      toast.error(
+        `Cuenta bloqueada temporalmente. Intenta de nuevo despues de las ${formattedTime}.`
+      );
+    }
   }, [location.search]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (isRecaptchaEnabled && !captchaToken) {
-      toast.error("Confirma que no eres un robot.");
-      return;
-    }
-
     try {
+      const captchaToken = isRecaptchaEnabled
+        ? await getRecaptchaToken("login")
+        : null;
+
       const res = await api.post("/auth/login", {
         email,
         contrasena,
@@ -55,11 +66,6 @@ const LoginForm = () => {
         setPassword("");
       } else {
         toast.error("Error desconocido");
-      }
-    } finally {
-      if (isRecaptchaEnabled) {
-        setCaptchaToken(null);
-        setCaptchaResetSignal((current) => current + 1);
       }
     }
   };
@@ -106,21 +112,8 @@ const LoginForm = () => {
             />
           </div>
 
-          {isRecaptchaEnabled ? (
-            <div className="d-flex justify-content-center mb-4">
-              <ReCaptchaWidget
-                onVerify={setCaptchaToken}
-                resetSignal={captchaResetSignal}
-              />
-            </div>
-          ) : null}
-
           <div className="d-flex justify-content-center mb-3">
-            <button
-              type="submit"
-              className="btn btn-primary w-50"
-              disabled={isRecaptchaEnabled && !captchaToken}
-            >
+            <button type="submit" className="btn btn-primary w-50">
               Ingresar
             </button>
           </div>

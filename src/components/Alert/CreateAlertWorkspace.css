@@ -571,6 +571,20 @@
     justify-self: center;
     flex-wrap: wrap;
 }
+
+.create-alert-comments-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.22rem;
+    color: inherit;
+}
+
+.create-alert-comments-count {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #64748b;
+}
+
 .create-alert-item-reactions {
     display: inline-flex;
     align-items: center;
