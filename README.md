@@ -1,32 +1,29 @@
-# Digital Alert Hub - Frontend
+﻿# Digital Alert Hub - Frontend
 
-Plataforma web para gestión y visualización de alertas en tiempo real. Desarrollada con **React**, **TypeScript** y **Vite** con autenticación OAuth 2.0 de Google y arquitectura modular escalable.
+Plataforma web para gestion y visualizacion de alertas en tiempo real. Esta aplicacion esta construida con React, TypeScript y Vite, e integra autenticacion con Google, panel administrativo, gestion de alertas y modulo de reportes.
 
-## 🚀 Características principales
+## Caracteristicas principales
 
-- ✅ Autenticación con Google OAuth 2.0
-- ✅ Gestión de perfil de usuario
-- ✅ Creación y visualización de alertas en tiempo real
-- ✅ Dashboard administrativo con estadísticas`r`n- ✅ Ventana de reportes con filtros y gr�ficas din�micas
-- ✅ Roles y permisos (usuario regular vs administrador)
-- ✅ Recuperación de contraseña
-- ✅ Interfaz responsive con CSS modular
-- ✅ Context API para gestión de estado global
+- Autenticacion con Google OAuth 2.0
+- Gestion de perfil de usuario
+- Creacion, visualizacion y seguimiento de alertas
+- Dashboard administrativo
+- Modulo de reportes con filtros, graficas y mapa
+- Roles y permisos
+- Recuperacion de contrasena
+- Interfaz responsive
+- Manejo de estado global con Context API
 
----
+## Requisitos previos
 
-## 📋 Requisitos Previos
+- Node.js 18 o superior
+- npm
+- Backend ejecutandose en `http://localhost:4000`
+- Credenciales de Google OAuth
 
-- **Node.js** 18+ instalado
-- **npm** o **yarn** como gestor de paquetes
-- **Backend** ejecutándose en `http://localhost:4000`
-- Cuenta de Google para OAuth 2.0
+## Instalacion
 
----
-
-## ⚙️ Instalación y Configuración
-
-### 1. **Clonar el repositorio**
+### 1. Clonar el repositorio
 
 ```bash
 git clone https://github.com/digitalalerthub/digital-alert-hub-frontend.git
@@ -34,211 +31,122 @@ cd digital-alert-hub-frontend
 git checkout dev
 ```
 
-### 2. **Instalar dependencias**
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 3. **Configurar variables de entorno (.env)**
+### 3. Configurar variables de entorno
 
-Crea archivo `.env` en la raiz del proyecto:
+Crea un archivo `.env.local` con una configuracion similar a esta:
 
 ```env
-# Frontend
 VITE_API_URL=http://localhost:4000/api
 VITE_GOOGLE_CLIENT_ID=1234567890-abcdefghijklmnopqrstuvwxyz123456.apps.googleusercontent.com
+VITE_GOOGLE_MAPS_API_KEY=tu_api_key_de_google_maps
+VITE_RECAPTCHA_SITE_KEY=tu_site_key_de_recaptcha
 ```
 
-Obtén el `VITE_GOOGLE_CLIENT_ID` de [Google Cloud Console](https://console.developers.google.com).
+## Scripts disponibles
 
----
+```bash
+npm run dev
+npm run build
+npm run preview
+npm run lint
+```
 
-## 🎯 Dependencias Principales
+## Ejecutar el proyecto
 
-| Dependencia | Versión | Propósito |
-|-------------|---------|-----------|
-| **React** | ^19.2.0 | Biblioteca UI declarativa |
-| **React Router DOM** | ^7.9.5 | Enrutamiento de p�ginas |
-| **TypeScript** | ~5.8.3 | Tipado est�tico |
-| **Axios** | ^1.13.2 | Cliente HTTP para peticiones API |`r`n| **Recharts** | ^3.8.0 | Librer�a de gr�ficas para reportes y dashboards |
-| **@react-oauth/google** | ^0.12.2 | Integraci�n Google OAuth 2.0 |
-| **jwt-decode** | ^4.0.0 | Decodificación de JWT tokens |
-| **Vite** | ^7.1.7 | Bundler y dev server r�pido |
-
-### Dependencias de Desarrollo
-
-| Dependencia | Versión | Propósito |
-|-------------|---------|-----------|
-| **@vitejs/plugin-react** | ^4.3.1 | Plugin React para Vite con HMR |
-| **eslint** | ^9.15.0 | Linter de código |
-| **typescript** | ^5.6.3 | Compilador TypeScript |
-| **@types/react** | ^18.3.12 | Tipos TypeScript para React |
-| **@types/react-dom** | ^18.3.1 | Tipos TypeScript para React DOM |
-
----
-
-## 🏃 Ejecutar el proyecto
-
-### Desarrollo con auto-reload (HMR)
+### Desarrollo
 
 ```bash
 npm run dev
 ```
 
-Accede a `http://localhost:5173`
+La aplicacion quedara disponible en `http://localhost:5173`.
 
-### Compilar para producción
+### Compilar para produccion
 
 ```bash
 npm run build
 ```
 
-### Vista previa de producción
+### Vista previa de produccion
 
 ```bash
 npm run preview
 ```
 
----
+## Stack principal
 
-## 📁 Estructura de Carpetas
+| Dependencia | Version | Uso |
+| --- | --- | --- |
+| react | ^19.2.0 | UI |
+| react-dom | ^19.2.0 | Renderizado |
+| react-router-dom | ^7.9.5 | Ruteo |
+| typescript | ~5.8.3 | Tipado |
+| vite | ^7.1.7 | Build y dev server |
+| axios | ^1.13.2 | Cliente HTTP |
+| recharts | ^3.8.0 | Graficas |
+| @react-oauth/google | ^0.12.2 | Login con Google |
+| react-toastify | ^11.0.5 | Notificaciones |
+| bootstrap | ^5.3.8 | Base visual |
+| bootstrap-icons | ^1.13.1 | Iconografia |
 
-```
+## Estructura del proyecto
+
+```text
 src/
-├── components/           # Componentes reutilizables
-│   ├── About/           # Sección Quiénes Somos
-│   ├── Admin/           # Panel administrativo
-│   ├── Alert/           # Componentes de alertas
-│   ├── Auth/            # Componentes de autenticación
-│   ├── Contact/         # Formulario de contacto
-│   ├── Home/            # Componentes de inicio
-│   ├── Layout/          # Navegación, footer, estructura
-│   ├── Profile/         # Edición de perfil
-│   └── Route/           # Rutas protegidas
-├── context/             # Context API (AuthContext)
-├── hooks/               # Custom hooks (useAuth, useHideOnScroll)
-├── pages/               # Páginas principales
-│   ├── HomePage.tsx
-│   ├── LoginPage.tsx
-│   ├── RegisterPage.tsx
-│   ├── DashboardPage.tsx
-│   ├── CreateAlertPage.tsx
-│   ├── AlertDetailPage.tsx
-│   ├── ProfilePage.tsx
-│   ├── QuienesSomosPage.tsx
-│   ├── ContactoPage.tsx
-│   ├── ForgotPasswordPage.tsx
-│   ├── ResetPasswordPage.tsx
-│   ├── Callback.tsx        # OAuth callback handler
-│   └── NotFoundPage.tsx
-├── services/            # Servicios API (axios)
-│   ├── api.ts           # Configuración base Axios
-│   ├── profileService.ts
-│   ├── rolesService.ts
-│   └── users.ts
-├── config/              # Configuración
-│   └── google.ts        # Config Google OAuth
-├── types/               # Tipos TypeScript
-│   └── User.ts
-├── App.tsx              # Componente raiz
-├── App.css              # Estilos globales
-├── main.tsx             # Punto de entrada
-└── index.css            # Estilos base
-
+  components/   Componentes reutilizables
+  config/       Configuracion de integraciones
+  context/      Contextos globales
+  hooks/        Hooks reutilizables
+  pages/        Pantallas principales
+  services/     Clientes HTTP y servicios
+  types/        Tipos TypeScript
+  App.tsx       Componente raiz
+  main.tsx      Punto de entrada
 ```
 
----
+## Rutas principales
 
-## 🔐 Autenticación
+| Ruta | Descripcion |
+| --- | --- |
+| `/` | Inicio |
+| `/login` | Inicio de sesion |
+| `/register` | Registro |
+| `/callback` | Retorno de OAuth |
+| `/dashboard` | Panel principal |
+| `/profile` | Perfil |
+| `/reportes` | Reportes |
+| `/crear-alertas` | Gestion y creacion de alertas |
 
-### OAuth 2.0 con Google
+## Conexion con backend
 
-1. Usuario hace clic en "Login with Google"
-2. Se abre popup de consent de Google
-3. Backend recibe código y lo intercambia por JWT token
-4. Token se almacena en `localStorage`
-5. `AuthContext` decodifica el JWT y extrae: `id`, `email`, `rol`
-6. Redirecciona a `/dashboard` si es admin (rol === 1) o a `/home` si es usuario regular
+El frontend consume la API del backend mediante `VITE_API_URL`.
 
-### Estructura del JWT Token
+Puntos clave:
 
-```typescript
-{
-  id: number,           // ID del usuario
-  email: string,        // Email del usuario
-  rol: number,          // 1 = Admin, 2 = Usuario normal
-  iat: number,          // Token issued at
-  exp: number           // Token expiration (8 horas)
-}
-```
+- Axios base en `src/services/api.ts`
+- Token JWT enviado en `Authorization: Bearer <token>`
+- Integracion con autenticacion de Google
+- Integracion con Google Maps para mapas y geocodificacion
 
----
+## Notas
 
-## 🛣️ Rutas Principales
+- Para login con Google debes configurar correctamente el `VITE_GOOGLE_CLIENT_ID`.
+- Para mapas y geocodificacion debes configurar `VITE_GOOGLE_MAPS_API_KEY`.
+- El backend debe estar disponible antes de levantar el frontend.
 
-| Ruta | Componente | Protegida | Descripción |
-|------|-----------|-----------|-------------|
-| `/` | HomePage | No | Página de inicio |
-| `/login` | LoginPage | No | Login con OAuth o credenciales |
-| `/register` | RegisterPage | No | Registrar cuenta |
-| `/quienes-somos` | QuienesSomosPage | No | Información del proyecto |
-| `/contacto` | ContactoPage | No | Formulario de contacto |
-| `/callback` | Callback | No | Handler para OAuth redirect |
-| `/dashboard` | DashboardPage | **Sí** | Panel principal (admin + usuarios) |
-| `/create-alert` | CreateAlertPage | **Sí** | Crear nueva alerta |
-| `/alert/:id` | AlertDetailPage | **Sí** | Detalle de alerta |
-| `/profile` | ProfilePage | **Sí** | Editar perfil |
-| `/forgot-password` | ForgotPasswordPage | No | Recuperar contraseña |
-| `/reset-password` | ResetPasswordPage | No | Resetear contraseña |
-| `*` | NotFoundPage | No | Página no encontrada |
+## Contribucion
 
----
-
-## 🔧 Configuración de ESLint
-
-La configuración ESLint está en `eslint.config.js`. Para desarrollo type-aware, consulta la [documentación oficial](https://typescript-eslint.io/).
-
----
-
-## 🔗 Conexión con Backend
-
-El frontend se conecta al backend en `http://localhost:4000` a través de:
-
-- **Base URL**: `VITE_API_URL` en `.env`
-- **Cliente HTTP**: Axios configurado en `src/services/api.ts`
-- **Autenticación**: JWT token en header `Authorization: Bearer <token>`
-- **Endpoints principales**:
-  - `POST /api/auth/google` - Login con Google
-  - `POST /api/auth/register` - Registrar usuario
-  - `POST /api/auth/login` - Login con credenciales
-  - `GET /api/users/profile` - Obtener perfil
-  - `GET /api/alerts` - Listar alertas
-  - `POST /api/alerts` - Crear alerta
-
----
-
-## 📝 Scripts Disponibles
-
-```bash
-npm run dev          # Iniciar servidor de desarrollo
-npm run build        # Compilar para producción
-npm run preview      # Vista previa de build
-npm run lint         # Ejecutar ESLint
-```
-
----
-
-## 🤝 Contribuir
-
-1. Crear rama desde `dev`: `git checkout -b feature/nombre-feature`
+1. Crear una rama desde `dev`
 2. Realizar cambios y commits
-3. Push a la rama: `git push origin feature/nombre-feature`
-4. Crear Pull Request a `dev`
+3. Subir la rama al remoto
+4. Abrir Pull Request hacia `dev`
 
----
+## Licencia
 
-## 📄 Licencia
-
-Proyecto de SENA - Digital Alert Hub 2025
-
+Proyecto academico SENA - Digital Alert Hub.

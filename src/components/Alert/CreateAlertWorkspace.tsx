@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
-import 'leaflet/dist/leaflet.css';
 import type { Alert } from '../../types/Alert';
 import AlertDeleteConfirmModal from './AlertDeleteConfirmModal';
 import AlertDetailModal from './AlertDetailModal';
@@ -60,6 +59,7 @@ const CreateAlertWorkspace = () => {
         autoSelectAdministrativeLocation,
         loadingLocations,
         evidencias,
+        fieldErrors,
         submitting,
         handleEvidenceChange,
         handleEvidenceDrop,
@@ -204,6 +204,7 @@ const CreateAlertWorkspace = () => {
                         selectedCoords={selectedCoords}
                         submitting={submitting}
                         evidencias={evidencias}
+                        fieldErrors={fieldErrors}
                         onEvidenceChange={handleEvidenceChange}
                         onEvidenceDrop={handleEvidenceDrop}
                     />

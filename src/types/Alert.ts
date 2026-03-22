@@ -11,8 +11,8 @@ export interface CreateAlertPayload {
   prioridad?: string;
   id_comuna: number;
   id_barrio: number;
-  ubicacion?: string;
-  evidencias?: File[];
+  ubicacion: string;
+  evidencias: File[];
 }
 
 export interface Alert {

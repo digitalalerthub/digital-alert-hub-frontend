@@ -29,7 +29,7 @@ type Props = {
   onAddressBlur: () => Promise<void> | void;
   suggestionsLoading: boolean;
   suggestions: LocationSuggestion[];
-  onSelectSuggestion: (item: LocationSuggestion) => void;
+  onSelectSuggestion: (item: LocationSuggestion) => Promise<void> | void;
   onVerifyAddress: () => Promise<void> | void;
   onUseMyLocation: () => Promise<void> | void;
   reverseLoading: boolean;
@@ -45,6 +45,12 @@ type Props = {
   selectedCoords: Coords | null;
   submitting: boolean;
   evidencias: File[];
+  fieldErrors: {
+    titulo?: string;
+    descripcion?: string;
+    ubicacion?: string;
+    evidencias?: string;
+  };
   onEvidenceChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onEvidenceDrop: (files: File[]) => void;
 };
@@ -80,6 +86,7 @@ const CreateAlertFormSection = ({
   selectedCoords,
   submitting,
   evidencias,
+  fieldErrors,
   onEvidenceChange,
   onEvidenceDrop,
 }: Props) => {
@@ -101,13 +108,14 @@ const CreateAlertFormSection = ({
         <label className="create-alert-label">{"T\u00EDtulo de la alerta"}</label>
         <input
           type="text"
-          className="form-control create-alert-input"
+          className={`form-control create-alert-input ${fieldErrors.titulo ? "is-invalid create-alert-input-invalid" : ""}`}
           placeholder="Fuga de agua"
           value={titulo}
           onChange={(e) => onTituloChange(e.target.value)}
           maxLength={200}
           required
         />
+        {fieldErrors.titulo && <small className="create-alert-field-error">{fieldErrors.titulo}</small>}
 
         <div className="create-alert-row">
           <div>
@@ -146,25 +154,32 @@ const CreateAlertFormSection = ({
 
         <label className="create-alert-label">{"Descripci\u00F3n del incidente"}</label>
         <textarea
-          className="form-control create-alert-textarea"
+          className={`form-control create-alert-textarea ${fieldErrors.descripcion ? "is-invalid create-alert-input-invalid" : ""}`}
           rows={3}
           placeholder={"Describe los detalles de la situaci\u00F3n..."}
           value={descripcion}
           onChange={(e) => onDescripcionChange(e.target.value)}
           required
         />
+        {fieldErrors.descripcion && (
+          <small className="create-alert-field-error">{fieldErrors.descripcion}</small>
+        )}
 
         <label className="create-alert-label">{"Ubicaci\u00F3n del incidente"}</label>
         <input
           type="text"
-          className="form-control create-alert-input"
+          className={`form-control create-alert-input ${fieldErrors.ubicacion ? "is-invalid create-alert-input-invalid" : ""}`}
           value={ubicacion}
           onChange={(e) => onUbicacionChange(e.target.value)}
           onBlur={onAddressBlur}
           maxLength={255}
           placeholder={"Direcci\u00F3n de la alerta"}
           disabled={submitting}
+          required
         />
+        {fieldErrors.ubicacion && (
+          <small className="create-alert-field-error">{fieldErrors.ubicacion}</small>
+        )}
 
         {(suggestionsLoading || reverseLoading) && (
           <small className="text-muted">
@@ -177,9 +192,9 @@ const CreateAlertFormSection = ({
             {suggestions.map((item) => (
               <button
                 type="button"
-                key={`${item.lat}-${item.lon}-${item.display_name}`}
+                key={`${item.place_id}-${item.display_name}`}
                 className="create-alert-suggestion-item"
-                onClick={() => onSelectSuggestion(item)}
+                onClick={() => void onSelectSuggestion(item)}
               >
                 {item.display_name}
               </button>
@@ -255,7 +270,7 @@ const CreateAlertFormSection = ({
         <div className="create-alert-dropzone-wrap">
             <label
               htmlFor="alert-evidence"
-              className={`create-alert-dropzone ${evidencias.length > 0 ? "has-file" : ""}`}
+              className={`create-alert-dropzone ${evidencias.length > 0 ? "has-file" : ""} ${fieldErrors.evidencias ? "is-invalid" : ""}`}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
@@ -277,6 +292,9 @@ const CreateAlertFormSection = ({
               disabled={submitting}
             />
         </div>
+        {fieldErrors.evidencias && (
+          <small className="create-alert-field-error">{fieldErrors.evidencias}</small>
+        )}
 
         <button type="submit" className="btn btn-dark create-alert-submit" disabled={submitting}>
           {submitting ? "Publicando..." : "Publicar Alerta"}

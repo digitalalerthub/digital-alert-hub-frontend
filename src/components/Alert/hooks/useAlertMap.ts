@@ -1,14 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
-import L from "leaflet";
-import geoService from "../../../services/geoService";
 import type { Alert } from "../../../types/Alert";
+import {
+  getGoogleMapsApi,
+  type GoogleInfoWindow,
+  type GoogleMap,
+  type GoogleMapMouseEvent,
+  type GoogleMarker,
+} from "../../../config/googleMaps";
 import {
   MAP_SELECTION_TEXT,
   extractCoordsFromText,
   formatReadableAddress,
   geocodeAddress,
+  geocodeAddressDetailed,
+  geocodePlaceSuggestion,
+  getAddressSuggestions,
   getCurrentPosition,
+  reverseGeocode,
 } from "../createAlertWorkspace.utils";
 import type { Coords, LocationSuggestion } from "../createAlertWorkspace.utils";
 
@@ -38,7 +47,9 @@ const buildColombiaAddressAttempts = (query: string): string[] => {
     attempts.push(`Carrera ${cra} con Calle ${cl}`);
   }
 
-  const calleMatch = clean.match(/(?:^|\s)(?:calle|cl)\s*([0-9]+[a-z]?)\s*#\s*([0-9]+[a-z]?)/i);
+  const calleMatch = clean.match(
+    /(?:^|\s)(?:calle|cl)\s*([0-9]+[a-z]?)\s*#\s*([0-9]+[a-z]?)/i
+  );
   if (calleMatch) {
     const cl = calleMatch[1].toUpperCase();
     const cra = calleMatch[2].toUpperCase();
@@ -47,8 +58,8 @@ const buildColombiaAddressAttempts = (query: string): string[] => {
 
   const withCityHints = attempts.flatMap((item) => [
     item,
-    `${item}, Medell\u00EDn, Antioquia, Colombia`,
-    `${item}, Medell\u00EDn, Colombia`,
+    `${item}, Medellín, Antioquia, Colombia`,
+    `${item}, Medellín, Colombia`,
   ]);
 
   return Array.from(new Set(withCityHints));
@@ -65,30 +76,42 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
 
   const suggestionsCacheRef = useRef<Map<string, LocationSuggestion[]>>(new Map());
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<L.Map | null>(null);
-  const markerRef = useRef<L.Marker | null>(null);
-  const activeLayerRef = useRef<L.LayerGroup | null>(null);
+  const mapRef = useRef<GoogleMap | null>(null);
+  const markerRef = useRef<GoogleMarker | null>(null);
+  const activeMarkersRef = useRef<GoogleMarker[]>([]);
+  const infoWindowRef = useRef<GoogleInfoWindow | null>(null);
 
   const setSelectedMarker = useCallback((lat: number, lng: number) => {
     if (!mapRef.current) return;
 
+    const maps = window.google?.maps;
+    if (!maps) return;
+
     if (!markerRef.current) {
-      markerRef.current = L.marker([lat, lng]).addTo(mapRef.current);
+      markerRef.current = new maps.Marker({
+        map: mapRef.current,
+        position: { lat, lng },
+      });
     } else {
-      markerRef.current.setLatLng([lat, lng]);
+      markerRef.current.setPosition({ lat, lng });
     }
 
-    mapRef.current.setView([lat, lng], 16);
+    mapRef.current.panTo({ lat, lng });
+    mapRef.current.setZoom(16);
   }, []);
 
   const renderActiveAlertsOnMap = useCallback(async (data: Alert[]) => {
     if (!mapRef.current) return;
 
-    if (!activeLayerRef.current) {
-      activeLayerRef.current = L.layerGroup().addTo(mapRef.current);
-    }
+    const maps = window.google?.maps;
+    if (!maps) return;
 
-    activeLayerRef.current.clearLayers();
+    activeMarkersRef.current.forEach((marker) => marker.setMap(null));
+    activeMarkersRef.current = [];
+
+    if (!infoWindowRef.current) {
+      infoWindowRef.current = new maps.InfoWindow();
+    }
 
     const activeAlerts = data
       .filter((a) => a.id_estado === 1 && a.ubicacion && a.ubicacion.trim().length > 0)
@@ -103,21 +126,35 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
 
       if (!coords) continue;
 
-      const marker = L.circleMarker([coords.lat, coords.lng], {
-        radius: 6,
-        color: "#7f1d1d",
-        fillColor: "#dc2626",
-        fillOpacity: 0.9,
-        weight: 1,
+      const marker = new maps.Marker({
+        map: mapRef.current,
+        position: coords,
+        title: alert.titulo,
+        icon: {
+          path: maps.SymbolPath.CIRCLE,
+          scale: 6,
+          fillColor: "#dc2626",
+          fillOpacity: 0.95,
+          strokeColor: "#7f1d1d",
+          strokeWeight: 1,
+        },
       });
 
-      marker.bindPopup(
-        `<strong>${alert.titulo}</strong><br/>${alert.categoria}${
-          alert.prioridad ? ` - ${alert.prioridad}` : ""
-        }`
-      );
+      marker.addListener("click", () => {
+        if (!mapRef.current) return;
 
-      marker.addTo(activeLayerRef.current);
+        infoWindowRef.current?.setContent(
+          `<strong>${alert.titulo}</strong><br/>${alert.categoria}${
+            alert.prioridad ? ` - ${alert.prioridad}` : ""
+          }`
+        );
+        infoWindowRef.current?.open({
+          anchor: marker,
+          map: mapRef.current,
+        });
+      });
+
+      activeMarkersRef.current.push(marker);
     }
   }, []);
 
@@ -128,7 +165,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
 
       try {
         setReverseLoading(true);
-        const data = await geoService.reverse(lat, lng);
+        const data = await reverseGeocode(lat, lng);
         const readable = formatReadableAddress(data);
 
         if (readable) {
@@ -137,10 +174,16 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
         } else {
           setUbicacion(MAP_SELECTION_TEXT);
           setForceCoordsOnSubmit(true);
+          toast.info(
+            "Google Maps no devolvió una dirección legible para ese punto. Revisa Geocoding API, restricciones del dominio y reinicia el frontend si acabas de cambiar la key."
+          );
         }
       } catch {
         setUbicacion(MAP_SELECTION_TEXT);
         setForceCoordsOnSubmit(true);
+        toast.warning(
+          "No se pudo consultar la dirección en Google Maps. Verifica la API key, Geocoding API y que el dominio actual esté permitido."
+        );
       } finally {
         setReverseLoading(false);
       }
@@ -149,38 +192,71 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
   );
 
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    let cancelled = false;
 
-    const medellin: Coords = { lat: 6.2442, lng: -75.5812 };
-    mapRef.current = L.map(mapContainerRef.current).setView([medellin.lat, medellin.lng], 13);
-    setIsMapReady(true);
+    const initializeMap = async () => {
+      if (!mapContainerRef.current || mapRef.current) return;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap",
-    }).addTo(mapRef.current);
+      const medellin: Coords = { lat: 6.2442, lng: -75.5812 };
 
-    mapRef.current.on("click", async (e: L.LeafletMouseEvent) => {
-      const lat = Number(e.latlng.lat.toFixed(6));
-      const lng = Number(e.latlng.lng.toFixed(6));
-      await setLocationFromCoords(lat, lng);
-    });
-
-    (async () => {
       try {
-        const position = await getCurrentPosition();
-        const lat = Number(position.coords.latitude.toFixed(6));
-        const lng = Number(position.coords.longitude.toFixed(6));
-        mapRef.current?.setView([lat, lng], 15);
+        const maps = await getGoogleMapsApi();
+        if (cancelled || !mapContainerRef.current) return;
+
+        mapRef.current = new maps.Map(mapContainerRef.current, {
+          center: medellin,
+          zoom: 13,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+
+        mapRef.current.addListener("click", async (event: GoogleMapMouseEvent) => {
+          const clickedLat = event?.latLng?.lat?.();
+          const clickedLng = event?.latLng?.lng?.();
+          if (
+            typeof clickedLat !== "number" ||
+            typeof clickedLng !== "number" ||
+            !Number.isFinite(clickedLat) ||
+            !Number.isFinite(clickedLng)
+          ) {
+            return;
+          }
+
+          const lat = Number(clickedLat.toFixed(6));
+          const lng = Number(clickedLng.toFixed(6));
+          await setLocationFromCoords(lat, lng);
+        });
+
+        setIsMapReady(true);
+
+        try {
+          const position = await getCurrentPosition();
+          if (cancelled || !mapRef.current) return;
+
+          const lat = Number(position.coords.latitude.toFixed(6));
+          const lng = Number(position.coords.longitude.toFixed(6));
+          mapRef.current.setCenter({ lat, lng });
+          mapRef.current.setZoom(15);
+        } catch {
+          mapRef.current?.setCenter(medellin);
+          mapRef.current?.setZoom(13);
+        }
       } catch {
-        mapRef.current?.setView([medellin.lat, medellin.lng], 13);
+        setIsMapReady(false);
       }
-    })();
+    };
+
+    void initializeMap();
 
     return () => {
-      mapRef.current?.remove();
-      mapRef.current = null;
+      cancelled = true;
+      markerRef.current?.setMap?.(null);
+      activeMarkersRef.current.forEach((marker) => marker.setMap(null));
+      activeMarkersRef.current = [];
+      infoWindowRef.current?.close?.();
       markerRef.current = null;
-      activeLayerRef.current = null;
+      mapRef.current = null;
       setIsMapReady(false);
     };
   }, [setLocationFromCoords]);
@@ -188,7 +264,9 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
   useEffect(() => {
     const query = ubicacion.trim();
 
-    const isMapSelectionText = query.toLowerCase().startsWith(MAP_SELECTION_TEXT.toLowerCase());
+    const isMapSelectionText = query
+      .toLowerCase()
+      .startsWith(MAP_SELECTION_TEXT.toLowerCase());
     const hasLetters = /[a-zA-Z]/.test(query);
 
     if (query.length < 5 || isMapSelectionText || !hasLetters) {
@@ -208,7 +286,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
     const timeout = setTimeout(async () => {
       try {
         setSuggestionsLoading(true);
-        const data = await geoService.search(query, 5, true);
+        const data = await getAddressSuggestions(query, 5);
         suggestionsCacheRef.current.set(cacheKey, data || []);
         setSuggestions(data || []);
       } catch {
@@ -216,7 +294,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
       } finally {
         setSuggestionsLoading(false);
       }
-    }, 900);
+    }, 500);
 
     return () => clearTimeout(timeout);
   }, [ubicacion]);
@@ -231,15 +309,25 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
   );
 
   const handleSelectSuggestion = useCallback(
-    (item: LocationSuggestion) => {
-      const lat = Number(item.lat);
-      const lng = Number(item.lon);
+    async (item: LocationSuggestion) => {
+      const result = await geocodePlaceSuggestion(item.place_id);
+      if (!result) {
+        toast.warning("No se pudo ubicar esa dirección en Google Maps");
+        return;
+      }
 
-      setUbicacion(item.display_name);
+      const { coords, data } = result;
+
+      setUbicacion(formatReadableAddress(data) || item.display_name);
       setForceCoordsOnSubmit(false);
-      setSelectedCoords({ lat, lng });
+      setSelectedCoords(coords);
       setSuggestions([]);
-      setSelectedMarker(lat, lng);
+      setSelectedMarker(coords.lat, coords.lng);
+      if (!formatReadableAddress(data)) {
+        toast.info(
+          "Se ubicó el punto, pero Google no devolvió una dirección detallada. Revisa restricciones de la key."
+        );
+      }
     },
     [setSelectedMarker, setUbicacion]
   );
@@ -248,38 +336,55 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
     const query = ubicacion.trim();
 
     if (!query) {
-      toast.info("Escribe una direcci\u00F3n para verificarla");
+      toast.info("Escribe una dirección para verificarla");
       return;
     }
 
     try {
       const attempts = buildColombiaAddressAttempts(query);
-      let coords = null;
+      let coords: Coords | null = null;
+      let formattedAddress = "";
 
       for (const item of attempts) {
-        coords = await geocodeAddress(item, true);
-        if (coords) break;
+        const result = await geocodeAddressDetailed(item, true);
+        if (!result) continue;
+
+        coords = result.coords;
+        formattedAddress = formatReadableAddress(result.data) || item;
+        break;
       }
+
       if (!coords) {
         for (const item of attempts) {
-          coords = await geocodeAddress(item, false);
-          if (coords) break;
+          const result = await geocodeAddressDetailed(item, false);
+          if (!result) continue;
+
+          coords = result.coords;
+          formattedAddress = formatReadableAddress(result.data) || item;
+          break;
         }
       }
 
       if (!coords) {
-        toast.warning("No encontramos esa direcci\u00F3n, pero puedes registrar la alerta igual");
+        toast.warning(
+          "No encontramos esa dirección, pero puedes registrar la alerta igual"
+        );
         return;
       }
 
       setSelectedCoords(coords);
       setSelectedMarker(coords.lat, coords.lng);
+      if (formattedAddress) {
+        setUbicacion(formattedAddress);
+      }
       setForceCoordsOnSubmit(false);
-      toast.success("Direcci\u00F3n ubicada en el mapa");
+      toast.success("Dirección ubicada en el mapa");
     } catch {
-      toast.warning("No se pudo verificar la direcci\u00F3n, puedes continuar de todos modos");
+      toast.warning(
+        "No se pudo verificar la dirección, puedes continuar de todos modos"
+      );
     }
-  }, [setSelectedMarker, ubicacion]);
+  }, [setSelectedMarker, setUbicacion, ubicacion]);
 
   const useMyLocation = useCallback(async () => {
     try {
@@ -288,9 +393,9 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
       const lat = Number(position.coords.latitude.toFixed(6));
       const lng = Number(position.coords.longitude.toFixed(6));
       await setLocationFromCoords(lat, lng);
-      toast.success("Ubicaci\u00F3n actual detectada");
+      toast.success("Ubicación actual detectada");
     } catch {
-      toast.warning("No se pudo obtener tu ubicaci\u00F3n actual");
+      toast.warning("No se pudo obtener tu ubicación actual");
     } finally {
       setLocatingUser(false);
     }
@@ -301,21 +406,22 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
 
     const attempts = buildColombiaAddressAttempts(ubicacion);
     for (const item of attempts) {
-      const coords = await geocodeAddress(item, true);
-      if (!coords) continue;
+      const result = await geocodeAddressDetailed(item, true);
+      if (!result) continue;
 
-      setSelectedCoords(coords);
-      setSelectedMarker(coords.lat, coords.lng);
+      setSelectedCoords(result.coords);
+      setSelectedMarker(result.coords.lat, result.coords.lng);
+      setUbicacion(formatReadableAddress(result.data) || ubicacion);
       setForceCoordsOnSubmit(false);
       return;
     }
-  }, [setSelectedMarker, ubicacion]);
+  }, [setSelectedMarker, setUbicacion, ubicacion]);
 
   const clearLocationSelection = useCallback(() => {
     setForceCoordsOnSubmit(false);
     setSelectedCoords(null);
     setSuggestions([]);
-    markerRef.current?.remove();
+    markerRef.current?.setMap?.(null);
     markerRef.current = null;
   }, []);
 

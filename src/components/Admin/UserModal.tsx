@@ -38,8 +38,8 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
             try {
                 const data = await rolesService.getAll();
                 setRoles(data);
-            } catch (err) {
-                console.error('Error cargando roles', err);
+            } catch {
+                toast.error('No se pudieron cargar los roles');
             }
         };
 
@@ -121,8 +121,6 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
 
             onSaved();
         } catch (error: unknown) {
-            console.error(error);
-
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||
