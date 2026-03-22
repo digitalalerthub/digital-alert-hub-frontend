@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, MouseEvent } from "react";
 import axios from "axios";
-import L from "leaflet";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import type { Alert, AlertEvidence } from "../../types/Alert";
@@ -10,6 +9,11 @@ import type { AlertReactionSummary } from "../../types/Reaction";
 import commentsService from "../../services/commentsService";
 import type { AlertComment } from "../../types/Comment";
 import { useAuth } from "../../context/useAuth";
+import {
+  getGoogleMapsApi,
+  type GoogleMap,
+  type GoogleMarker,
+} from "../../config/googleMaps";
 import "./AlertDetailModal.css";
 
 type Props = {
@@ -93,7 +97,8 @@ const AlertDetailModal = ({
   const navigate = useNavigate();
   const location = useLocation();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<GoogleMap | null>(null);
+  const markerRef = useRef<GoogleMarker | null>(null);
   const [reactions, setReactions] = useState<AlertReactionSummary[]>([]);
   const [loadingReactions, setLoadingReactions] = useState(false);
   const [pendingReactionId, setPendingReactionId] = useState<number | null>(null);
@@ -164,30 +169,43 @@ const AlertDetailModal = ({
   }, []);
 
   useEffect(() => {
-    if (!mapContainerRef.current || mapRef.current) return;
+    let cancelled = false;
 
-    const fallback: Coords = { lat: 6.2442, lng: -75.5812 };
-    const center = mapCoords || fallback;
+    const loadMap = async () => {
+      if (!mapContainerRef.current || mapRef.current) return;
 
-    mapRef.current = L.map(mapContainerRef.current, {
-      zoomControl: false,
-      attributionControl: false,
-    }).setView([center.lat, center.lng], mapCoords ? 16 : 12);
+      const fallback: Coords = { lat: 6.2442, lng: -75.5812 };
+      const center = mapCoords || fallback;
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(mapRef.current);
+      try {
+        const maps = await getGoogleMapsApi();
+        if (cancelled || !mapContainerRef.current) return;
 
-    if (mapCoords) {
-      L.circleMarker([mapCoords.lat, mapCoords.lng], {
-        radius: 7,
-        color: "#7f1d1d",
-        fillColor: "#dc2626",
-        fillOpacity: 0.95,
-        weight: 2,
-      }).addTo(mapRef.current);
-    }
+        mapRef.current = new maps.Map(mapContainerRef.current, {
+          center,
+          zoom: mapCoords ? 16 : 12,
+          mapTypeControl: false,
+          streetViewControl: false,
+          fullscreenControl: false,
+        });
+
+        if (mapCoords) {
+          markerRef.current = new maps.Marker({
+            map: mapRef.current,
+            position: mapCoords,
+          });
+        }
+      } catch {
+        mapRef.current = null;
+      }
+    };
+
+    void loadMap();
 
     return () => {
-      mapRef.current?.remove();
+      cancelled = true;
+      markerRef.current?.setMap?.(null);
+      markerRef.current = null;
       mapRef.current = null;
     };
   }, [mapCoords]);

@@ -52,8 +52,6 @@ const RoleModal = ({ role, onClose, onSaved }: Props) => {
 
             onSaved();
         } catch (error: unknown) {
-            console.error(error);
-
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||

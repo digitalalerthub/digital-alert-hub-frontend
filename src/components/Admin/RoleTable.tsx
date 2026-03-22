@@ -23,8 +23,8 @@ const RoleTable = () => {
         try {
             const rolesList = await rolesService.getAll();
             setRoles(rolesList);
-        } catch (error) {
-            console.error('Error cargando roles', error);
+        } catch {
+            toast.error('No se pudieron cargar los roles');
         } finally {
             setLoading(false);
         }
@@ -80,8 +80,6 @@ const RoleTable = () => {
             setRoleToDelete(null);
             void loadData();
         } catch (error: unknown) {
-            console.error(error);
-
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||

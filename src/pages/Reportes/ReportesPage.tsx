@@ -17,6 +17,7 @@ import {
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import locationsService from '../../services/locationsService';
 import reportsService from '../../services/reportsService';
+import ReportAlertsMap from './ReportAlertsMap';
 import type { BarrioOption, ComunaOption } from '../../types/Location';
 import type {
     AlertReportResponse,
@@ -554,6 +555,8 @@ const ReportesPage = () => {
                             </div>
                         </article>
                     </section>
+
+                    <ReportAlertsMap filters={filters} />
                 </div>
             </div>
         </div>

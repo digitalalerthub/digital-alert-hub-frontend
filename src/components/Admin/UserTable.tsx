@@ -39,7 +39,6 @@ const UserTable = () => {
         if (usersResult.status === 'fulfilled') {
             setUsers(usersResult.value);
         } else {
-            console.error('Error cargando usuarios', usersResult.reason);
             setUsers([]);
             setErrorMessage(
                 'No fue posible consultar la API de usuarios. Verifica que el backend esté activo y que tu sesión tenga permisos de administrador.',
@@ -49,7 +48,6 @@ const UserTable = () => {
         if (rolesResult.status === 'fulfilled') {
             setRoles(rolesResult.value);
         } else {
-            console.warn('Error cargando roles', rolesResult.reason);
             setRoles([]);
         }
 
@@ -123,8 +121,6 @@ const UserTable = () => {
             setUserToToggle(null);
             void loadData();
         } catch (error: unknown) {
-            console.error(error);
-
             if (axios.isAxiosError(error)) {
                 toast.error(
                     error.response?.data?.message ||
