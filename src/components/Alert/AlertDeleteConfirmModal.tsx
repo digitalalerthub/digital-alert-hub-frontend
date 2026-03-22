@@ -52,7 +52,7 @@ const AlertDeleteConfirmModal = ({ alert, deleting, onCancel, onConfirm }: Props
             onClick={onConfirm}
             disabled={deleting}
           >
-            {deleting ? "Eliminando..." : "Sí, eliminar"}
+            {deleting ? "Eliminando..." : "S\u00ED, eliminar"}
           </button>
         </div>
       </div>

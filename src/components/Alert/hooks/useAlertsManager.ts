@@ -9,6 +9,10 @@ type UseAlertsManagerArgs = {
   renderActiveAlertsOnMap: (data: Alert[]) => Promise<void>;
 };
 
+type DeleteAlertOptions = {
+  onSuccess?: () => void;
+};
+
 export const useAlertsManager = ({ renderActiveAlertsOnMap }: UseAlertsManagerArgs) => {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [alertsLoading, setAlertsLoading] = useState(false);
@@ -72,11 +76,17 @@ export const useAlertsManager = ({ renderActiveAlertsOnMap }: UseAlertsManagerAr
   );
 
   const handleDeleteAlert = useCallback(
-    async (id: number) => {
+    async (id: number, options?: DeleteAlertOptions) => {
       try {
         await alertsService.delete(id);
-        toast.success("Alerta eliminada");
-        await loadAlerts();
+        const nextAlerts = alerts.filter((alert) => alert.id_alerta !== id);
+        setAlerts(nextAlerts);
+        void renderActiveAlertsOnMap(nextAlerts);
+        options?.onSuccess?.();
+        window.setTimeout(() => {
+          toast.success("Alerta eliminada");
+        }, 0);
+        void loadAlerts();
       } catch (error: unknown) {
         if (axios.isAxiosError(error)) {
           toast.error(error.response?.data?.message || "No se pudo eliminar la alerta");
@@ -86,7 +96,7 @@ export const useAlertsManager = ({ renderActiveAlertsOnMap }: UseAlertsManagerAr
         throw error;
       }
     },
-    [loadAlerts]
+    [alerts, loadAlerts, renderActiveAlertsOnMap]
   );
 
   const onSearchChange = useCallback((value: string) => {

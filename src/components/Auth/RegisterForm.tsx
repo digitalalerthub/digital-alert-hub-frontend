@@ -4,10 +4,14 @@ import axios from "axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "../../App.css";
-import { isRecaptchaEnabled } from "../../config/recaptcha";
+import { getRecaptchaToken, isRecaptchaEnabled } from "../../config/recaptcha";
 import api from "../../services/api";
 import GoogleButton from "./GoogleButton";
-import ReCaptchaWidget from "./ReCaptchaWidget";
+
+const NAME_REGEX = /^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s'-]{2,100}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^\d{7,15}$/;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 const RegisterForm = () => {
   const [nombre, setNombre] = useState("");
@@ -15,8 +19,6 @@ const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [contrasena, setContrasena] = useState("");
   const [telefono, setTelefono] = useState("");
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaResetSignal, setCaptchaResetSignal] = useState(0);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,11 +27,42 @@ const RegisterForm = () => {
     ? `/login?redirect=${encodeURIComponent(redirectTo)}`
     : "/login";
 
+  const validateForm = (): string | null => {
+    const normalizedNombre = nombre.trim();
+    const normalizedApellido = apellido.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+    const normalizedPassword = contrasena.trim();
+    const normalizedPhone = telefono.trim();
+
+    if (!NAME_REGEX.test(normalizedNombre)) {
+      return "El nombre solo puede contener letras, espacios, apostrofes o guiones, y debe tener al menos 2 caracteres.";
+    }
+
+    if (!NAME_REGEX.test(normalizedApellido)) {
+      return "El apellido solo puede contener letras, espacios, apostrofes o guiones, y debe tener al menos 2 caracteres.";
+    }
+
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      return "Ingresa un correo electronico con formato valido.";
+    }
+
+    if (!PHONE_REGEX.test(normalizedPhone)) {
+      return "El telefono debe tener solo numeros y entre 7 y 15 digitos.";
+    }
+
+    if (!PASSWORD_REGEX.test(normalizedPassword)) {
+      return "La contrasena debe tener minimo 8 caracteres e incluir letras y numeros.";
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (isRecaptchaEnabled && !captchaToken) {
-      toast.error("Confirma que no eres un robot.", {
+    const validationError = validateForm();
+    if (validationError) {
+      toast.error(validationError, {
         position: "top-right",
         autoClose: 3000,
       });
@@ -37,12 +70,16 @@ const RegisterForm = () => {
     }
 
     try {
+      const captchaToken = isRecaptchaEnabled
+        ? await getRecaptchaToken("register")
+        : null;
+
       const res = await api.post("/auth/register", {
-        nombre,
-        apellido,
-        email,
-        contrasena,
-        telefono,
+        nombre: nombre.trim(),
+        apellido: apellido.trim(),
+        email: email.trim().toLowerCase(),
+        contrasena: contrasena.trim(),
+        telefono: telefono.trim(),
         captchaToken,
       });
 
@@ -65,11 +102,6 @@ const RegisterForm = () => {
           position: "top-right",
           autoClose: 3000,
         });
-      }
-    } finally {
-      if (isRecaptchaEnabled) {
-        setCaptchaToken(null);
-        setCaptchaResetSignal((current) => current + 1);
       }
     }
   };
@@ -100,6 +132,9 @@ const RegisterForm = () => {
               placeholder="Tu nombre"
               value={nombre}
               onChange={(e) => setNombre(e.target.value)}
+              minLength={2}
+              maxLength={100}
+              autoComplete="given-name"
               required
             />
           </div>
@@ -112,6 +147,9 @@ const RegisterForm = () => {
               placeholder="Tu apellido"
               value={apellido}
               onChange={(e) => setApellido(e.target.value)}
+              minLength={2}
+              maxLength={100}
+              autoComplete="family-name"
               required
             />
           </div>
@@ -121,9 +159,10 @@ const RegisterForm = () => {
             <input
               type="email"
               className="form-control ps-5"
-              placeholder="Correo electrónico"
+              placeholder="Correo electronico"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
             />
           </div>
@@ -133,9 +172,11 @@ const RegisterForm = () => {
             <input
               type="password"
               className="form-control ps-5"
-              placeholder="Contraseña"
+              placeholder="Contrasena"
               value={contrasena}
               onChange={(e) => setContrasena(e.target.value)}
+              minLength={8}
+              autoComplete="new-password"
               required
             />
           </div>
@@ -143,30 +184,24 @@ const RegisterForm = () => {
           <div className="mb-4 position-relative">
             <i className="bi bi-telephone position-absolute top-50 translate-middle-y ms-3 text-secondary" />
             <input
-              type="text"
+              type="tel"
               className="form-control ps-5"
-              placeholder="Número de teléfono"
+              placeholder="Numero de telefono"
               value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              onChange={(e) =>
+                setTelefono(e.target.value.replace(/\D/g, "").slice(0, 15))
+              }
+              inputMode="numeric"
+              pattern="\d{7,15}"
+              minLength={7}
+              maxLength={15}
+              autoComplete="tel"
               required
             />
           </div>
 
-          {isRecaptchaEnabled ? (
-            <div className="d-flex justify-content-center mb-4">
-              <ReCaptchaWidget
-                onVerify={setCaptchaToken}
-                resetSignal={captchaResetSignal}
-              />
-            </div>
-          ) : null}
-
           <div className="d-flex justify-content-center mb-3">
-            <button
-              type="submit"
-              className="btn btn-primary w-50"
-              disabled={isRecaptchaEnabled && !captchaToken}
-            >
+            <button type="submit" className="btn btn-primary w-50">
               Registrarse
             </button>
           </div>
@@ -181,7 +216,7 @@ const RegisterForm = () => {
               to={loginUrl}
               className="text-decoration-none fw-semibold text-primary"
             >
-              Inicia sesión
+              Inicia sesion
             </Link>
           </p>
         </form>

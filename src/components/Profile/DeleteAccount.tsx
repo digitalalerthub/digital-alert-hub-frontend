@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteAccount } from "../../services/profileService";
 import { toast } from "react-toastify";
+import { deleteAccount } from "../../services/profileService";
 
 export default function DeleteAccount() {
   const [showModal, setShowModal] = useState(false);
@@ -14,7 +14,7 @@ export default function DeleteAccount() {
       const res = await deleteAccount();
 
       if (res.success) {
-        toast.success("Cuenta desactivada correctamente", { autoClose: 2000 });
+        toast.success("Cuenta eliminada correctamente", { autoClose: 2000 });
 
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -25,7 +25,7 @@ export default function DeleteAccount() {
         }, 2000);
       }
     } catch {
-      toast.error("Ocurrió un error al desactivar la cuenta");
+      toast.error("Ocurrió un error al eliminar la cuenta");
     } finally {
       setIsLoading(false);
       setShowModal(false);
@@ -34,7 +34,6 @@ export default function DeleteAccount() {
 
   return (
     <>
-      {/* Botón eliminar cuenta */}
       <div className="d-flex justify-content-center mt-3">
         <button
           onClick={() => setShowModal(true)}
@@ -45,17 +44,14 @@ export default function DeleteAccount() {
         </button>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <>
           <div className="modal show d-block" tabIndex={-1}>
             <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content rounded-4 shadow">
-
-                {/* Header */}
                 <div className="modal-header bg-warning-subtle">
                   <h5 className="modal-title d-flex align-items-center gap-2 text-warning">
-                    <i className="bi bi-exclamation-triangle-fill"></i>
+                    <i className="bi bi-exclamation-triangle-fill" />
                     ¿Estás seguro?
                   </h5>
                   <button
@@ -66,25 +62,21 @@ export default function DeleteAccount() {
                   />
                 </div>
 
-                {/* Body */}
                 <div className="modal-body">
                   <p className="fw-semibold mb-2">
-                    Esta acción{" "}
-                    <span className="text-danger">
-                      desactivará tu cuenta de forma permanente
-                    </span>.
+                    Esta acción <span className="text-danger">eliminará tu cuenta de forma permanente</span>.
                   </p>
 
                   <div className="alert alert-warning d-flex gap-2 mb-0">
-                    <i className="bi bi-info-circle-fill mt-1"></i>
+                    <i className="bi bi-info-circle-fill mt-1" />
                     <small>
-                      Tu sesión se cerrará inmediatamente y deberás contactar al
-                      administrador para solicitar la reactivación de tu cuenta.
+                      Tu sesión se cerrará inmediatamente. Podrás registrarte de nuevo cuando lo
+                      desees, pero las alertas que hayas creado quedarán con autor "Cuenta
+                      eliminada".
                     </small>
                   </div>
                 </div>
 
-                {/* Footer */}
                 <div className="modal-footer justify-content-center gap-2">
                   <button
                     type="button"
@@ -104,22 +96,20 @@ export default function DeleteAccount() {
                     {isLoading ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2" />
-                        Desactivando...
+                        Eliminando...
                       </>
                     ) : (
                       <>
                         <i className="bi bi-trash me-1 text-white" />
-                        Sí, desactivar cuenta
+                        Sí, eliminar cuenta
                       </>
                     )}
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
 
-          {/* Backdrop */}
           <div className="modal-backdrop show"></div>
         </>
       )}

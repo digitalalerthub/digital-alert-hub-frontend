@@ -20,6 +20,7 @@ type Props = {
   editLabel?: string;
   onEdit?: () => void;
   onDeleteRequest?: (alert: Alert) => void;
+  topActions?: React.ReactNode;
 };
 
 type Coords = {
@@ -85,7 +86,9 @@ const AlertDetailModal = ({
   editLabel = "Editar",
   onEdit,
   onDeleteRequest,
+  topActions,
 }: Props) => {
+  const hasTopActions = canEdit || canDelete || Boolean(topActions);
   const { user, isAdmin, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -106,8 +109,8 @@ const AlertDetailModal = ({
   const mapCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.ubicacion]);
   const readableLocation = useMemo(() => getReadableLocation(alert.ubicacion), [alert.ubicacion]);
   const creatorName = useMemo(
-    () => alert.nombre_usuario?.trim() || `Usuario #${alert.id_usuario}`,
-    [alert.id_usuario, alert.nombre_usuario]
+    () => alert.nombre_usuario?.trim() || "Cuenta eliminada",
+    [alert.nombre_usuario]
   );
   const status = getStatusMeta(alert.id_estado);
   const priorityText = (alert.prioridad || "Sin prioridad").toUpperCase();
@@ -509,13 +512,13 @@ const AlertDetailModal = ({
         </div>
 
         <section className="alert-detail-comments-section">
-          <div className={`alert-detail-comments-head ${canEdit || canDelete ? "with-actions" : ""}`}>
+          <div className={`alert-detail-comments-head ${hasTopActions ? "with-actions" : ""}`}>
             <article className="alert-detail-comments-pill">
               <i className="bi bi-chat-left-text" aria-hidden="true" />
               <span>Comentarios</span>
             </article>
 
-            {(canEdit || canDelete) && (
+            {hasTopActions && (
               <div className="alert-detail-comments-actions">
                 {canEdit && (
                   <button
@@ -538,6 +541,7 @@ const AlertDetailModal = ({
                     Eliminar
                   </button>
                 )}
+                {topActions}
               </div>
             )}
           </div>

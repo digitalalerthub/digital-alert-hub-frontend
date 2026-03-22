@@ -26,6 +26,7 @@ import ReportesPage from './pages/Reportes/ReportesPage';
 // Componentes
 import NavBar from './components/Layout/NavBar';
 import PrivateRoute from './components/Route/PrivateRoute';
+import PublicRoute from './components/Route/PublicRoute';
 
 // Contexto
 import { AuthProvider } from './context/AuthProvider';
@@ -37,14 +38,16 @@ function App() {
                 <NavBar />
                 <Routes>
                     {/* Rutas Publicas */}
-                    <Route path='/' element={<HomePage />} />
+                    <Route element={<PublicRoute />}>
+                        <Route path='/' element={<HomePage />} />
+                        <Route path='/login' element={<LoginPage />} />
+                        <Route path='/register' element={<RegisterPage />} />
+                    </Route>
                     <Route
                         path='/quienes-somos'
                         element={<QuienesSomosPage />}
                     />
                     <Route path='/contacto' element={<ContactoPage />} />
-                    <Route path='/login' element={<LoginPage />} />
-                    <Route path='/register' element={<RegisterPage />} />
                     <Route path='/alertas/:id' element={<AlertDetailPage />} />
                     <Route
                         path='/forgot-password'

@@ -182,7 +182,7 @@ const AlertListSection = ({
             alert.evidencia_url && !alert.evidencia_tipo?.startsWith("video/")
           );
           const alertReactions = reactionSummaryByAlert[alert.id_alerta] ?? defaultSummary;
-          const creatorName = alert.nombre_usuario?.trim() || `Usuario #${alert.id_usuario}`;
+          const creatorName = alert.nombre_usuario?.trim() || "Cuenta eliminada";
           const isOwnAlert =
             currentUserId !== null && Number(currentUserId) === Number(alert.id_usuario);
           const canDeleteAlert = isAdmin || (isOwnAlert && alert.id_estado === 1);
@@ -260,7 +260,12 @@ const AlertListSection = ({
                     </div>
 
                     <div className="create-alert-item-actions">
-                      <i className="bi bi-chat-left-text create-alert-footer-icon" />
+                      <span className="create-alert-comments-meta">
+                        <i className="bi bi-chat-left-text create-alert-footer-icon" />
+                        <span className="create-alert-comments-count">
+                          {alert.total_comentarios ?? 0}
+                        </span>
+                      </span>
                       {alertReactions.length > 0 && (
                         <div className="create-alert-item-reactions">
                           {alertReactions.map((reaction) => {

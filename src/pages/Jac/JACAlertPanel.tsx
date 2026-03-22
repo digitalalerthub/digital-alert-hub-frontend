@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { toast } from 'react-toastify';
+import AlertDetailModal from '../../components/Alert/AlertDetailModal';
 import type { Alert } from '../../types/Alert';
 import alertsService from '../../services/alertsService';
 import {
@@ -73,6 +74,8 @@ const PAGE_SIZE = 10;
 const JACAlertPanel = () => {
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [loading, setLoading] = useState(true);
+    const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+    const [loadingSelectedAlert, setLoadingSelectedAlert] = useState(false);
     const [search, setSearch] = useState('');
     const [filtroEstado, setFiltroEstado] = useState('Todos');
     const [filtroCategoria, setFiltroCategoria] = useState('Todas');
@@ -85,6 +88,11 @@ const JACAlertPanel = () => {
             prev.map((a) =>
                 a.id_alerta === updated.id_alerta ? { ...a, ...updated } : a,
             ),
+        );
+        setSelectedAlert((current) =>
+            current?.id_alerta === updated.id_alerta
+                ? { ...current, ...updated }
+                : current,
         );
     }, []);
 
@@ -191,6 +199,62 @@ const JACAlertPanel = () => {
         setFiltroBarrio('Todos');
         setCurrentPage(1);
     };
+
+    const openAlertDetail = useCallback(async (alert: Alert) => {
+        setLoadingSelectedAlert(true);
+        try {
+            const detail = await alertsService.getById(alert.id_alerta);
+            setSelectedAlert(detail);
+        } catch {
+            toast.error('No se pudo cargar el detalle de la alerta');
+        } finally {
+            setLoadingSelectedAlert(false);
+        }
+    }, []);
+
+    const closeAlertDetail = useCallback(() => {
+        if (loadingSelectedAlert) return;
+        setSelectedAlert(null);
+    }, [loadingSelectedAlert]);
+
+    const jacManagementActions = selectedAlert
+        ? ACCIONES.map(({ nuevoEstado, label, icon, title }) => {
+              const accionMeta = ESTADO_META[nuevoEstado];
+              const yaEsEseEstado = selectedAlert.id_estado === nuevoEstado;
+              const isUpdatingSelected =
+                  updatingId === selectedAlert.id_alerta;
+
+              return (
+                  <button
+                      key={nuevoEstado}
+                      type='button'
+                      className='jac-detail-action-btn'
+                      title={title}
+                      disabled={
+                          loadingSelectedAlert ||
+                          isUpdatingSelected ||
+                          yaEsEseEstado
+                      }
+                      onClick={() =>
+                          requestStatusChange(
+                              selectedAlert,
+                              nuevoEstado,
+                              label,
+                          )
+                      }
+                      style={{
+                          borderColor: accionMeta.color,
+                          color: accionMeta.color,
+                          background: accionMeta.bg,
+                          opacity: yaEsEseEstado ? 0.4 : 1,
+                      }}
+                  >
+                      <i className={`bi ${icon}`} />
+                      <span>{label}</span>
+                  </button>
+              );
+          })
+        : null;
     // ─── Render ─────────────────────────────────────────────────
 
     return (
@@ -394,12 +458,22 @@ const JACAlertPanel = () => {
                                             }
                                         >
                                             <td className='jac-td-title'>
-                                                {alert.titulo}
+                                                <button
+                                                    type='button'
+                                                    className='jac-alert-link'
+                                                    onClick={() =>
+                                                        void openAlertDetail(
+                                                            alert,
+                                                        )
+                                                    }
+                                                >
+                                                    {alert.titulo}
+                                                </button>
                                             </td>
                                             <td>{alert.categoria}</td>
                                             <td>
                                                 {alert.nombre_usuario ??
-                                                    `Usuario #${alert.id_usuario}`}
+                                                    'Cuenta eliminada'}
                                             </td>
                                             <td>
                                                 <span
@@ -591,6 +665,13 @@ const JACAlertPanel = () => {
                             </div>
                         </div>
                     </div>
+                )}
+                {selectedAlert && (
+                    <AlertDetailModal
+                        alert={selectedAlert}
+                        onClose={closeAlertDetail}
+                        topActions={jacManagementActions}
+                    />
                 )}
             </div>
         </div>
