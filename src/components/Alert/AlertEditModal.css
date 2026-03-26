@@ -6,7 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem 1rem;
 }
 
 .alert-edit-modal {
@@ -26,6 +26,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(248, 250, 252, 0.96);
+  backdrop-filter: blur(4px);
 }
 
 .alert-edit-title {
@@ -38,8 +43,8 @@
 }
 
 .alert-edit-close {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 999px;
   border: 1px solid #d1d5db;
   background: #f9fafb;
@@ -47,8 +52,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   line-height: 1;
+  position: relative;
+  z-index: 21;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .alert-edit-close:hover {
@@ -400,6 +409,20 @@
   .alert-edit-modal {
     width: 100%;
     border-radius: 18px;
+  }
+
+  .alert-edit-backdrop {
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem 0.75rem;
+  }
+
+  .alert-edit-header {
+    padding: 0.85rem;
+  }
+
+  .alert-edit-close {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1rem;
   }
 
   .alert-edit-form {

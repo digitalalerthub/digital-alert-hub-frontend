@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1rem;
+  padding: max(1rem, env(safe-area-inset-top)) 1rem 1rem;
   background: rgba(17, 24, 39, 0.52);
   overscroll-behavior: none;
 }
@@ -28,26 +28,35 @@
 .alert-detail-toolbar {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 0.55rem;
+  width: fit-content;
+  margin: 0 0 0.25rem auto;
   position: sticky;
-  top: 0;
-  z-index: 5;
-  padding-bottom: 0.15rem;
-  background: linear-gradient(to bottom, #f4f5f7 78%, rgba(244, 245, 247, 0));
+  top: 0.35rem;
+  z-index: 20;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
 }
 
 .alert-detail-close {
-  width: 28px;
-  height: 28px;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 999px;
   border: 1px solid #d1d5db;
   color: #ef4444;
   background: #f9fafb;
-  font-size: 0.72rem;
+  font-size: 0.9rem;
   line-height: 1;
   flex-shrink: 0;
   cursor: pointer;
   pointer-events: auto;
+  position: relative;
+  z-index: 21;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .alert-detail-top {
@@ -598,12 +607,18 @@
 
 @media (max-width: 640px) {
   .alert-detail-backdrop {
-    padding: 0.75rem;
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem 0.75rem;
   }
 
   .alert-detail-modal {
     padding: 0.75rem 0.75rem 1rem;
     border-radius: 16px;
+  }
+
+  .alert-detail-close {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1rem;
   }
 
   .alert-detail-media-box {

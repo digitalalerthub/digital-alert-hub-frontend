@@ -15,6 +15,7 @@ import {
     YAxis,
 } from 'recharts';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
+import { useAlertCategories } from '../../context/useAlertCategories';
 import locationsService from '../../services/locationsService';
 import reportsService from '../../services/reportsService';
 import ReportAlertsMap from './ReportAlertsMap';
@@ -23,19 +24,14 @@ import type {
     AlertReportResponse,
     ReportFilterState,
 } from '../../types/Report';
+import {
+    AUTO_REFRESH_MS,
+    buildMonthOptions,
+    formatReportDateTime,
+    getCurrentYear,
+    getEstadoChartColor,
+} from './reportes.utils';
 import './ReportesPage.css';
-
-const AUTO_REFRESH_MS = 60000;
-const PIE_COLORS = ['#ef4444', '#f59e0b', '#10b981', '#3b82f6', '#8b5cf6'];
-const DEFAULT_CATEGORY_OPTIONS = [
-    'Agua',
-    'Energia',
-    'Gas',
-    'Movilidad',
-    'Seguridad',
-    'Residuos',
-    'Otro',
-];
 
 const INITIAL_FILTERS: ReportFilterState = {
     idEstado: '',
@@ -46,35 +42,8 @@ const INITIAL_FILTERS: ReportFilterState = {
     category: '',
 };
 
-const buildMonthOptions = (selectedYear?: string) => {
-    const formatter = new Intl.DateTimeFormat('es-CO', {
-        month: 'long',
-        timeZone: 'UTC',
-    });
-
-    const numericYear = Number(selectedYear || '2026');
-    return Array.from({ length: 12 }, (_, index) => {
-        const date = new Date(Date.UTC(numericYear, index, 1));
-        const value = `${numericYear}-${String(index + 1).padStart(2, '0')}`;
-        const label = formatter.format(date);
-
-        return {
-            value,
-            label: label.charAt(0).toUpperCase() + label.slice(1),
-        };
-    });
-};
-
-const formatDateTime = (value?: string) => {
-    if (!value) return 'Sin fecha';
-
-    return new Intl.DateTimeFormat('es-CO', {
-        dateStyle: 'medium',
-        timeStyle: 'short',
-    }).format(new Date(value));
-};
-
 const ReportesPage = () => {
+    const { categorias } = useAlertCategories();
     const [filters, setFilters] = useState<ReportFilterState>(INITIAL_FILTERS);
     const [report, setReport] = useState<AlertReportResponse | null>(null);
     const [comunas, setComunas] = useState<ComunaOption[]>([]);
@@ -84,7 +53,9 @@ const ReportesPage = () => {
     const [error, setError] = useState('');
     const [monthsDropdownOpen, setMonthsDropdownOpen] = useState(false);
     const monthsDropdownRef = useRef<HTMLDivElement | null>(null);
-    const effectiveYear = filters.year || '2026';
+    const effectiveYear =
+        filters.year ||
+        String(report?.catalogos.years?.[0] ?? getCurrentYear());
 
     const monthOptions = buildMonthOptions(effectiveYear);
     const selectedMonthLabels = useMemo(
@@ -105,12 +76,19 @@ const ReportesPage = () => {
 
         return `${selectedMonthLabels.slice(0, 2).join(', ')} +${selectedMonthLabels.length - 2}`;
     }, [selectedMonthLabels]);
-    const categoryOptions = Array.from(
-        new Set([
-            ...DEFAULT_CATEGORY_OPTIONS,
-            ...(report?.catalogos.categorias ?? []),
-        ]),
+    const categoryOptions = useMemo(
+        () =>
+            Array.from(
+                new Set([
+                    ...categorias.map((categoria) => categoria.label),
+                    ...(report?.catalogos.categorias ?? []),
+                ]),
+            ),
+        [categorias, report?.catalogos.categorias],
     );
+    const yearOptions = report?.catalogos.years?.length
+        ? report.catalogos.years
+        : [Number(effectiveYear)];
     const barrioSeries = report?.charts.alertasPorBarrio ?? [];
     const topBarrios = (
         barrioSeries.some((item) => item.label !== 'Sin barrio')
@@ -302,7 +280,7 @@ const ReportesPage = () => {
                             {refreshing ? 'Actualizando...' : 'Actualización automática'}
                         </span>
                         <span className='reportes-meta-pill'>
-                            {formatDateTime(report?.generated_at)}
+                            {formatReportDateTime(report?.generated_at)}
                         </span>
                     </div>
 
@@ -358,7 +336,11 @@ const ReportesPage = () => {
                             onChange={handleSelectChange('year')}
                         >
                             <option value=''>Filtro Anual</option>
-                            <option value='2026'>2026</option>
+                            {yearOptions.map((year) => (
+                                <option key={year} value={year}>
+                                    {year}
+                                </option>
+                            ))}
                         </select>
 
                         <div
@@ -538,15 +520,12 @@ const ReportesPage = () => {
                                                 outerRadius={72}
                                                 paddingAngle={2}
                                             >
-                                                {statusData.map((entry, index) => (
+                                                {statusData.map((entry) => (
                                                     <Cell
                                                         key={entry.id_estado}
-                                                        fill={
-                                                            PIE_COLORS[
-                                                                index %
-                                                                    PIE_COLORS.length
-                                                            ]
-                                                        }
+                                                        fill={getEstadoChartColor(
+                                                            entry.label,
+                                                        )}
                                                     />
                                                 ))}
                                             </Pie>

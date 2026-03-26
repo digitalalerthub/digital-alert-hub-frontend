@@ -24,6 +24,7 @@ import type { Coords, LocationSuggestion } from "../createAlertWorkspace.utils";
 type UseAlertMapArgs = {
   ubicacion: string;
   setUbicacion: (value: string) => void;
+  pendingStateId: number | null;
 };
 
 const buildColombiaAddressAttempts = (query: string): string[] => {
@@ -65,7 +66,7 @@ const buildColombiaAddressAttempts = (query: string): string[] => {
   return Array.from(new Set(withCityHints));
 };
 
-export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
+export const useAlertMap = ({ ubicacion, setUbicacion, pendingStateId }: UseAlertMapArgs) => {
   const [suggestions, setSuggestions] = useState<LocationSuggestion[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
   const [reverseLoading, setReverseLoading] = useState(false);
@@ -114,7 +115,12 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
     }
 
     const activeAlerts = data
-      .filter((a) => a.id_estado === 1 && a.ubicacion && a.ubicacion.trim().length > 0)
+      .filter(
+        (a) =>
+          (pendingStateId === null || a.id_estado === pendingStateId) &&
+          a.ubicacion &&
+          a.ubicacion.trim().length > 0
+      )
       .slice(0, 30);
 
     for (const alert of activeAlerts) {
@@ -156,7 +162,7 @@ export const useAlertMap = ({ ubicacion, setUbicacion }: UseAlertMapArgs) => {
 
       activeMarkersRef.current.push(marker);
     }
-  }, []);
+  }, [pendingStateId]);
 
   const setLocationFromCoords = useCallback(
     async (lat: number, lng: number) => {

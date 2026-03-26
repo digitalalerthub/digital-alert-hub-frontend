@@ -1,16 +1,7 @@
 import type { ChangeEvent, DragEvent, FormEvent, RefObject } from "react";
 import type { Coords, LocationSuggestion } from "./createAlertWorkspace.utils";
+import type { AlertCategoryCatalogItem } from "../../types/AlertCategory";
 import type { BarrioOption, ComunaOption } from "../../types/Location";
-
-const CATEGORY_OPTIONS = [
-  "Agua",
-  "Energ\u00EDa",
-  "Gas",
-  "Movilidad",
-  "Seguridad",
-  "Residuos",
-  "Otro",
-];
 
 const PRIORITY_OPTIONS = ["Baja", "Media", "Alta"] as const;
 
@@ -20,8 +11,10 @@ type Props = {
   onTituloChange: (value: string) => void;
   descripcion: string;
   onDescripcionChange: (value: string) => void;
-  categoria: string;
-  onCategoriaChange: (value: string) => void;
+  categoriaId: string;
+  onCategoriaIdChange: (value: string) => void;
+  categorias: AlertCategoryCatalogItem[];
+  loadingCategories: boolean;
   prioridad: string;
   onPrioridadChange: (value: string) => void;
   ubicacion: string;
@@ -61,8 +54,10 @@ const CreateAlertFormSection = ({
   onTituloChange,
   descripcion,
   onDescripcionChange,
-  categoria,
-  onCategoriaChange,
+  categoriaId,
+  onCategoriaIdChange,
+  categorias,
+  loadingCategories,
   prioridad,
   onPrioridadChange,
   ubicacion,
@@ -122,15 +117,22 @@ const CreateAlertFormSection = ({
             <label className="create-alert-label">{"Categor\u00EDa"}</label>
             <select
               className="form-select create-alert-select"
-              value={categoria}
-              onChange={(e) => onCategoriaChange(e.target.value)}
+              value={categoriaId}
+              onChange={(e) => onCategoriaIdChange(e.target.value)}
+              disabled={loadingCategories || categorias.length === 0}
               required
             >
-              {CATEGORY_OPTIONS.map((option) => (
-                <option key={option} value={option}>
-                  {option}
+              {categorias.length === 0 ? (
+                <option value="">
+                  {loadingCategories ? "Cargando categorias..." : "Sin categorias"}
                 </option>
-              ))}
+              ) : (
+                categorias.map((option) => (
+                  <option key={option.id_categoria} value={option.id_categoria}>
+                    {option.label}
+                  </option>
+                ))
+              )}
             </select>
           </div>
 

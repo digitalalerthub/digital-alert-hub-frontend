@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useAlertCategories } from "../../../context/useAlertCategories";
 import alertsService from "../../../services/alertsService";
 import locationsService from "../../../services/locationsService";
 import type { BarrioOption, ComunaOption } from "../../../types/Location";
@@ -9,7 +10,6 @@ import type { Coords } from "../createAlertWorkspace.utils";
 import { reverseGeocode } from "../createAlertWorkspace.utils";
 import { resolveAdministrativeLocation } from "../locationResolver.utils";
 
-const DEFAULT_CATEGORY = "Agua";
 const DEFAULT_PRIORITY = "Media";
 const MAX_EVIDENCE_IMAGES = 10;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -48,9 +48,10 @@ const buildLocationValue = (
 };
 
 export const useAlertCreationForm = () => {
+  const { categorias, isLoading: loadingCategories } = useAlertCategories();
   const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [categoria, setCategoria] = useState(DEFAULT_CATEGORY);
+  const [categoriaId, setCategoriaId] = useState("");
   const [prioridad, setPrioridad] = useState(DEFAULT_PRIORITY);
   const [ubicacion, setUbicacion] = useState("");
   const [comunas, setComunas] = useState<ComunaOption[]>([]);
@@ -95,6 +96,19 @@ export const useAlertCreationForm = () => {
 
     void loadComunas();
   }, []);
+
+  useEffect(() => {
+    setCategoriaId((current) => {
+      if (
+        current &&
+        categorias.some((categoria) => String(categoria.id_categoria) === current)
+      ) {
+        return current;
+      }
+
+      return categorias[0] ? String(categorias[0].id_categoria) : "";
+    });
+  }, [categorias]);
 
   useEffect(() => {
     const numericComuna = Number(comunaId);
@@ -272,7 +286,8 @@ export const useAlertCreationForm = () => {
         return;
       }
 
-      if (!categoria.trim()) {
+      const parsedCategoriaId = Number(categoriaId);
+      if (!Number.isInteger(parsedCategoriaId) || parsedCategoriaId <= 0) {
         toast.error("La categoria es obligatoria");
         return;
       }
@@ -291,7 +306,7 @@ export const useAlertCreationForm = () => {
         await alertsService.create({
           titulo: titulo.trim(),
           descripcion: descripcion.trim(),
-          categoria: categoria.trim(),
+          id_categoria: parsedCategoriaId,
           prioridad: prioridad.trim() || undefined,
           id_comuna: parsedComunaId,
           id_barrio: parsedBarrioId,
@@ -302,7 +317,7 @@ export const useAlertCreationForm = () => {
         toast.success("Alerta creada correctamente");
         setTitulo("");
         setDescripcion("");
-        setCategoria(DEFAULT_CATEGORY);
+        setCategoriaId(categorias[0] ? String(categorias[0].id_categoria) : "");
         setPrioridad(DEFAULT_PRIORITY);
         setUbicacion("");
         setComunaId((prev) => prev || (comunas[0] ? String(comunas[0].id_comuna) : ""));
@@ -323,7 +338,19 @@ export const useAlertCreationForm = () => {
         setSubmitting(false);
       }
     },
-    [barrios, barrioId, categoria, comunaId, comunas, descripcion, evidencias, prioridad, titulo, ubicacion]
+    [
+      barrios,
+      barrioId,
+      categoriaId,
+      categorias,
+      comunaId,
+      comunas,
+      descripcion,
+      evidencias,
+      prioridad,
+      titulo,
+      ubicacion,
+    ]
   );
 
   return {
@@ -331,8 +358,10 @@ export const useAlertCreationForm = () => {
     setTitulo,
     descripcion,
     setDescripcion,
-    categoria,
-    setCategoria,
+    categoriaId,
+    setCategoriaId,
+    categorias,
+    loadingCategories,
     prioridad,
     setPrioridad,
     ubicacion,

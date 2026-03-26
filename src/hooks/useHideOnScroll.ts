@@ -1,6 +1,4 @@
-// Controla el navegador para que oculte cuando hay un inicio de sesión
-
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useHideOnScroll() {
     const [hidden, setHidden] = useState(false);
@@ -11,9 +9,9 @@ export function useHideOnScroll() {
             const current = window.scrollY;
 
             if (current < 80) {
-                setHidden(false); // Siempre visible en la parte superior el nav
+                setHidden(false);
             } else if (current > lastScrollY.current) {
-                setHidden(true); // Scroll hacia abajo ocultarse
+                setHidden(true);
             }
 
             lastScrollY.current = current;
@@ -24,7 +22,7 @@ export function useHideOnScroll() {
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []); // solo una vez
+    }, []);
 
     return hidden;
 }

@@ -10,7 +10,7 @@ const alertsService = {
         const formData = new FormData();
         formData.append('titulo', payload.titulo);
         formData.append('descripcion', payload.descripcion);
-        formData.append('categoria', payload.categoria);
+        formData.append('id_categoria', String(payload.id_categoria));
         formData.append('id_comuna', String(payload.id_comuna));
         formData.append('id_barrio', String(payload.id_barrio));
 
@@ -56,8 +56,8 @@ const alertsService = {
             formData.append('titulo', payload.titulo);
         if (payload.descripcion !== undefined)
             formData.append('descripcion', payload.descripcion);
-        if (payload.categoria !== undefined)
-            formData.append('categoria', payload.categoria);
+        if (payload.id_categoria !== undefined)
+            formData.append('id_categoria', String(payload.id_categoria));
         if (payload.prioridad !== undefined)
             formData.append('prioridad', payload.prioridad);
         if (payload.id_comuna !== undefined)

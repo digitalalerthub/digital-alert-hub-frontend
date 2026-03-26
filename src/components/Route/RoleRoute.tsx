@@ -1,8 +1,10 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../../context/useAuth';
+import type { CanonicalRoleName } from '../../utils/roles';
+import { getCanonicalRoleName } from '../../utils/roles';
 
 interface RoleRouteProps {
-    allowedRoles: number[];
+    allowedRoles: CanonicalRoleName[];
 }
 
 const RoleRoute = ({ allowedRoles }: RoleRouteProps) => {
@@ -57,7 +59,8 @@ const RoleRoute = ({ allowedRoles }: RoleRouteProps) => {
 
     if (!isLoggedIn || !user) return <Navigate to='/' replace />;
 
-    if (!allowedRoles.includes(user.rol)) {
+    const currentRole = getCanonicalRoleName(user.role_name);
+    if (!currentRole || !allowedRoles.includes(currentRole)) {
         return <Navigate to='/admin' replace />;
     }
 

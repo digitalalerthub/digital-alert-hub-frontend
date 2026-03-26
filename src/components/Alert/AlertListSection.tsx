@@ -3,8 +3,10 @@ import type { MouseEvent } from "react";
 import { toast } from "react-toastify";
 import type { Alert } from "../../types/Alert";
 import reactionsService from "../../services/reactionsService";
+import { useAlertStates } from "../../context/useAlertStates";
 import type { AlertReactionSummary, Reaction } from "../../types/Reaction";
 import { formatAlertDate, getStatusMeta } from "./createAlertWorkspace.utils";
+import { isAlertState } from "../../config/alertStates";
 
 type Props = {
   search: string;
@@ -40,6 +42,7 @@ const AlertListSection = ({
   isAdmin,
   onDeleteAlertRequest,
 }: Props) => {
+  const { labelById } = useAlertStates();
   const [reactions, setReactions] = useState<Reaction[]>([]);
   const [reactionSummaryByAlert, setReactionSummaryByAlert] = useState<
     Record<number, AlertReactionSummary[]>
@@ -177,7 +180,7 @@ const AlertListSection = ({
           <p className="text-muted mb-0">No hay alertas para mostrar.</p>
         )}
         {pagedAlerts.map((alert) => {
-          const status = getStatusMeta(alert.id_estado);
+          const status = getStatusMeta(alert.id_estado, labelById);
           const hasImageEvidence = Boolean(
             alert.evidencia_url && !alert.evidencia_tipo?.startsWith("video/")
           );
@@ -185,7 +188,8 @@ const AlertListSection = ({
           const creatorName = alert.nombre_usuario?.trim() || "Cuenta eliminada";
           const isOwnAlert =
             currentUserId !== null && Number(currentUserId) === Number(alert.id_usuario);
-          const canDeleteAlert = isAdmin || (isOwnAlert && alert.id_estado === 1);
+          const canDeleteAlert =
+            isAdmin || (isOwnAlert && isAlertState(alert.id_estado, labelById, "pendiente"));
 
           return (
             <article

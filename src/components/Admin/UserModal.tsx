@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import usersService from '../../services/users';
@@ -6,10 +7,14 @@ import rolesService, { type Rol } from '../../services/rolesService';
 import './UserModal.css';
 
 import type {
-    User,
     CreateUserPayload,
     UpdateUserPayload,
+    User,
 } from '../../types/User';
+import {
+    buildUserModalFormState,
+    validateUserModalForm,
+} from './userModal.utils';
 
 interface Props {
     user: User | null;
@@ -19,16 +24,7 @@ interface Props {
 
 const UserModal = ({ user, onClose, onSaved }: Props) => {
     const isEditing = Boolean(user);
-
-    const [form, setForm] = useState({
-        nombre: '',
-        apellido: '',
-        email: '',
-        telefono: '',
-        id_rol: '',
-        contrasena: '',
-    });
-
+    const [form, setForm] = useState(buildUserModalFormState(user));
     const [roles, setRoles] = useState<Rol[]>([]);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -43,50 +39,35 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
             }
         };
 
-        fetchRoles();
+        void fetchRoles();
     }, []);
 
     useEffect(() => {
-        if (user) {
-            setForm({
-                nombre: user.nombre,
-                apellido: user.apellido,
-                email: user.email,
-                telefono: user.telefono || '',
-                id_rol: String(user.id_rol),
-                contrasena: '',
-            });
-        }
+        setForm(buildUserModalFormState(user));
     }, [user]);
+
+    const handleFieldChange = (name: string, value: string) => {
+        setForm((current) => ({
+            ...current,
+            [name]: value,
+        }));
+
+        if (errors[name]) {
+            setErrors((current) => ({ ...current, [name]: '' }));
+        }
+    };
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
     ) => {
         const { name, value } = e.target;
-        setForm({
-            ...form,
-            [name]: value,
-        });
-        // Limpiar error del campo cuando el usuario escribe
-        if (errors[name]) {
-            setErrors({ ...errors, [name]: '' });
-        }
+        handleFieldChange(name, value);
     };
 
     const validateForm = () => {
-        const newErrors: Record<string, string> = {};
-
-        if (!form.nombre.trim()) newErrors.nombre = 'El nombre es requerido';
-        if (!form.apellido.trim())
-            newErrors.apellido = 'El apellido es requerido';
-        if (!form.email.trim()) newErrors.email = 'El email es requerido';
-        if (!form.id_rol) newErrors.id_rol = 'Debe seleccionar un rol';
-        if (!isEditing && !form.contrasena) {
-            newErrors.contrasena = 'La contraseña es requerida';
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
+        const nextErrors = validateUserModalForm(form, isEditing);
+        setErrors(nextErrors);
+        return Object.keys(nextErrors).length === 0;
     };
 
     const handleSubmit = async () => {
@@ -95,28 +76,29 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
         setSaving(true);
 
         try {
-            if (isEditing) {
+            if (isEditing && user) {
                 const payload: UpdateUserPayload = {
                     nombre: form.nombre,
                     apellido: form.apellido,
-                    telefono: form.telefono,
+                    telefono: form.telefono.trim(),
                     id_rol: Number(form.id_rol),
                 };
 
-                await usersService.update(user!.id_usuario, payload);
+                await usersService.update(user.id_usuario, payload);
                 toast.success('Usuario actualizado correctamente');
             } else {
                 const payload: CreateUserPayload = {
                     nombre: form.nombre,
                     apellido: form.apellido,
-                    email: form.email,
-                    telefono: form.telefono,
+                    email: form.email.trim().toLowerCase(),
+                    telefono: form.telefono.trim(),
                     id_rol: Number(form.id_rol),
-                    contrasena: form.contrasena,
                 };
 
                 await usersService.create(payload);
-                toast.success('Usuario creado correctamente');
+                toast.success(
+                    'Usuario creado. Se envio un correo para activar la cuenta y definir la contrasena.',
+                );
             }
 
             onSaved();
@@ -134,38 +116,50 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
         }
     };
 
-    return (
+    if (typeof document === 'undefined') {
+        return null;
+    }
+
+    return createPortal(
         <>
-            {/* Backdrop con blur */}
             <div className='modal-backdrop-custom' onClick={onClose} />
 
-            {/* Modal */}
             <div className='modal-container'>
-                <div className='modal-content shadow-lg modal-content-custom'>
-                    {/* Header mejorado */}
+                <div
+                    className='modal-content shadow-lg modal-content-custom'
+                    role='dialog'
+                    aria-modal='true'
+                    aria-labelledby='user-modal-title'
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <div className='modal-header modal-header-custom'>
-                        <div>
-                            <h5 className='modal-title modal-title-custom'>
-                                {isEditing
-                                    ? '✏️ Editar Usuario'
-                                    : '➕ Crear Usuario'}
+                        <div className='modal-header-copy'>
+                            <h5
+                                id='user-modal-title'
+                                className='modal-title modal-title-custom'
+                            >
+                                {isEditing ? 'Editar Usuario' : 'Crear Usuario'}
                             </h5>
                             <p className='modal-subtitle'>
                                 {isEditing
-                                    ? 'Actualiza la información del usuario'
-                                    : 'Completa los datos del nuevo usuario'}
+                                    ? 'Actualiza la informacion del usuario'
+                                    : 'Se enviara un correo para activar la cuenta y crear la contrasena'}
                             </p>
                         </div>
                         <button
-                            className='btn-close btn-close-white modal-close-btn'
+                            type='button'
+                            className='modal-close-btn'
+                            aria-label='Cerrar modal de usuario'
                             onClick={onClose}
-                        ></button>
+                        >
+                            <span aria-hidden='true' className='modal-close-icon'>
+                                ×
+                            </span>
+                        </button>
                     </div>
 
-                    {/* Body con mejor espaciado */}
                     <div className='modal-body modal-body-custom'>
                         <div className='row g-4'>
-                            {/* Nombre */}
                             <div className='col-md-6'>
                                 <label className='form-label form-label-custom'>
                                     Nombre{' '}
@@ -180,6 +174,8 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                     value={form.nombre}
                                     onChange={handleChange}
                                     placeholder='Ingresa el nombre'
+                                    minLength={2}
+                                    maxLength={100}
                                 />
                                 {errors.nombre && (
                                     <div className='invalid-feedback d-block'>
@@ -188,7 +184,6 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                 )}
                             </div>
 
-                            {/* Apellido */}
                             <div className='col-md-6'>
                                 <label className='form-label form-label-custom'>
                                     Apellido{' '}
@@ -203,6 +198,8 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                     value={form.apellido}
                                     onChange={handleChange}
                                     placeholder='Ingresa el apellido'
+                                    minLength={2}
+                                    maxLength={100}
                                 />
                                 {errors.apellido && (
                                     <div className='invalid-feedback d-block'>
@@ -211,10 +208,9 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                 )}
                             </div>
 
-                            {/* Email */}
                             <div className='col-md-7'>
                                 <label className='form-label form-label-custom'>
-                                    📧 Email{' '}
+                                    Email{' '}
                                     <span className='required-asterisk'>*</span>
                                 </label>
                                 <input
@@ -227,6 +223,7 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                     onChange={handleChange}
                                     disabled={isEditing}
                                     placeholder='ejemplo@correo.com'
+                                    autoComplete='email'
                                 />
                                 {errors.email && (
                                     <div className='invalid-feedback d-block'>
@@ -235,25 +232,40 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                 )}
                             </div>
 
-                            {/* Teléfono */}
                             <div className='col-md-5'>
                                 <label className='form-label form-label-custom'>
-                                    📱 Teléfono
+                                    Telefono
                                 </label>
                                 <input
                                     type='text'
                                     name='telefono'
-                                    className='form-control form-input-custom'
+                                    className={`form-control form-input-custom ${
+                                        errors.telefono ? 'is-invalid' : ''
+                                    }`}
                                     value={form.telefono}
-                                    onChange={handleChange}
-                                    placeholder='+57 300 123 4567'
+                                    onChange={(e) =>
+                                        handleFieldChange(
+                                            'telefono',
+                                            e.target.value
+                                                .replace(/\D/g, '')
+                                                .slice(0, 15),
+                                        )
+                                    }
+                                    placeholder='3001234567'
+                                    inputMode='numeric'
+                                    minLength={7}
+                                    maxLength={15}
                                 />
+                                {errors.telefono && (
+                                    <div className='invalid-feedback d-block'>
+                                        {errors.telefono}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Rol + Contraseña en la misma fila */}
-                            <div className='col-md-6'>
+                            <div className='col-12'>
                                 <label className='form-label form-label-custom'>
-                                    👤 Rol{' '}
+                                    Rol{' '}
                                     <span className='required-asterisk'>*</span>
                                 </label>
                                 <select
@@ -281,38 +293,18 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                 )}
                             </div>
 
-                            {/* Contraseña solo al crear */}
                             {!isEditing && (
-                                <div className='col-md-6'>
-                                    <label className='form-label form-label-custom'>
-                                        🔒 Contraseña{' '}
-                                        <span className='required-asterisk'>
-                                            *
-                                        </span>
-                                    </label>
-                                    <input
-                                        type='password'
-                                        name='contrasena'
-                                        className={`form-control form-input-custom ${
-                                            errors.contrasena
-                                                ? 'is-invalid'
-                                                : ''
-                                        }`}
-                                        value={form.contrasena}
-                                        onChange={handleChange}
-                                        placeholder='Mínimo 6 caracteres'
-                                    />
-                                    {errors.contrasena && (
-                                        <div className='invalid-feedback d-block'>
-                                            {errors.contrasena}
-                                        </div>
-                                    )}
+                                <div className='col-12'>
+                                    <div className='alert alert-info mb-0'>
+                                        El usuario recibira un correo para
+                                        activar la cuenta y definir su
+                                        contrasena.
+                                    </div>
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    {/* Footer mejorado */}
                     <div className='modal-footer modal-footer-custom'>
                         <button
                             className='btn btn-secondary btn-custom'
@@ -336,13 +328,14 @@ const UserModal = ({ user, onClose, onSaved }: Props) => {
                                     Guardando...
                                 </>
                             ) : (
-                                <>💾 Guardar</>
+                                <>Guardar</>
                             )}
                         </button>
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body,
     );
 };
 

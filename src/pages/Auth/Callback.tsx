@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function Callback() {
     const [searchParams] = useSearchParams();
@@ -9,16 +9,13 @@ function Callback() {
         const token = searchParams.get('token');
 
         if (token) {
-            // Guardar token en localStorage
             localStorage.setItem('token', token);
-
-            // Redirigir al dashboard usando navigate
             navigate('/admin', { replace: true });
-        } else {
-            // Si no hay token, redirigir al login
-            navigate('/', { replace: true });
+            return;
         }
-    }, [searchParams, navigate]);
+
+        navigate('/', { replace: true });
+    }, [navigate, searchParams]);
 
     return (
         <div
@@ -29,7 +26,7 @@ function Callback() {
                 height: '100vh',
             }}
         >
-            <p>Iniciando sesión...</p>
+            <p>Iniciando sesion...</p>
         </div>
     );
 }
