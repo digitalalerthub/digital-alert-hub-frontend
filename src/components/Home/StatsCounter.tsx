@@ -67,6 +67,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
 const StatsCounter = () => {
   const [stats, setStats] = useState<Stats | null>(null);
+  const [hasError, setHasError] = useState(false);
   const [visible, setVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
@@ -77,14 +78,10 @@ const StatsCounter = () => {
       if (!res.ok) throw new Error("Error en respuesta");
       const data = await res.json();
       setStats(data);
+      setHasError(false);
     } catch {
-      // Datos de demo mientras no hay backend
-      setStats({
-        ciudadanos: 12480,
-        alertasTotales: 3742,
-        alertasAtendidas: 3190,
-        alertasPendientes: 552,
-      });
+      setStats(null);
+      setHasError(true);
     }
   };
 
@@ -122,11 +119,19 @@ const StatsCounter = () => {
   if (!stats) {
     return (
       <div className="sc-section">
-        <div className="sc-skeleton-grid">
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="sc-skeleton" />
-          ))}
-        </div>
+        {hasError ? (
+          <div className="sc-skeleton-grid">
+            <div className="sc-skeleton" style={{ width: "100%", minHeight: 160 }}>
+              No fue posible cargar las estadisticas en este momento.
+            </div>
+          </div>
+        ) : (
+          <div className="sc-skeleton-grid">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="sc-skeleton" />
+            ))}
+          </div>
+        )}
       </div>
     );
   }

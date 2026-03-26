@@ -7,6 +7,14 @@ import rolesService, { type Rol } from '../../services/rolesService';
 import type { User } from '../../types/User';
 import UserModal from './UserModal';
 import UserStatusConfirmModal from './UserStatusConfirmModal';
+import {
+    buildVisiblePageNumbers,
+    filterUsersBySearch,
+    findRoleNameById,
+    formatUserCreatedAt,
+    getPaginatedUsers,
+    ITEMS_PER_PAGE,
+} from './userTable.utils';
 import './UserTable.css';
 
 const UserTable = () => {
@@ -20,8 +28,6 @@ const UserTable = () => {
     const [togglingStatus, setTogglingStatus] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-
-    const itemsPerPage = 10;
 
     useEffect(() => {
         void loadData();
@@ -41,7 +47,7 @@ const UserTable = () => {
         } else {
             setUsers([]);
             setErrorMessage(
-                'No fue posible consultar la API de usuarios. Verifica que el backend esté activo y que tu sesión tenga permisos de administrador.',
+                'No fue posible consultar la API de usuarios. Verifica que el backend este activo y que tu sesion tenga permisos de administrador.',
             );
         }
 
@@ -55,44 +61,14 @@ const UserTable = () => {
         setLoading(false);
     };
 
-    const filteredUsers = useMemo(() => {
-        if (!searchTerm.trim()) return users;
-
-        const searchLower = searchTerm.toLowerCase();
-        return users.filter((user) => {
-            const fullName = `${user.nombre} ${user.apellido}`.toLowerCase();
-            const email = user.email.toLowerCase();
-
-            return (
-                fullName.includes(searchLower) || email.includes(searchLower)
-            );
-        });
-    }, [users, searchTerm]);
+    const filteredUsers = useMemo(
+        () => filterUsersBySearch(users, searchTerm),
+        [users, searchTerm],
+    );
 
     useEffect(() => {
         setCurrentPage(1);
     }, [searchTerm]);
-
-    const findRoleName = (id_rol: number): string => {
-        const role = roles.find((r) => r.id_rol === id_rol);
-        return role ? role.nombre_rol : 'Sin rol';
-    };
-
-    const formatDate = (dateString: string): string => {
-        try {
-            const iso = dateString.replace(' ', 'T');
-            const d = new Date(iso);
-            if (isNaN(d.getTime())) return 'Fecha inválida';
-
-            return d.toLocaleDateString('es-ES', {
-                day: '2-digit',
-                month: 'short',
-                year: 'numeric',
-            });
-        } catch {
-            return 'Fecha inválida';
-        }
-    };
 
     const requestToggleStatus = (user: User) => {
         setUserToToggle(user);
@@ -163,10 +139,9 @@ const UserTable = () => {
         return <div className='text-center mt-5'>Cargando...</div>;
     }
 
-    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = Math.min(startIndex + itemsPerPage, filteredUsers.length);
-    const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+    const { totalPages, startIndex, endIndex, paginatedUsers } =
+        getPaginatedUsers(filteredUsers, currentPage, ITEMS_PER_PAGE);
+    const visiblePageNumbers = buildVisiblePageNumbers(currentPage, totalPages);
 
     return (
         <div className='gestion-usuarios'>
@@ -191,13 +166,13 @@ const UserTable = () => {
                 <Breadcrumb
                     items={[
                         { label: 'Panel Principal', to: '/admin' },
-                        { label: 'Gestión de Usuarios' },
+                        { label: 'Gestion de Usuarios' },
                     ]}
                 />
 
                 <div className='header-section'>
                     <div className='title-section'>
-                        <h2 className='main-title'>Gestión de Usuarios</h2>
+                        <h2 className='main-title'>Gestion de Usuarios</h2>
                         <p className='subtitle'>
                             Administra y controla los usuarios del sistema
                         </p>
@@ -230,6 +205,7 @@ const UserTable = () => {
                             />
                             {searchTerm && (
                                 <button
+                                    type='button'
                                     onClick={clearSearch}
                                     className='clear-button'
                                 >
@@ -245,7 +221,11 @@ const UserTable = () => {
                             )}
                         </div>
 
-                        <button className='create-btn' onClick={openCreate}>
+                        <button
+                            type='button'
+                            className='create-btn'
+                            onClick={openCreate}
+                        >
                             <span className='btn-icon'>+</span>
                             Nuevo Usuario
                         </button>
@@ -255,8 +235,8 @@ const UserTable = () => {
                         <div className='search-results-info'>
                             {filteredUsers.length === 0 ? (
                                 <span className='no-results-text'>
-                                    No se encontraron usuarios que coincidan con
-                                    "{searchTerm}"
+                                    No se encontraron usuarios que coincidan con "
+                                    {searchTerm}"
                                 </span>
                             ) : (
                                 <span className='results-found-text'>
@@ -296,7 +276,7 @@ const UserTable = () => {
                                     {errorMessage
                                         ? errorMessage
                                         : searchTerm
-                                          ? 'Intenta con otros términos de búsqueda'
+                                          ? 'Intenta con otros terminos de busqueda'
                                           : 'Comienza creando tu primer usuario'}
                                 </p>
                             </div>
@@ -309,11 +289,11 @@ const UserTable = () => {
                                             Nombre Completo
                                         </th>
                                         <th className='table-th table-th-left'>
-                                            Correo Electrónico
+                                            Correo Electronico
                                         </th>
                                         <th className='table-th'>Rol</th>
                                         <th className='table-th'>
-                                            Fecha de Creación
+                                            Fecha de Creacion
                                         </th>
                                         <th className='table-th'>Estado</th>
                                         <th className='table-th'>Acciones</th>
@@ -339,11 +319,16 @@ const UserTable = () => {
                                             </td>
                                             <td className='td-center'>
                                                 <span className='role-badge'>
-                                                    {findRoleName(user.id_rol)}
+                                                    {findRoleNameById(
+                                                        roles,
+                                                        user.id_rol,
+                                                    )}
                                                 </span>
                                             </td>
                                             <td className='td-date'>
-                                                {formatDate(user.created_at)}
+                                                {formatUserCreatedAt(
+                                                    user.created_at,
+                                                )}
                                             </td>
                                             <td className='td-center'>
                                                 <span
@@ -370,6 +355,7 @@ const UserTable = () => {
                                                     }}
                                                 >
                                                     <button
+                                                        type='button'
                                                         className='action-btn-edit'
                                                         title='Editar usuario'
                                                         onClick={() =>
@@ -389,6 +375,7 @@ const UserTable = () => {
                                                         </svg>
                                                     </button>
                                                     <button
+                                                        type='button'
                                                         className={
                                                             user.estado
                                                                 ? 'action-btn-deactivate'
@@ -459,10 +446,11 @@ const UserTable = () => {
                             </div>
                             <div className='pagination-buttons'>
                                 <button
+                                    type='button'
                                     className={`pagination-btn ${currentPage === 1 ? 'pagination-btn-disabled' : ''}`}
                                     onClick={() =>
-                                        setCurrentPage((p) =>
-                                            Math.max(p - 1, 1),
+                                        setCurrentPage((page) =>
+                                            Math.max(page - 1, 1),
                                         )
                                     }
                                     disabled={currentPage === 1}
@@ -479,41 +467,23 @@ const UserTable = () => {
                                     </svg>
                                 </button>
 
-                                {[...Array(Math.min(5, totalPages)).keys()].map(
-                                    (i) => {
-                                        let pageNum;
-                                        if (totalPages <= 5) {
-                                            pageNum = i + 1;
-                                        } else if (currentPage <= 3) {
-                                            pageNum = i + 1;
-                                        } else if (
-                                            currentPage >=
-                                            totalPages - 2
-                                        ) {
-                                            pageNum = totalPages - 4 + i;
-                                        } else {
-                                            pageNum = currentPage - 2 + i;
-                                        }
-
-                                        return (
-                                            <button
-                                                key={pageNum}
-                                                className={`pagination-btn ${currentPage === pageNum ? 'pagination-btn-active' : ''}`}
-                                                onClick={() =>
-                                                    setCurrentPage(pageNum)
-                                                }
-                                            >
-                                                {pageNum}
-                                            </button>
-                                        );
-                                    },
-                                )}
+                                {visiblePageNumbers.map((pageNum) => (
+                                    <button
+                                        key={pageNum}
+                                        type='button'
+                                        className={`pagination-btn ${currentPage === pageNum ? 'pagination-btn-active' : ''}`}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                ))}
 
                                 <button
+                                    type='button'
                                     className={`pagination-btn ${currentPage === totalPages ? 'pagination-btn-disabled' : ''}`}
                                     onClick={() =>
-                                        setCurrentPage((p) =>
-                                            Math.min(p + 1, totalPages),
+                                        setCurrentPage((page) =>
+                                            Math.min(page + 1, totalPages),
                                         )
                                     }
                                     disabled={currentPage === totalPages}

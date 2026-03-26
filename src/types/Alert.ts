@@ -7,7 +7,7 @@ export interface AlertEvidence {
 export interface CreateAlertPayload {
   titulo: string;
   descripcion: string;
-  categoria: string;
+  id_categoria: number;
   prioridad?: string;
   id_comuna: number;
   id_barrio: number;
@@ -22,6 +22,7 @@ export interface Alert {
   nombre_comuna?: string;
   nombre_barrio?: string;
   id_estado: number;
+  id_categoria: number;
   id_comuna?: number;
   id_barrio?: number;
   titulo: string;
@@ -41,7 +42,7 @@ export interface Alert {
 export interface UpdateAlertPayload {
   titulo?: string;
   descripcion?: string;
-  categoria?: string;
+  id_categoria?: number;
   prioridad?: string;
   id_comuna?: number;
   id_barrio?: number;

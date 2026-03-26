@@ -10,11 +10,16 @@ import {
     extractCoordsFromText,
     getStatusMeta,
 } from '../../components/Alert/createAlertWorkspace.utils';
+import { useAlertStates } from '../../context/useAlertStates';
 import alertsService from '../../services/alertsService';
 import type { Alert } from '../../types/Alert';
 import type { ReportFilterState } from '../../types/Report';
-
-const AUTO_REFRESH_MS = 60000;
+import {
+    AUTO_REFRESH_MS,
+    getEstadoChartColor,
+    getReadableReportLocation,
+    normalizeReportText,
+} from './reportes.utils';
 const MAP_FALLBACK_CENTER = { lat: 6.2442, lng: -75.5812 };
 
 type Props = {
@@ -28,19 +33,6 @@ type MappedAlert = Alert & {
     };
 };
 
-const normalizeText = (value?: string) =>
-    (value || '')
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .trim();
-
-const getReadableLocation = (value?: string) => {
-    if (!value) return 'Sin direccion';
-    const marker = ' | Punto en mapa:';
-    return value.includes(marker) ? value.split(marker)[0].trim() : value;
-};
-
 const escapeHtml = (value: string) =>
     value
         .replace(/&/g, '&amp;')
@@ -48,21 +40,6 @@ const escapeHtml = (value: string) =>
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
-
-const getMarkerColor = (idEstado: number) => {
-    switch (idEstado) {
-        case 1:
-            return '#64748b';
-        case 2:
-            return '#f59e0b';
-        case 3:
-            return '#22c55e';
-        case 4:
-            return '#ef4444';
-        default:
-            return '#2563eb';
-    }
-};
 
 const alertMatchesFilters = (alert: Alert, filters: ReportFilterState) => {
     if (filters.idEstado && Number(filters.idEstado) !== alert.id_estado) {
@@ -85,7 +62,8 @@ const alertMatchesFilters = (alert: Alert, filters: ReportFilterState) => {
 
     if (
         filters.category &&
-        normalizeText(filters.category) !== normalizeText(alert.categoria)
+        normalizeReportText(filters.category) !==
+        normalizeReportText(alert.categoria)
     ) {
         return false;
     }
@@ -121,6 +99,7 @@ const alertMatchesFilters = (alert: Alert, filters: ReportFilterState) => {
 };
 
 const ReportAlertsMap = ({ filters }: Props) => {
+    const { labelById } = useAlertStates();
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -254,7 +233,7 @@ const ReportAlertsMap = ({ filters }: Props) => {
                 const bounds = new maps.LatLngBounds();
 
                 mapAlerts.forEach((alert) => {
-                    const status = getStatusMeta(alert.id_estado);
+                    const status = getStatusMeta(alert.id_estado, labelById);
                     const marker = new maps.Marker({
                         map: mapRef.current!,
                         position: alert.coords,
@@ -262,7 +241,7 @@ const ReportAlertsMap = ({ filters }: Props) => {
                         icon: {
                             path: maps.SymbolPath.CIRCLE,
                             scale: 7,
-                            fillColor: getMarkerColor(alert.id_estado),
+                            fillColor: getEstadoChartColor(status.label),
                             fillOpacity: 0.95,
                             strokeColor: '#ffffff',
                             strokeWeight: 2,
@@ -276,7 +255,9 @@ const ReportAlertsMap = ({ filters }: Props) => {
                                     <strong>${escapeHtml(alert.titulo)}</strong>
                                     <span>${escapeHtml(status.label)}</span>
                                     <small>${escapeHtml(
-                                        getReadableLocation(alert.ubicacion),
+                                        getReadableReportLocation(
+                                            alert.ubicacion,
+                                        ),
                                     )}</small>
                                 </div>
                             `,
@@ -315,7 +296,7 @@ const ReportAlertsMap = ({ filters }: Props) => {
         return () => {
             cancelled = true;
         };
-    }, [mapAlerts]);
+    }, [labelById, mapAlerts]);
 
     return (
         <section className='reportes-map-section'>

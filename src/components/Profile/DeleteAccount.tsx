@@ -1,118 +1,130 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import { deleteAccount } from "../../services/profileService";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { deleteAccount } from '../../services/profileService';
 
 export default function DeleteAccount() {
-  const [showModal, setShowModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+    const [showModal, setShowModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
-  const handleDelete = async () => {
-    try {
-      setIsLoading(true);
-      const res = await deleteAccount();
+    const handleDelete = async () => {
+        try {
+            setIsLoading(true);
+            const res = await deleteAccount();
 
-      if (res.success) {
-        toast.success("Cuenta eliminada correctamente", { autoClose: 2000 });
+            if (res.success) {
+                toast.success('Cuenta eliminada correctamente', {
+                    autoClose: 2000,
+                });
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("user");
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
 
-        setTimeout(() => {
-          navigate("/login");
-          window.location.reload();
-        }, 2000);
-      }
-    } catch {
-      toast.error("Ocurrió un error al eliminar la cuenta");
-    } finally {
-      setIsLoading(false);
-      setShowModal(false);
-    }
-  };
+                setTimeout(() => {
+                    navigate('/login');
+                    window.location.reload();
+                }, 2000);
+            }
+        } catch {
+            toast.error('Ocurrio un error al eliminar la cuenta');
+        } finally {
+            setIsLoading(false);
+            setShowModal(false);
+        }
+    };
 
-  return (
-    <>
-      <div className="d-flex justify-content-center mt-3">
-        <button
-          onClick={() => setShowModal(true)}
-          className="btn btn-outline-danger btn-sm px-3"
-        >
-          <i className="bi bi-trash me-1" />
-          Eliminar cuenta
-        </button>
-      </div>
-
-      {showModal && (
+    return (
         <>
-          <div className="modal show d-block" tabIndex={-1}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content rounded-4 shadow">
-                <div className="modal-header bg-warning-subtle">
-                  <h5 className="modal-title d-flex align-items-center gap-2 text-warning">
-                    <i className="bi bi-exclamation-triangle-fill" />
-                    ¿Estás seguro?
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    onClick={() => setShowModal(false)}
-                    disabled={isLoading}
-                  />
-                </div>
-
-                <div className="modal-body">
-                  <p className="fw-semibold mb-2">
-                    Esta acción <span className="text-danger">eliminará tu cuenta de forma permanente</span>.
-                  </p>
-
-                  <div className="alert alert-warning d-flex gap-2 mb-0">
-                    <i className="bi bi-info-circle-fill mt-1" />
-                    <small>
-                      Tu sesión se cerrará inmediatamente. Podrás registrarte de nuevo cuando lo
-                      desees, pero las alertas que hayas creado quedarán con autor "Cuenta
-                      eliminada".
-                    </small>
-                  </div>
-                </div>
-
-                <div className="modal-footer justify-content-center gap-2">
-                  <button
-                    type="button"
-                    className="btn btn-light btn-sm"
-                    onClick={() => setShowModal(false)}
-                    disabled={isLoading}
-                  >
-                    Cancelar
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn-danger btn-sm"
-                    onClick={handleDelete}
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2" />
-                        Eliminando...
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-trash me-1 text-white" />
-                        Sí, eliminar cuenta
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
+            <div className='d-flex justify-content-center mt-3'>
+                <button
+                    onClick={() => setShowModal(true)}
+                    className='btn btn-outline-danger btn-sm px-3'
+                >
+                    <i className='bi bi-trash me-1' />
+                    Eliminar cuenta
+                </button>
             </div>
-          </div>
 
-          <div className="modal-backdrop show"></div>
+            {showModal && (
+                <>
+                    <div className='modal show d-block' tabIndex={-1}>
+                        <div className='modal-dialog modal-dialog-centered'>
+                            <div className='modal-content rounded-4 shadow'>
+                                <div className='modal-header bg-warning-subtle'>
+                                    <h5 className='modal-title d-flex align-items-center gap-2 text-warning'>
+                                        <i className='bi bi-exclamation-triangle-fill' />
+                                        Estas seguro?
+                                    </h5>
+                                    <button
+                                        type='button'
+                                        className='btn p-0 border-0 bg-transparent text-warning fs-2 lh-1'
+                                        aria-label='Cerrar modal de eliminar cuenta'
+                                        onClick={() => setShowModal(false)}
+                                        disabled={isLoading}
+                                    >
+                                        <span aria-hidden='true'>×</span>
+                                    </button>
+                                </div>
+
+                                <div className='modal-body'>
+                                    <p className='fw-semibold mb-2'>
+                                        Esta accion{' '}
+                                        <span className='text-danger'>
+                                            eliminara tu cuenta de forma
+                                            permanente
+                                        </span>
+                                        .
+                                    </p>
+
+                                    <div className='alert alert-warning d-flex gap-2 mb-0'>
+                                        <i className='bi bi-info-circle-fill mt-1' />
+                                        <small>
+                                            Tu sesion se cerrara inmediatamente.
+                                            Podras registrarte de nuevo cuando
+                                            lo desees, pero las alertas que
+                                            hayas creado quedaran con autor
+                                            "Cuenta eliminada".
+                                        </small>
+                                    </div>
+                                </div>
+
+                                <div className='modal-footer justify-content-center gap-2'>
+                                    <button
+                                        type='button'
+                                        className='btn btn-light btn-sm'
+                                        onClick={() => setShowModal(false)}
+                                        disabled={isLoading}
+                                    >
+                                        Cancelar
+                                    </button>
+
+                                    <button
+                                        type='button'
+                                        className='btn btn-danger btn-sm'
+                                        onClick={handleDelete}
+                                        disabled={isLoading}
+                                    >
+                                        {isLoading ? (
+                                            <>
+                                                <span className='spinner-border spinner-border-sm me-2' />
+                                                Eliminando...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <i className='bi bi-trash me-1 text-white' />
+                                                Si, eliminar cuenta
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='modal-backdrop show'></div>
+                </>
+            )}
         </>
-      )}
-    </>
-  );
+    );
 }

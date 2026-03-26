@@ -62,10 +62,20 @@
 
 /* Header */
 .modal-header-custom {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   background: linear-gradient(135deg, #3352dc 0%, #d2d6e3 100%);
   color: white;
   padding: 1.25rem 1.5rem;
   border: none;
+}
+
+.modal-header-copy {
+  flex: 1;
+  min-width: 0;
 }
 
 .modal-title-custom {
@@ -81,7 +91,48 @@
 }
 
 .modal-close-btn {
-  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  position: relative;
+  z-index: 2;
+  background: transparent;
+  color: #ffffff;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  line-height: 1;
+  opacity: 0.92;
+  transition:
+    opacity 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.modal-close-icon {
+  display: inline-block;
+  font-size: 2rem;
+  font-weight: 300;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+.modal-close-btn:hover,
+.modal-close-btn:focus-visible {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.14);
+  transform: scale(1.02);
+}
+
+.modal-close-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.78);
+  outline-offset: 2px;
 }
 
 /* Body */
@@ -157,4 +208,19 @@
 .btn-custom:active,
 .btn-primary-custom:active {
   transform: translateY(0);
+}
+
+@media (max-width: 576px) {
+  .modal-container {
+    align-items: flex-start;
+    padding: max(0.75rem, env(safe-area-inset-top)) 0.75rem 1rem;
+  }
+
+  .modal-content-custom {
+    max-height: calc(100vh - 1.5rem);
+  }
+
+  .modal-header-custom {
+    padding-right: 1rem;
+  }
 }

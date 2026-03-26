@@ -4,15 +4,25 @@ import { useState, useEffect, type ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { AuthContext } from './AuthContext';
 import type { JWTPayload } from './AuthContext';
+import { getCanonicalRoleName, isAdminRole } from '../utils/roles';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [user, setUser] = useState<JWTPayload | null>(null);
     const [token, setToken] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
+    const decodeToken = (rawToken: string): JWTPayload => {
+        const decoded = jwtDecode<JWTPayload>(rawToken);
+
+        return {
+            ...decoded,
+            role_name: getCanonicalRoleName(decoded.role_name),
+        };
+    };
+
     const isTokenExpired = (token: string): boolean => {
         try {
-            const decoded = jwtDecode<JWTPayload>(token);
+            const decoded = decodeToken(token);
             const now = Math.floor(Date.now() / 1000);
             return decoded.exp < now;
         } catch {
@@ -25,7 +35,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
         if (savedToken && !isTokenExpired(savedToken)) {
             try {
-                const decoded = jwtDecode<JWTPayload>(savedToken);
+                const decoded = decodeToken(savedToken);
                 setUser(decoded);
                 setToken(savedToken);
             } catch {
@@ -40,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = (newToken: string) => {
         localStorage.setItem('token', newToken);
-        const decoded = jwtDecode<JWTPayload>(newToken);
+        const decoded = decodeToken(newToken);
         setUser(decoded);
         setToken(newToken);
     };
@@ -56,7 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             value={{
                 isLoggedIn: !!user,
                 user,
-                isAdmin: user?.rol === 1,
+                isAdmin: isAdminRole(user?.role_name),
                 token,
                 isLoading,
                 login,

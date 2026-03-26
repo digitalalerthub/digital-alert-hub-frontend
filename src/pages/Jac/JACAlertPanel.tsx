@@ -1,77 +1,37 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import { toast } from 'react-toastify';
 import AlertDetailModal from '../../components/Alert/AlertDetailModal';
 import type { Alert } from '../../types/Alert';
+import {
+    getAlertStatusMeta,
+} from '../../config/alertStates';
+import { useAlertStates } from '../../context/useAlertStates';
 import alertsService from '../../services/alertsService';
 import {
     useJACAlertsManager,
     type EstadoId,
 } from '../../hooks/useJACAlertsManager';
 import { formatAlertDate } from '../../components/Alert/createAlertWorkspace.utils';
-
+import {
+    PAGE_SIZE,
+    PRIORIDAD_COLOR,
+} from './jacAlertPanel.config';
+import {
+    buildAvailableCategorias,
+    buildAvailableComunas,
+    buildComunaOptions,
+    buildEstadoMeta,
+    buildEstadoMetaById,
+    buildJacActions,
+    buildStatsConfig,
+    filterAlertsByJacState,
+    getAlertStateLabel as resolveAlertStateLabel,
+} from './jacAlertPanel.utils';
 import './JACAlertPanel.css';
 
-// ─── Constantes ───────
-
-const ESTADO_META: Record<
-    EstadoId,
-    { label: string; color: string; bg: string }
-> = {
-    1: { label: 'Nueva', color: '#2563eb', bg: '#eff6ff' },
-    2: { label: 'En Progreso', color: '#ec8108', bg: '#fffbeb' },
-    3: { label: 'Resuelta', color: '#16a34a', bg: '#f0fdf4' },
-    4: { label: 'Falsa Alerta', color: '#e40e0e', bg: '#fef2f2' },
-};
-
-const STATS_CONFIG = [
-    { label: 'Nuevas Alertas', id_estado: 1 as EstadoId, icon: 'bi-send' },
-    { label: 'En Progreso', id_estado: 2 as EstadoId, icon: 'bi-arrow-repeat' },
-    { label: 'Resueltas', id_estado: 3 as EstadoId, icon: 'bi-check-circle' },
-    {
-        label: 'Falsas Alertas',
-        id_estado: 4 as EstadoId,
-        icon: 'bi-exclamation-triangle',
-    },
-];
-
-const ACCIONES: {
-    nuevoEstado: EstadoId;
-    label: string;
-    icon: string;
-    title: string;
-}[] = [
-    {
-        nuevoEstado: 2,
-        label: 'En Progreso',
-        icon: 'bi-arrow-repeat',
-        title: 'Marcar En Progreso',
-    },
-    {
-        nuevoEstado: 3,
-        label: 'Resuelta',
-        icon: 'bi-check-circle',
-        title: 'Marcar Resuelta',
-    },
-    {
-        nuevoEstado: 4,
-        label: 'Falsa Alerta',
-        icon: 'bi-exclamation-triangle',
-        title: 'Marcar Falsa Alerta',
-    },
-];
-
-const PRIORIDAD_COLOR: Record<string, string> = {
-    Alta: '#dc2626',
-    Media: '#d97706',
-    Baja: '#16a34a',
-};
-
-const PAGE_SIZE = 10;
-
-// ─── Componente ──────────────
-
 const JACAlertPanel = () => {
+    const { estados, labelById } = useAlertStates();
     const [alerts, setAlerts] = useState<Alert[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
@@ -104,6 +64,29 @@ const JACAlertPanel = () => {
         confirmStatusChange,
     } = useJACAlertsManager(handleAlertUpdated);
 
+    const estadoMeta = useMemo(
+        () => buildEstadoMeta(estados, labelById),
+        [estados, labelById],
+    );
+
+    const estadoMetaById = useMemo(
+        () => buildEstadoMetaById(estadoMeta) as Record<
+            EstadoId,
+            { label: string; color: string; bg: string }
+        >,
+        [estadoMeta],
+    );
+
+    const statsConfig = useMemo(
+        () => buildStatsConfig(estadoMeta),
+        [estadoMeta],
+    );
+
+    const acciones = useMemo(
+        () => buildJacActions(estados, estadoMetaById),
+        [estados, estadoMetaById],
+    );
+
     useEffect(() => {
         const load = async () => {
             setLoading(true);
@@ -119,65 +102,50 @@ const JACAlertPanel = () => {
         void load();
     }, []);
 
-    // ─── Filtrado y paginación ───────────────────────────────────
-    // Alertas pre-filtradas por estado y categoría (para opciones de comuna/barrio)
-    const alertasPreFiltradas = alerts.filter((a) => {
-        const estadoLabel = ESTADO_META[a.id_estado as EstadoId]?.label ?? '';
-        if (filtroEstado !== 'Todos' && estadoLabel !== filtroEstado)
-            return false;
-        if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
-            return false;
-        return true;
-    });
+    const getAlertStateLabel = useCallback(
+        (idEstado: number) =>
+            resolveAlertStateLabel(idEstado, estadoMetaById, labelById),
+        [estadoMetaById, labelById],
+    );
 
-    const comunasDisponibles = [
-        'Todas',
-        ...Array.from(
-            new Set(
-                alertasPreFiltradas
-                    .map((a) => a.nombre_comuna ?? '')
-                    .filter(Boolean),
-            ),
-        ),
-    ];
+    const alertasPreFiltradas = filterAlertsByJacState(
+        alerts,
+        filtroEstado,
+        filtroCategoria,
+        getAlertStateLabel,
+    );
 
-    const barriosDisponibles = [
-        'Todos',
-        ...Array.from(
-            new Set(
-                alertasPreFiltradas
-                    .filter(
-                        (a) =>
-                            filtroComuna === 'Todas' ||
-                            a.nombre_comuna === filtroComuna,
-                    )
-                    .map((a) => a.nombre_barrio ?? '')
-                    .filter(Boolean),
-            ),
-        ),
-    ];
-    const categoriasDisponibles = [
-        'Todas',
-        ...Array.from(new Set(alerts.map((a) => a.categoria))),
-    ];
+    const comunasDisponibles = buildAvailableComunas(alertasPreFiltradas);
 
-    const stats = STATS_CONFIG.map((s) => ({
+    const barriosDisponibles = buildComunaOptions(
+        alertasPreFiltradas,
+        filtroComuna,
+    );
+
+    const categoriasDisponibles = buildAvailableCategorias(alerts);
+
+    const stats = statsConfig.map((s) => ({
         ...s,
         count: alerts.filter((a) => a.id_estado === s.id_estado).length,
     }));
 
     const filtered = alerts.filter((a) => {
-        const estadoLabel = ESTADO_META[a.id_estado as EstadoId]?.label ?? '';
-        if (filtroEstado !== 'Todos' && estadoLabel !== filtroEstado)
+        const estadoLabel = getAlertStateLabel(a.id_estado);
+        if (filtroEstado !== 'Todos' && estadoLabel !== filtroEstado) {
             return false;
-        if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria)
+        }
+        if (filtroCategoria !== 'Todas' && a.categoria !== filtroCategoria) {
             return false;
-        if (filtroComuna !== 'Todas' && a.nombre_comuna !== filtroComuna)
+        }
+        if (filtroComuna !== 'Todas' && a.nombre_comuna !== filtroComuna) {
             return false;
-        if (filtroBarrio !== 'Todos' && a.nombre_barrio !== filtroBarrio)
+        }
+        if (filtroBarrio !== 'Todos' && a.nombre_barrio !== filtroBarrio) {
             return false;
-        if (search && !a.titulo.toLowerCase().includes(search.toLowerCase()))
+        }
+        if (search && !a.titulo.toLowerCase().includes(search.toLowerCase())) {
             return false;
+        }
         return true;
     });
 
@@ -188,7 +156,7 @@ const JACAlertPanel = () => {
     );
 
     const onFilterChange =
-        (setter: (v: string) => void) =>
+        (setter: (value: string) => void) =>
         (e: React.ChangeEvent<HTMLSelectElement>) => {
             setter(e.target.value);
             setCurrentPage(1);
@@ -218,11 +186,12 @@ const JACAlertPanel = () => {
     }, [loadingSelectedAlert]);
 
     const jacManagementActions = selectedAlert
-        ? ACCIONES.map(({ nuevoEstado, label, icon, title }) => {
-              const accionMeta = ESTADO_META[nuevoEstado];
+        ? acciones.map(({ nuevoEstado, label, icon, title }) => {
+              const accionMeta = estadoMetaById[nuevoEstado];
               const yaEsEseEstado = selectedAlert.id_estado === nuevoEstado;
-              const isUpdatingSelected =
-                  updatingId === selectedAlert.id_alerta;
+              const isUpdatingSelected = updatingId === selectedAlert.id_alerta;
+
+              if (!accionMeta) return null;
 
               return (
                   <button
@@ -236,11 +205,7 @@ const JACAlertPanel = () => {
                           yaEsEseEstado
                       }
                       onClick={() =>
-                          requestStatusChange(
-                              selectedAlert,
-                              nuevoEstado,
-                              label,
-                          )
+                          requestStatusChange(selectedAlert, nuevoEstado, label)
                       }
                       style={{
                           borderColor: accionMeta.color,
@@ -255,12 +220,17 @@ const JACAlertPanel = () => {
               );
           })
         : null;
-    // ─── Render ─────────────────────────────────────────────────
+
+    const estadoOptions = [
+        'Todos',
+        ...estadoMeta
+            .map((item) => item.label)
+            .filter((label, index, labels) => labels.indexOf(label) === index),
+    ];
 
     return (
         <div className='panel-jac'>
             <div className='jac-panel-page'>
-                {/* Breadcrumb */}
                 <Breadcrumb
                     items={[
                         { label: 'Panel Principal', to: '/admin' },
@@ -268,10 +238,11 @@ const JACAlertPanel = () => {
                     ]}
                 />
 
-                {/* Stats */}
                 <div className='jac-stats-grid'>
                     {stats.map((s) => {
-                        const meta = ESTADO_META[s.id_estado];
+                        const meta = estadoMetaById[s.id_estado];
+                        if (!meta) return null;
+
                         return (
                             <div key={s.id_estado} className='jac-stat-card'>
                                 <div
@@ -292,12 +263,9 @@ const JACAlertPanel = () => {
                     })}
                 </div>
 
-                {/* Card principal */}
-                <h2 className='jac-title'>Gestión de Alertas</h2>
+                <h2 className='jac-title'>Gestion de Alertas</h2>
                 <div className='jac-main-card'>
-                    {/* Filtros */}
                     <div className='jac-filters'>
-                        {/* Búsqueda */}
                         <div className='jac-filter-group'>
                             <label className='jac-filter-label'>Buscar</label>
                             <div className='jac-search-wrap'>
@@ -305,7 +273,7 @@ const JACAlertPanel = () => {
                                 <input
                                     type='text'
                                     className='form-control jac-search'
-                                    placeholder='Buscar por título...'
+                                    placeholder='Buscar por titulo...'
                                     value={search}
                                     onChange={(e) => {
                                         setSearch(e.target.value);
@@ -314,7 +282,7 @@ const JACAlertPanel = () => {
                                 />
                             </div>
                         </div>
-                        {/* Estado */}
+
                         <div className='jac-filter-group'>
                             <label className='jac-filter-label'>Estado</label>
                             <select
@@ -322,22 +290,14 @@ const JACAlertPanel = () => {
                                 value={filtroEstado}
                                 onChange={onFilterChange(setFiltroEstado)}
                             >
-                                {[
-                                    'Todos',
-                                    ...Object.values(ESTADO_META).map(
-                                        (e) => e.label,
-                                    ),
-                                ].map((o) => (
+                                {estadoOptions.map((o) => (
                                     <option key={o}>{o}</option>
                                 ))}
                             </select>
                         </div>
 
-                        {/* Categoría */}
                         <div className='jac-filter-group'>
-                            <label className='jac-filter-label'>
-                                Categoría
-                            </label>
+                            <label className='jac-filter-label'>Categoria</label>
                             <select
                                 className='form-select jac-filter-select'
                                 value={filtroCategoria}
@@ -349,7 +309,6 @@ const JACAlertPanel = () => {
                             </select>
                         </div>
 
-                        {/* Comuna */}
                         <div className='jac-filter-group'>
                             <label className='jac-filter-label'>Comuna</label>
                             <select
@@ -363,7 +322,6 @@ const JACAlertPanel = () => {
                             </select>
                         </div>
 
-                        {/* Barrio */}
                         <div className='jac-filter-group'>
                             <label className='jac-filter-label'>Barrio</label>
                             <select
@@ -378,7 +336,6 @@ const JACAlertPanel = () => {
                             </select>
                         </div>
 
-                        {/* Limpiar filtros */}
                         {(filtroEstado !== 'Todos' ||
                             filtroCategoria !== 'Todas' ||
                             filtroComuna !== 'Todas' ||
@@ -412,13 +369,12 @@ const JACAlertPanel = () => {
                         )}
                     </div>
 
-                    {/* Tabla */}
                     <div className='jac-table-wrap'>
                         <table className='jac-table'>
                             <thead>
                                 <tr>
                                     <th>ALERTA</th>
-                                    <th>CATEGORÍA</th>
+                                    <th>CATEGORIA</th>
                                     <th>INFORMANTE</th>
                                     <th>ESTADO</th>
                                     <th>PRIORIDAD</th>
@@ -442,12 +398,13 @@ const JACAlertPanel = () => {
                                     </tr>
                                 )}
                                 {paged.map((alert) => {
-                                    const meta =
-                                        ESTADO_META[
-                                            alert.id_estado as EstadoId
-                                        ] ?? ESTADO_META[1];
+                                    const meta = getAlertStatusMeta(
+                                        alert.id_estado,
+                                        labelById,
+                                    );
                                     const isUpdating =
                                         updatingId === alert.id_alerta;
+
                                     return (
                                         <tr
                                             key={alert.id_alerta}
@@ -499,7 +456,7 @@ const JACAlertPanel = () => {
                                                             ] ?? '#9ca3af',
                                                     }}
                                                 >
-                                                    {alert.prioridad ?? '—'}
+                                                    {alert.prioridad ?? '-'}
                                                 </span>
                                             </td>
                                             <td className='jac-td-date'>
@@ -509,7 +466,7 @@ const JACAlertPanel = () => {
                                             </td>
                                             <td>
                                                 <div className='jac-actions'>
-                                                    {ACCIONES.map(
+                                                    {acciones.map(
                                                         ({
                                                             nuevoEstado,
                                                             label,
@@ -517,12 +474,17 @@ const JACAlertPanel = () => {
                                                             title,
                                                         }) => {
                                                             const accionMeta =
-                                                                ESTADO_META[
+                                                                estadoMetaById[
                                                                     nuevoEstado
                                                                 ];
                                                             const yaEsEseEstado =
                                                                 alert.id_estado ===
                                                                 nuevoEstado;
+
+                                                            if (!accionMeta) {
+                                                                return null;
+                                                            }
+
                                                             return (
                                                                 <button
                                                                     key={
@@ -572,7 +534,6 @@ const JACAlertPanel = () => {
                         </table>
                     </div>
 
-                    {/* Paginación */}
                     <div className='jac-pagination-bar'>
                         <span className='jac-pagination-info'>
                             Mostrando {paged.length} de {filtered.length}{' '}
@@ -622,7 +583,6 @@ const JACAlertPanel = () => {
                     </div>
                 </div>
 
-                {/* Modal de confirmación */}
                 {confirmAction && (
                     <div className='jac-modal-backdrop' onClick={cancelAction}>
                         <div
@@ -633,14 +593,14 @@ const JACAlertPanel = () => {
                                 Confirmar cambio de estado
                             </h3>
                             <p className='jac-modal-body'>
-                                ¿Cambiar{' '}
+                                Cambiar{' '}
                                 <strong>"{confirmAction.alert.titulo}"</strong>{' '}
                                 a{' '}
                                 <strong
                                     style={{
-                                        color: ESTADO_META[
+                                        color: estadoMetaById[
                                             confirmAction.nuevoEstado
-                                        ].color,
+                                        ]?.color,
                                     }}
                                 >
                                     {confirmAction.label}
@@ -666,6 +626,7 @@ const JACAlertPanel = () => {
                         </div>
                     </div>
                 )}
+
                 {selectedAlert && (
                     <AlertDetailModal
                         alert={selectedAlert}

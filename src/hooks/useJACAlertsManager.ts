@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import type { Alert } from '../types/Alert';
 import alertsService from '../services/alertsService';
 
-export type EstadoId = 1 | 2 | 3 | 4;
+export type EstadoId = number;
 
 export type ConfirmAction = {
     alert: Alert;

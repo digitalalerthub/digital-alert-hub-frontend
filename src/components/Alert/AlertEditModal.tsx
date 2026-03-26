@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent, DragEvent, FormEvent } from "react";
 import { toast } from "react-toastify";
+import { useAlertCategories } from "../../context/useAlertCategories";
 import locationsService from "../../services/locationsService";
 import type { Alert, UpdateAlertPayload } from "../../types/Alert";
 import type { BarrioOption, ComunaOption } from "../../types/Location";
@@ -10,6 +11,15 @@ import {
 } from "./createAlertWorkspace.utils";
 import { useAlertMap } from "./hooks/useAlertMap";
 import { resolveAdministrativeLocation } from "./locationResolver.utils";
+import {
+  ALLOWED_IMAGE_TYPES,
+  buildExistingEvidenceList,
+  buildLocationValue,
+  type ExistingEvidenceItem,
+  MAX_EVIDENCE_IMAGES,
+  MAX_EVIDENCE_SIZE,
+  PRIORITY_OPTIONS,
+} from "./alertEditModal.utils";
 import "./AlertEditModal.css";
 
 type Props = {
@@ -19,76 +29,12 @@ type Props = {
   onSave: (id: number, payload: UpdateAlertPayload) => Promise<void>;
 };
 
-const CATEGORY_OPTIONS = ["Agua", "Energía", "Gas", "Movilidad", "Seguridad", "Residuos", "Otro"] as const;
-const PRIORITY_OPTIONS = ["Baja", "Media", "Alta"] as const;
-const MAX_EVIDENCE_IMAGES = 10;
-const MAX_EVIDENCE_SIZE = 20 * 1024 * 1024;
-const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-
-type Coords = {
-  lat: number;
-  lng: number;
-};
-
-type ExistingEvidenceItem = {
-  key: string;
-  id: number | null;
-  url: string;
-  type: string | null;
-};
-
-const buildLocationValue = (
-  ubicacion: string,
-  selectedCoords: Coords | null,
-  forceCoordsOnSubmit: boolean
-): string | undefined => {
-  const clean = ubicacion.trim();
-
-  if (selectedCoords && (forceCoordsOnSubmit || !clean)) {
-    return `Punto en mapa: ${selectedCoords.lat}, ${selectedCoords.lng}`;
-  }
-
-  if (selectedCoords && clean) {
-    return `${clean} | Punto en mapa: ${selectedCoords.lat}, ${selectedCoords.lng}`;
-  }
-
-  if (clean) return clean;
-  return undefined;
-};
-
-const buildExistingEvidenceList = (alert: Alert): ExistingEvidenceItem[] => {
-  const fromArray = (alert.evidencias || [])
-    .filter((item) => Boolean(item?.url_evidencia))
-    .map((item, index) => ({
-      key: `evidence-${item.id_evidencia || index}-${item.url_evidencia}`,
-      id: item.id_evidencia || null,
-      url: item.url_evidencia,
-      type: item.tipo_evidencia || null,
-    }));
-
-  if (fromArray.length > 0) {
-    return fromArray;
-  }
-
-  if (alert.evidencia_url) {
-    return [
-      {
-        key: `legacy-${alert.id_alerta}-${alert.evidencia_url}`,
-        id: null,
-        url: alert.evidencia_url,
-        type: alert.evidencia_tipo || null,
-      },
-    ];
-  }
-
-  return [];
-};
-
 const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
+  const { categorias, isLoading: loadingCategories } = useAlertCategories();
   const isEvidenceOnlyMode = mode === "evidence-only";
   const [titulo, setTitulo] = useState(alert.titulo);
   const [descripcion, setDescripcion] = useState(alert.descripcion);
-  const [categoria, setCategoria] = useState(alert.categoria);
+  const [categoriaId, setCategoriaId] = useState(alert.id_categoria ? String(alert.id_categoria) : "");
   const [prioridad, setPrioridad] = useState(alert.prioridad || "Media");
   const [ubicacion, setUbicacion] = useState(alert.ubicacion || "");
   const [comunas, setComunas] = useState<ComunaOption[]>([]);
@@ -103,7 +49,17 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
   const [removeAllEvidence, setRemoveAllEvidence] = useState(false);
   const [evidencias, setEvidencias] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
-  const categoryOptions = useMemo(() => Array.from(new Set([categoria, ...CATEGORY_OPTIONS])), [categoria]);
+  const categoryOptions = useMemo(() => {
+    if (categorias.length > 0) {
+      return categorias;
+    }
+
+    if (alert.id_categoria && alert.categoria) {
+      return [{ id_categoria: alert.id_categoria, label: alert.categoria }];
+    }
+
+    return [];
+  }, [alert.categoria, alert.id_categoria, categorias]);
   const priorityOptions = useMemo(() => Array.from(new Set([prioridad, ...PRIORITY_OPTIONS])), [prioridad]);
   const initialCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.ubicacion]);
   const mapSeededRef = useRef(false);
@@ -125,7 +81,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     useMyLocation: triggerMyLocation,
     handleAddressBlur,
     setLocationFromCoords,
-  } = useAlertMap({ ubicacion, setUbicacion });
+  } = useAlertMap({ ubicacion, setUbicacion, pendingStateId: null });
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -136,9 +92,21 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
   }, [onClose]);
 
   useEffect(() => {
+    const { body, documentElement } = document;
+
+    body.classList.add("alert-detail-modal-open");
+    documentElement.classList.add("alert-detail-modal-open");
+
+    return () => {
+      body.classList.remove("alert-detail-modal-open");
+      documentElement.classList.remove("alert-detail-modal-open");
+    };
+  }, []);
+
+  useEffect(() => {
     setTitulo(alert.titulo);
     setDescripcion(alert.descripcion);
-    setCategoria(alert.categoria);
+    setCategoriaId(alert.id_categoria ? String(alert.id_categoria) : "");
     setPrioridad(alert.prioridad || "Media");
     setUbicacion(alert.ubicacion || "");
     setComunaId(alert.id_comuna ? String(alert.id_comuna) : "");
@@ -150,6 +118,22 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
     mapSeededRef.current = false;
     autoResolutionRequestRef.current = 0;
   }, [alert]);
+
+  useEffect(() => {
+    if (isEvidenceOnlyMode) return;
+
+    setCategoriaId((current) => {
+      if (current && categoryOptions.some((option) => String(option.id_categoria) === current)) {
+        return current;
+      }
+
+      if (alert.id_categoria) {
+        return String(alert.id_categoria);
+      }
+
+      return categoryOptions[0] ? String(categoryOptions[0].id_categoria) : "";
+    });
+  }, [alert.id_categoria, categoryOptions, isEvidenceOnlyMode]);
 
   const getBarriosByComuna = useCallback(async (idComuna: number): Promise<BarrioOption[]> => {
     const cached = barriosCacheRef.current.get(idComuna);
@@ -389,14 +373,21 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
         toast.error("Agrega al menos una nueva evidencia");
         return;
       }
-    } else if (!titulo.trim() || !descripcion.trim() || !categoria.trim()) {
+    } else if (!titulo.trim() || !descripcion.trim()) {
       toast.error("Título, descripción y categoría son obligatorios");
       return;
     }
 
+    const parsedCategoriaId = Number(categoriaId);
     const parsedComunaId = Number(comunaId);
     const parsedBarrioId = Number(barrioId);
     const locationValue = buildLocationValue(ubicacion, selectedCoords, forceCoordsOnSubmit);
+
+    if (!isEvidenceOnlyMode && (!Number.isInteger(parsedCategoriaId) || parsedCategoriaId <= 0)) {
+      toast.error("Selecciona una categoria valida");
+      return;
+    }
+
     const payload: UpdateAlertPayload = isEvidenceOnlyMode
       ? {
           evidencias: evidencias.length ? evidencias : undefined,
@@ -404,7 +395,7 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
       : {
           titulo: titulo.trim(),
           descripcion: descripcion.trim(),
-          categoria: categoria.trim(),
+          id_categoria: parsedCategoriaId,
           prioridad: prioridad.trim(),
           ubicacion: locationValue,
           evidencias: evidencias.length ? evidencias : undefined,
@@ -441,7 +432,12 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
           <h3 className="alert-edit-title">
             {isEvidenceOnlyMode ? "+ Agregar Evidencia" : "+ Editar Alerta"}
           </h3>
-          <button type="button" className="alert-edit-close" onClick={onClose} aria-label="Cerrar modal">
+          <button
+            type="button"
+            className="alert-edit-close"
+            onClick={onClose}
+            aria-label="Cerrar modal"
+          >
             <i className="bi bi-x-lg" />
           </button>
         </div>
@@ -474,15 +470,22 @@ const AlertEditModal = ({ alert, mode = "full", onClose, onSave }: Props) => {
                   <label className="alert-edit-label">Categoría</label>
                   <select
                     className="alert-edit-select"
-                    value={categoria}
-                    onChange={(e) => setCategoria(e.target.value)}
+                    value={categoriaId}
+                    onChange={(e) => setCategoriaId(e.target.value)}
+                    disabled={loadingCategories || categoryOptions.length === 0}
                     required
                   >
-                    {categoryOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
+                    {categoryOptions.length === 0 ? (
+                      <option value="">
+                        {loadingCategories ? "Cargando categorias..." : "Sin categorias"}
                       </option>
-                    ))}
+                    ) : (
+                      categoryOptions.map((option) => (
+                        <option key={option.id_categoria} value={option.id_categoria}>
+                          {option.label}
+                        </option>
+                      ))
+                    )}
                   </select>
                 </div>
 
