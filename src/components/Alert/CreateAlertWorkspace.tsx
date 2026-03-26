@@ -11,41 +11,54 @@ import { useAlertCreationForm } from './hooks/useAlertCreationForm';
 import { useAlertMap } from './hooks/useAlertMap';
 import { useAlertsManager } from './hooks/useAlertsManager';
 import { useAuth } from '../../context/useAuth';
+import { useAlertStates } from '../../context/useAlertStates';
+import {
+    findAlertStateIdByName,
+    getCanonicalAlertStateNameById,
+} from '../../config/alertStates';
 import './CreateAlertWorkspace.css';
 
 const CreateAlertWorkspace = () => {
     const { user, isAdmin } = useAuth();
+    const { estados, labelById } = useAlertStates();
     const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
     const [editingAlert, setEditingAlert] = useState<Alert | null>(null);
     const [pendingDeleteAlert, setPendingDeleteAlert] = useState<Alert | null>(
         null,
     );
     const [deletingAlertId, setDeletingAlertId] = useState<number | null>(null);
+    const selectedAlertStateName = selectedAlert
+        ? getCanonicalAlertStateNameById(selectedAlert.id_estado, labelById)
+        : null;
     const isOwnerSelectedAlert =
         Boolean(selectedAlert) && user?.id === selectedAlert?.id_usuario;
     const isSelectedAlertEvidenceOnly =
         Boolean(selectedAlert) &&
         !isAdmin &&
         isOwnerSelectedAlert &&
-        selectedAlert?.id_estado === 2;
+        selectedAlertStateName === 'en_progreso';
     const canEditSelectedAlert =
         Boolean(selectedAlert) &&
         (isAdmin ||
             (user?.id === selectedAlert?.id_usuario &&
-                [1, 2].includes(selectedAlert?.id_estado ?? 0)));
+                (selectedAlertStateName === 'pendiente' ||
+                    selectedAlertStateName === 'en_progreso')));
     const canDeleteSelectedAlert =
         Boolean(selectedAlert) &&
         (isAdmin ||
             (user?.id === selectedAlert?.id_usuario &&
-                selectedAlert?.id_estado === 1));
+                selectedAlertStateName === 'pendiente'));
+    const pendingStateId = findAlertStateIdByName(estados, 'pendiente');
 
     const {
         titulo,
         setTitulo,
         descripcion,
         setDescripcion,
-        categoria,
-        setCategoria,
+        categoriaId,
+        setCategoriaId,
+        categorias,
+        loadingCategories,
         prioridad,
         setPrioridad,
         ubicacion,
@@ -81,7 +94,7 @@ const CreateAlertWorkspace = () => {
         useMyLocation,
         handleAddressBlur,
         clearLocationSelection,
-    } = useAlertMap({ ubicacion, setUbicacion });
+    } = useAlertMap({ ubicacion, setUbicacion, pendingStateId });
 
     const {
         alertsLoading,
@@ -179,8 +192,10 @@ const CreateAlertWorkspace = () => {
                         onTituloChange={setTitulo}
                         descripcion={descripcion}
                         onDescripcionChange={setDescripcion}
-                        categoria={categoria}
-                        onCategoriaChange={setCategoria}
+                        categoriaId={categoriaId}
+                        onCategoriaIdChange={setCategoriaId}
+                        categorias={categorias}
+                        loadingCategories={loadingCategories}
                         prioridad={prioridad}
                         onPrioridadChange={setPrioridad}
                         ubicacion={ubicacion}
@@ -245,7 +260,10 @@ const CreateAlertWorkspace = () => {
                     mode={
                         !isAdmin &&
                         user?.id === editingAlert.id_usuario &&
-                        editingAlert.id_estado === 2
+                        getCanonicalAlertStateNameById(
+                            editingAlert.id_estado,
+                            labelById,
+                        ) === 'en_progreso'
                             ? 'evidence-only'
                             : 'full'
                     }

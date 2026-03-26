@@ -5,6 +5,7 @@ import {
   type GoogleGeocoderResult,
   type GooglePrediction,
 } from "../../config/googleMaps";
+import { getAlertStatusMeta } from "../../config/alertStates";
 
 export type LocationSuggestion = {
   place_id: string;
@@ -404,17 +405,10 @@ export const formatAlertDate = (value?: string): string => {
   }).format(date);
 };
 
-export const getStatusMeta = (idEstado: number) => {
-  switch (idEstado) {
-    case 1:
-      return { label: "Pendiente", className: "is-pending" };
-    case 2:
-      return { label: "En Progreso", className: "is-progress" };
-    case 3:
-      return { label: "Resuelta", className: "is-resolved" };
-    case 4:
-      return { label: "Falsa Alerta", className: "is-false-alert" };
-    default:
-      return { label: "Sin Estado", className: "is-unknown" };
-  }
+export const getStatusMeta = (
+  idEstado: number,
+  labelById?: Record<number, string>
+) => {
+  const { label, className } = getAlertStatusMeta(idEstado, labelById);
+  return { label, className };
 };

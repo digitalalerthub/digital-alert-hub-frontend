@@ -49,6 +49,17 @@ body {
     font-family: var(--font-family-base);
 }
 
+.app-routes-loading {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: var(--page-top-offset);
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: var(--font-semibold);
+}
+
 button,
 input,
 textarea,

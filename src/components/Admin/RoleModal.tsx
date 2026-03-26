@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import rolesService, { type Rol } from '../../services/rolesService';
@@ -65,15 +66,28 @@ const RoleModal = ({ role, onClose, onSaved }: Props) => {
         }
     };
 
-    return (
+    if (typeof document === 'undefined') {
+        return null;
+    }
+
+    return createPortal(
         <>
             <div className='modal-backdrop-custom' onClick={onClose} />
 
             <div className='modal-container'>
-                <div className='modal-content shadow-lg modal-content-custom'>
+                <div
+                    className='modal-content shadow-lg modal-content-custom'
+                    role='dialog'
+                    aria-modal='true'
+                    aria-labelledby='role-modal-title'
+                    onClick={(e) => e.stopPropagation()}
+                >
                     <div className='modal-header modal-header-custom'>
-                        <div>
-                            <h5 className='modal-title modal-title-custom'>
+                        <div className='modal-header-copy'>
+                            <h5
+                                id='role-modal-title'
+                                className='modal-title modal-title-custom'
+                            >
                                 {isEditing
                                     ? '\u270F\uFE0F Editar Rol'
                                     : '\u2795 Crear Rol'}
@@ -85,9 +99,15 @@ const RoleModal = ({ role, onClose, onSaved }: Props) => {
                             </p>
                         </div>
                         <button
-                            className='btn-close btn-close-white modal-close-btn'
+                            type='button'
+                            className='modal-close-btn'
+                            aria-label='Cerrar modal de rol'
                             onClick={onClose}
-                        ></button>
+                        >
+                            <span aria-hidden='true' className='modal-close-icon'>
+                                ×
+                            </span>
+                        </button>
                     </div>
 
                     <div className='modal-body modal-body-custom'>
@@ -143,7 +163,8 @@ const RoleModal = ({ role, onClose, onSaved }: Props) => {
                     </div>
                 </div>
             </div>
-        </>
+        </>,
+        document.body,
     );
 };
 

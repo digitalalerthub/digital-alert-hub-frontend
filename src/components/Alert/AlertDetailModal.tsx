@@ -3,17 +3,25 @@ import type { FormEvent, MouseEvent } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import type { Alert, AlertEvidence } from "../../types/Alert";
+import type { Alert } from "../../types/Alert";
 import reactionsService from "../../services/reactionsService";
 import type { AlertReactionSummary } from "../../types/Reaction";
 import commentsService from "../../services/commentsService";
 import type { AlertComment } from "../../types/Comment";
+import { useAlertStates } from "../../context/useAlertStates";
 import { useAuth } from "../../context/useAuth";
 import {
   getGoogleMapsApi,
   type GoogleMap,
   type GoogleMarker,
 } from "../../config/googleMaps";
+import { buildAlertEvidenceItems } from "./alertEvidence.utils";
+import {
+  extractAlertCoordsFromText,
+  formatAlertDateTime,
+  getReadableAlertLocation,
+} from "./alertModal.utils";
+import { getStatusMeta } from "./createAlertWorkspace.utils";
 import "./AlertDetailModal.css";
 
 type Props = {
@@ -27,61 +35,6 @@ type Props = {
   topActions?: React.ReactNode;
 };
 
-type Coords = {
-  lat: number;
-  lng: number;
-};
-
-const COORDS_REGEX = /(-?\d+(?:\.\d+)?),\s*(-?\d+(?:\.\d+)?)/;
-
-const extractCoordsFromText = (text?: string): Coords | null => {
-  if (!text) return null;
-  const match = text.match(COORDS_REGEX);
-  if (!match) return null;
-
-  const lat = Number(match[1]);
-  const lng = Number(match[2]);
-  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
-  return { lat, lng };
-};
-
-const getReadableLocation = (text?: string): string => {
-  if (!text) return "No especificada";
-  const marker = " | Punto en mapa:";
-  if (text.includes(marker)) {
-    return text.split(marker)[0].trim() || "No especificada";
-  }
-  return text;
-};
-
-const formatAlertDate = (value?: string): string => {
-  if (!value) return "Sin fecha";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Sin fecha";
-  return new Intl.DateTimeFormat("es-CO", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-};
-
-const getStatusMeta = (idEstado: number) => {
-  switch (idEstado) {
-    case 1:
-      return { label: "Pendiente", className: "is-pending" };
-    case 2:
-      return { label: "En Progreso", className: "is-progress" };
-    case 3:
-      return { label: "Resuelta", className: "is-resolved" };
-    case 4:
-      return { label: "Falsa Alerta", className: "is-false-alert" };
-    default:
-      return { label: "Sin Estado", className: "is-unknown" };
-  }
-};
-
 const AlertDetailModal = ({
   alert,
   onClose,
@@ -93,6 +46,7 @@ const AlertDetailModal = ({
   topActions,
 }: Props) => {
   const hasTopActions = canEdit || canDelete || Boolean(topActions);
+  const { labelById } = useAlertStates();
   const { user, isAdmin, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -111,41 +65,19 @@ const AlertDetailModal = ({
   const [savingEditedComment, setSavingEditedComment] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState<number | null>(null);
   const [currentEvidenceIndex, setCurrentEvidenceIndex] = useState(0);
-  const mapCoords = useMemo(() => extractCoordsFromText(alert.ubicacion), [alert.ubicacion]);
-  const readableLocation = useMemo(() => getReadableLocation(alert.ubicacion), [alert.ubicacion]);
+  const mapCoords = useMemo(() => extractAlertCoordsFromText(alert.ubicacion), [alert.ubicacion]);
+  const readableLocation = useMemo(() => getReadableAlertLocation(alert.ubicacion), [alert.ubicacion]);
   const creatorName = useMemo(
     () => alert.nombre_usuario?.trim() || "Cuenta eliminada",
     [alert.nombre_usuario]
   );
-  const status = getStatusMeta(alert.id_estado);
+  const status = getStatusMeta(alert.id_estado, labelById);
   const priorityText = (alert.prioridad || "Sin prioridad").toUpperCase();
   const shareUrl = useMemo(
     () => `${window.location.origin}/alertas/${alert.id_alerta}`,
     [alert.id_alerta]
   );
-  const evidenceItems = useMemo(() => {
-    const listFromArray = (alert.evidencias || [])
-      .filter((item): item is AlertEvidence => Boolean(item?.url_evidencia))
-      .map((item, index) => ({
-        id: item.id_evidencia || index,
-        url: item.url_evidencia,
-        type: item.tipo_evidencia || null,
-      }));
-
-    if (listFromArray.length > 0) return listFromArray;
-
-    if (alert.evidencia_url) {
-      return [
-        {
-          id: 0,
-          url: alert.evidencia_url,
-          type: alert.evidencia_tipo || null,
-        },
-      ];
-    }
-
-    return [];
-  }, [alert.evidencia_tipo, alert.evidencia_url, alert.evidencias]);
+  const evidenceItems = useMemo(() => buildAlertEvidenceItems(alert), [alert]);
   const currentEvidence = evidenceItems[currentEvidenceIndex] || null;
 
   useEffect(() => {
@@ -174,7 +106,7 @@ const AlertDetailModal = ({
     const loadMap = async () => {
       if (!mapContainerRef.current || mapRef.current) return;
 
-      const fallback: Coords = { lat: 6.2442, lng: -75.5812 };
+      const fallback = { lat: 6.2442, lng: -75.5812 };
       const center = mapCoords || fallback;
 
       try {
@@ -419,7 +351,13 @@ const AlertDetailModal = ({
       <div className="alert-detail-backdrop" onClick={onClose}>
       <div className="alert-detail-modal" onClick={(e) => e.stopPropagation()}>
         <div className="alert-detail-toolbar">
-          <button type="button" className="alert-detail-close" onClick={onClose}>
+          <button
+            type="button"
+            className="alert-detail-close"
+            onClick={onClose}
+            aria-label="Cerrar modal"
+          >
+            <span className="visually-hidden">Cerrar modal</span>
             <i className="bi bi-x-lg" />
           </button>
         </div>
@@ -473,7 +411,7 @@ const AlertDetailModal = ({
                 <i className="bi bi-person-circle alert-detail-author-icon" />
                 <div>
                   <p className="alert-detail-author-name">{creatorName}</p>
-                  <span className="alert-detail-author-date">{formatAlertDate(alert.created_at)}</span>
+                  <span className="alert-detail-author-date">{formatAlertDateTime(alert.created_at)}</span>
                 </div>
               </div>
               <div className="alert-detail-author-state">
@@ -652,7 +590,7 @@ const AlertDetailModal = ({
                   <p className="alert-detail-comment-text">{comment.texto_comentario}</p>
                 )}
 
-                <span className="alert-detail-comment-date">{formatAlertDate(comment.created_at)}</span>
+                <span className="alert-detail-comment-date">{formatAlertDateTime(comment.created_at)}</span>
               </article>
             ))}
           </div>
